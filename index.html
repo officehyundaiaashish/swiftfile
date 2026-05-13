@@ -1045,36 +1045,59 @@
             .converter-tabs {
                 display: grid !important;
                 grid-template-columns: repeat(3, 1fr) !important;
-                gap: 0.6rem !important;
-                margin-bottom: 2rem !important;
-                padding: 0 !important;
+                gap: 0.75rem !important;
+                margin-bottom: 2.5rem !important;
+                padding: 0.25rem !important;
             }
 
             .tab-btn {
                 flex: 1 1 auto !important;
                 min-width: 0 !important;
-                padding: 0.8rem 0.25rem !important;
-                font-size: 0.72rem !important;
+                padding: 1rem 0.25rem !important;
+                font-size: 0.75rem !important;
+                font-weight: 500 !important;
                 flex-direction: column !important;
-                gap: 0.5rem !important;
-                height: 85px !important;
+                gap: 0.6rem !important;
+                height: 90px !important;
                 justify-content: center !important;
                 text-align: center !important;
-                border-radius: 16px !important;
-                border: 1px solid rgba(0,0,0,0.05) !important;
+                border-radius: 18px !important;
+                border: 1px solid rgba(0,0,0,0.04) !important;
                 background: white !important;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.04) !important;
+                color: var(--text-primary) !important;
+                transition: all 0.2s ease !important;
             }
 
             .tab-btn i {
-                width: 24px !important;
-                height: 24px !important;
-                margin-bottom: 2px !important;
+                width: 26px !important;
+                height: 26px !important;
+                color: var(--accent-color) !important;
+                stroke-width: 2 !important;
+            }
+
+            .tab-btn.active {
+                background: var(--accent-color) !important;
+                color: white !important;
+                border-color: var(--accent-color) !important;
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+                transform: scale(0.96) !important;
+            }
+
+            .tab-btn.active i {
+                color: white !important;
+                transform: scale(1.1) !important;
             }
 
             .dark-theme .tab-btn {
-                background: var(--surface-color) !important;
-                border-color: var(--border-color) !important;
+                background: rgba(255, 255, 255, 0.05) !important;
+                border-color: rgba(255, 255, 255, 0.08) !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+                backdrop-filter: blur(10px) !important;
+            }
+
+            .dark-theme .tab-btn.active {
+                background: var(--accent-gradient) !important;
             }
 
             .tab-btn i {
@@ -4354,8 +4377,15 @@
                     sy = (img.height - sh) / 2 + offY;
                     
                     // Clamp sx, sy to keep image within bounds
-                    sx = Math.max(0, Math.min(img.width - sw, sx));
-                    sy = Math.max(0, Math.min(img.height - sh, sy));
+                    const minSX = 0;
+                    const maxSX = img.width - sw;
+                    const minSY = 0;
+                    const maxSY = img.height - sh;
+                    
+                    if (sx < minSX) { sx = minSX; item.offsetX = (sx - (img.width - sw) / 2) / (img.width / 100); }
+                    if (sx > maxSX) { sx = maxSX; item.offsetX = (sx - (img.width - sw) / 2) / (img.width / 100); }
+                    if (sy < minSY) { sy = minSY; item.offsetY = (sy - (img.height - sh) / 2) / (img.height / 100); }
+                    if (sy > maxSY) { sy = maxSY; item.offsetY = (sy - (img.height - sh) / 2) / (img.height / 100); }
 
                     ctx.drawImage(img, sx, sy, sw, sh, box.x, box.y, box.w, box.h);
                     ctx.restore();
@@ -4441,8 +4471,81 @@
                     drawCollage(false);
                 };
 
-                zone.onmouseenter = () => zone.style.opacity = '1';
-                zone.onmouseleave = () => zone.style.opacity = '0';
+                zone.onmouseenter = () => { if (!window.isCollageDragging) zone.style.opacity = '1'; };
+                zone.onmouseleave = () => { if (!window.isCollageDragging) zone.style.opacity = '0'; };
+
+                // Dragging Logic
+                let startX, startY;
+                let isLocalDragging = false;
+
+                const startDrag = (clientX, clientY) => {
+                    isLocalDragging = true;
+                    window.isCollageDragging = true;
+                    startX = clientX;
+                    startY = clientY;
+                    zone.style.cursor = 'grabbing';
+                    zone.style.opacity = '1';
+                };
+
+                const moveDrag = (clientX, clientY) => {
+                    if (!isLocalDragging) return;
+                    
+                    const dxDisp = clientX - startX;
+                    const dyDisp = clientY - startY;
+
+                    // Convert display pixels to canvas pixels
+                    const dxCanvas = dxDisp / scaleX;
+                    const dyCanvas = dyDisp / scaleY;
+
+                    // Calculate current drawn source dimensions
+                    const imgRatio = item.img.width / item.img.height;
+                    const boxRatio = box.w / box.h;
+                    let sw;
+                    if (imgRatio > boxRatio) sw = item.img.height * boxRatio;
+                    else sw = item.img.width;
+                    sw /= (item.scale || 1.0);
+
+                    // Ratio of source pixels to canvas pixels
+                    const sPerC = sw / box.w;
+                    
+                    const dxSrc = dxCanvas * sPerC;
+                    const dySrc = dyCanvas * sPerC;
+
+                    // Update offsets in percentage units
+                    item.offsetX = (item.offsetX || 0) - (dxSrc / (item.img.width / 100));
+                    item.offsetY = (item.offsetY || 0) - (dySrc / (item.img.height / 100));
+
+                    startX = clientX;
+                    startY = clientY;
+                    drawCollage(false);
+                };
+
+                const endDrag = () => {
+                    isLocalDragging = false;
+                    window.isCollageDragging = false;
+                    zone.style.cursor = 'default';
+                };
+
+                zone.onmousedown = (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.closest('button')) return;
+                    startDrag(e.clientX, e.clientY);
+                };
+
+                window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+                window.addEventListener('mouseup', endDrag);
+
+                // Touch Support
+                zone.ontouchstart = (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.closest('button')) return;
+                    startDrag(e.touches[0].clientX, e.touches[0].clientY);
+                };
+                window.addEventListener('touchmove', (e) => {
+                    if (isLocalDragging) {
+                        e.preventDefault();
+                        moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+                    }
+                }, { passive: false });
+                window.addEventListener('touchend', endDrag);
 
                 zone.appendChild(panPad);
                 zone.appendChild(slider);
