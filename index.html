@@ -1053,53 +1053,29 @@
             .tool-select-btn {
                 width: 100% !important;
                 background: white !important;
-                border: 1px solid rgba(0,0,0,0.05) !important;
-                padding: 0.9rem 1.25rem !important;
-                border-radius: 16px !important;
+                border: 1px solid rgba(0, 0, 0, 0.05) !important;
+                padding: 1.1rem 1.25rem !important;
+                border-radius: 20px !important;
                 display: flex !important;
                 align-items: center !important;
-                justify-content: space-between !important;
+                justify-content: flex-start !important;
                 color: var(--text-primary) !important;
                 font-weight: 600 !important;
-                font-size: 0.95rem !important;
-                cursor: pointer !important;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
-                transition: all 0.3s ease !important;
+                font-size: 1rem !important;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04) !important;
+                border-left: 4px solid var(--accent-color) !important;
             }
 
             .dark-theme .tool-select-btn {
-                background: rgba(255,255,255,0.05) !important;
-                border-color: rgba(255,255,255,0.1) !important;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-                backdrop-filter: blur(10px) !important;
+                background: rgba(255, 255, 255, 0.04) !important;
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                border-left: 4px solid var(--accent-color) !important;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
+                backdrop-filter: blur(15px) !important;
             }
 
             .tool-dropdown-menu {
-                position: absolute !important;
-                top: calc(100% + 8px) !important;
-                left: 0 !important;
-                width: 100% !important;
-                background: white !important;
-                border: 1px solid rgba(0,0,0,0.08) !important;
-                border-radius: 20px !important;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
-                overflow: hidden !important;
-                opacity: 0 !important;
-                transform: translateY(-10px) !important;
-                pointer-events: none !important;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            }
-
-            .dark-theme .tool-dropdown-menu {
-                background: #1e1e2e !important;
-                border-color: rgba(255,255,255,0.1) !important;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important;
-            }
-
-            .tool-dropdown-menu.show {
-                opacity: 1 !important;
-                transform: translateY(0) !important;
-                pointer-events: auto !important;
+                display: none !important;
             }
 
             .tool-option {
@@ -1110,20 +1086,46 @@
                 color: var(--text-primary) !important;
                 font-weight: 500 !important;
                 font-size: 0.9rem !important;
-                border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
                 transition: background 0.2s !important;
             }
 
             .dark-theme .tool-option {
-                border-bottom-color: rgba(255,255,255,0.05) !important;
+                border-bottom-color: rgba(255, 255, 255, 0.05) !important;
             }
 
-            .tool-option:last-child { border-bottom: none !important; }
-            .tool-option:active { background: rgba(99, 102, 241, 0.08) !important; }
-            .tool-option i { width: 18px !important; color: var(--accent-color) !important; }
+            .tool-option:last-child {
+                border-bottom: none !important;
+            }
+
+            .tool-option:active {
+                background: rgba(99, 102, 241, 0.08) !important;
+            }
+
+            .tool-option i {
+                width: 18px !important;
+                color: var(--accent-color) !important;
+            }
 
             .converter-tabs {
+                display: flex !important;
+                overflow-x: auto !important;
+                gap: 10px !important;
+                padding: 0.5rem 2px !important;
+                margin-bottom: 1rem !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+            }
+
+            .converter-tabs::-webkit-scrollbar {
                 display: none !important;
+            }
+
+            .tab-btn {
+                flex-shrink: 0 !important;
+                padding: 0.75rem 1.25rem !important;
+                font-size: 0.85rem !important;
+                white-space: nowrap !important;
             }
 
             .converter-card {
@@ -1133,13 +1135,15 @@
             }
 
             .drop-zone {
-                padding: 4.5rem 1.25rem 3rem 1.25rem !important; /* Extra top space */
+                padding: 4.5rem 1.25rem 3rem 1.25rem !important;
+                /* Extra top space */
                 margin: 0 0 2rem 0 !important;
                 min-height: 260px !important;
             }
 
             .icon-wrapper {
-                margin-top: 1.5rem !important; /* Shift icon down */
+                margin-top: 1.5rem !important;
+                /* Shift icon down */
                 margin-bottom: 1.5rem !important;
             }
 
@@ -1209,6 +1213,7 @@
 
         /* Specialized Mobile Optimizations */
         @media (max-width: 768px) {
+
             .bg-tool-layout,
             .collage-tool-layout {
                 grid-template-columns: 1fr !important;
@@ -1227,7 +1232,8 @@
                 padding: 10px !important;
             }
 
-            #bg-preview-img, #collage-canvas {
+            #bg-preview-img,
+            #collage-canvas {
                 max-height: 450px !important;
             }
 
@@ -1302,10 +1308,13 @@
             .file-info::before {
                 content: "Tap to browse files";
             }
-            .file-info span, .file-info {
+
+            .file-info span,
+            .file-info {
                 visibility: hidden;
                 position: relative;
             }
+
             .file-info::after {
                 content: "Tap to browse files";
                 visibility: visible;
@@ -1321,7 +1330,8 @@
                 background: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
-                margin-bottom: 3rem !important; /* More space before footer */
+                margin-bottom: 3rem !important;
+                /* More space before footer */
             }
 
             .tab-content {
@@ -1381,7 +1391,7 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.toggle('active', content.id === tabId);
             });
-            
+
             // Sync Mobile Dropdown Label if needed
             const toolLabels = {
                 'img-to-pdf': 'Image to PDF',
@@ -1407,40 +1417,27 @@
                 'bg-remover': 'eraser',
                 'collage-maker': 'layout'
             };
-            
+
             const label = document.getElementById('current-tool-label');
             const icon = document.getElementById('current-tool-icon');
             if (label && toolLabels[tabId]) {
                 label.textContent = toolLabels[tabId];
                 if (icon) {
                     icon.setAttribute('data-lucide', toolIcons[tabId]);
-                    lucide.createIcons({root: document.getElementById('mobile-tool-selector')});
+                    lucide.createIcons({ root: document.getElementById('mobile-tool-selector') });
                 }
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Mobile Tool Dropdown Logic
+        // Mobile Tool Dropdown Logic removed as requested
         document.addEventListener('DOMContentLoaded', () => {
-            const toolSelectTrigger = document.getElementById('tool-select-trigger');
-            const toolDropdownMenu = document.getElementById('tool-dropdown-menu');
-
-            if (toolSelectTrigger) {
-                toolSelectTrigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toolDropdownMenu.classList.toggle('show');
-                });
-            }
-
-            window.addEventListener('click', () => {
-                if (toolDropdownMenu) toolDropdownMenu.classList.remove('show');
-            });
+            // Dropdown triggers removed
         });
 
         function handleMobileToolSelect(tabId, labelText, iconName) {
             switchTab(tabId);
-            document.getElementById('tool-dropdown-menu').classList.remove('show');
         }
     </script>
 </head>
@@ -1473,24 +1470,11 @@
 
         <!-- Mobile Tool Selector (Custom Dropdown) -->
         <div class="mobile-tool-selector hidden" id="mobile-tool-selector">
-            <button class="tool-select-btn" id="tool-select-trigger">
+            <div class="tool-select-btn">
                 <div style="display:flex; align-items:center; gap:12px;">
                     <i id="current-tool-icon" data-lucide="image"></i>
                     <span id="current-tool-label">Image to PDF</span>
                 </div>
-                <i data-lucide="chevron-down"></i>
-            </button>
-            <div class="tool-dropdown-menu" id="tool-dropdown-menu">
-                <div class="tool-option" onclick="handleMobileToolSelect('img-to-pdf', 'Image to PDF', 'image')"><i data-lucide="image"></i> Image to PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('pdf-to-img', 'PDF to Image', 'file-image')"><i data-lucide="file-image"></i> PDF to Image</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('merge-pdf', 'Merge PDF', 'copy')"><i data-lucide="copy"></i> Merge PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('split-pdf', 'Split PDF', 'scissors')"><i data-lucide="scissors"></i> Split PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('compress-pdf', 'Compress PDF', 'shrink')"><i data-lucide="shrink"></i> Compress PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('compress-image', 'Compress Image', 'image-plus')"><i data-lucide="image-plus"></i> Compress Image</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('unlock-pdf', 'Unlock PDF', 'unlock')"><i data-lucide="unlock"></i> Unlock PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('protect-pdf', 'Protect PDF', 'lock')"><i data-lucide="lock"></i> Protect PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('bg-remover', 'Remove BG', 'eraser')"><i data-lucide="eraser"></i> Remove BG</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('collage-maker', 'Collage Maker', 'layout')"><i data-lucide="layout"></i> Collage Maker</div>
             </div>
         </div>
 
@@ -1918,7 +1902,8 @@
                     <div class="preview-grid" id="compress-img-previews"></div>
 
                     <div class="action-bar">
-                        <button id="compress-img-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                        <button id="compress-img-btn" class="primary-btn btn-download-success"
+                            style="width: 100%; justify-content: center;">
                             <span>Compress & Download</span>
                             <i data-lucide="download"></i>
                         </button>
@@ -1964,7 +1949,8 @@
                         <input type="password" id="pdf-password" class="password-input" placeholder="Enter password...">
 
                         <div class="action-bar" style="margin-top: 1rem;">
-                            <button id="unlock-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                            <button id="unlock-btn" class="primary-btn btn-download-success"
+                                style="width: 100%; justify-content: center;">
                                 <span>Unlock & Download</span>
                                 <i data-lucide="unlock"></i>
                             </button>
@@ -2028,7 +2014,8 @@
                             placeholder="Confirm new password...">
 
                         <div class="action-bar" style="margin-top: 1rem;">
-                            <button id="protect-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                            <button id="protect-btn" class="primary-btn btn-download-success"
+                                style="width: 100%; justify-content: center;">
                                 <span>Encrypt & Download</span>
                                 <i data-lucide="shield"></i>
                             </button>
@@ -2066,32 +2053,51 @@
                         <div class="collage-main-preview">
                             <div class="large-preview-box" id="collage-main-box"
                                 style="background: var(--input-bg); min-height: 500px; padding: 20px;">
-                                <div id="collage-canvas-wrapper" style="position: relative; display: inline-block; max-width: 100%; max-height: 600px;">
-                                    <canvas id="collage-canvas" style="max-width: 100%; max-height: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 4px; display: block;"></canvas>
-                                    <div id="collage-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 4px; pointer-events: none;"></div>
+                                <div id="collage-canvas-wrapper"
+                                    style="position: relative; display: inline-block; max-width: 100%; max-height: 600px;">
+                                    <canvas id="collage-canvas"
+                                        style="max-width: 100%; max-height: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 4px; display: block;"></canvas>
+                                    <div id="collage-overlay"
+                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 4px; pointer-events: none;">
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="bg-controls-panel">
                             <div class="control-group">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Artistic Layouts</label>
-                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;" id="collage-layout-btns">
-                                    <button class="bg-option-btn active" data-layout="grid" title="Grid"><i data-lucide="grid"></i></button>
-                                    <button class="bg-option-btn" data-layout="hero-l" title="Hero Left"><i data-lucide="layout-panel-left"></i></button>
-                                    <button class="bg-option-btn" data-layout="hero-t" title="Hero Top"><i data-lucide="layout-panel-top"></i></button>
-                                    <button class="bg-option-btn" data-layout="triptych" title="Triptych"><i data-lucide="columns-3"></i></button>
-                                    <button class="bg-option-btn" data-layout="cinema" title="Cinema"><i data-lucide="rows-3"></i></button>
-                                    <button class="bg-option-btn" data-layout="mosaic" title="Mosaic"><i data-lucide="layout-grid"></i></button>
-                                    <button class="bg-option-btn" data-layout="magazine" title="Magazine"><i data-lucide="newspaper"></i></button>
-                                    <button class="bg-option-btn" data-layout="stack" title="Stack"><i data-lucide="layers"></i></button>
-                                    <button class="bg-option-btn" data-layout="split" title="Modern Split"><i data-lucide="split"></i></button>
-                                    <button class="bg-option-btn" data-layout="feature" title="Featured Item"><i data-lucide="star"></i></button>
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Artistic
+                                    Layouts</label>
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;"
+                                    id="collage-layout-btns">
+                                    <button class="bg-option-btn active" data-layout="grid" title="Grid"><i
+                                            data-lucide="grid"></i></button>
+                                    <button class="bg-option-btn" data-layout="hero-l" title="Hero Left"><i
+                                            data-lucide="layout-panel-left"></i></button>
+                                    <button class="bg-option-btn" data-layout="hero-t" title="Hero Top"><i
+                                            data-lucide="layout-panel-top"></i></button>
+                                    <button class="bg-option-btn" data-layout="triptych" title="Triptych"><i
+                                            data-lucide="columns-3"></i></button>
+                                    <button class="bg-option-btn" data-layout="cinema" title="Cinema"><i
+                                            data-lucide="rows-3"></i></button>
+                                    <button class="bg-option-btn" data-layout="mosaic" title="Mosaic"><i
+                                            data-lucide="layout-grid"></i></button>
+                                    <button class="bg-option-btn" data-layout="magazine" title="Magazine"><i
+                                            data-lucide="newspaper"></i></button>
+                                    <button class="bg-option-btn" data-layout="stack" title="Stack"><i
+                                            data-lucide="layers"></i></button>
+                                    <button class="bg-option-btn" data-layout="split" title="Modern Split"><i
+                                            data-lucide="split"></i></button>
+                                    <button class="bg-option-btn" data-layout="feature" title="Featured Item"><i
+                                            data-lucide="star"></i></button>
                                 </div>
                             </div>
 
                             <div class="control-group">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Canvas Size</label>
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Canvas
+                                    Size</label>
                                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
                                     <button class="bg-option-btn active" data-ratio="1:1">1:1 Square</button>
                                     <button class="bg-option-btn" data-ratio="4:5">4:5 Insta</button>
@@ -2102,25 +2108,35 @@
 
                             <div class="control-group">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Spacing</label>
-                                    <span id="collage-spacing-val" style="font-size: 0.8rem; font-weight: 600;">10px</span>
+                                    <label
+                                        style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Spacing</label>
+                                    <span id="collage-spacing-val"
+                                        style="font-size: 0.8rem; font-weight: 600;">10px</span>
                                 </div>
-                                <input type="range" id="collage-spacing" min="0" max="100" value="10" style="width: 100%;">
+                                <input type="range" id="collage-spacing" min="0" max="100" value="10"
+                                    style="width: 100%;">
                             </div>
 
                             <div class="control-group">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Roundness</label>
-                                    <span id="collage-radius-val" style="font-size: 0.8rem; font-weight: 600;">8px</span>
+                                    <label
+                                        style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Roundness</label>
+                                    <span id="collage-radius-val"
+                                        style="font-size: 0.8rem; font-weight: 600;">8px</span>
                                 </div>
-                                <input type="range" id="collage-radius" min="0" max="100" value="8" style="width: 100%;">
+                                <input type="range" id="collage-radius" min="0" max="100" value="8"
+                                    style="width: 100%;">
                             </div>
 
                             <div class="control-group">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Background</label>
-                                <div style="display: flex; gap: 12px; align-items: center; background: var(--input-bg); padding: 8px; border-radius: 12px;">
-                                    <div style="position: relative; width: 32px; height: 32px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color);">
-                                        <input type="color" id="collage-bg-color" value="#ffffff" style="position: absolute; top: -5px; left: -5px; width: 50px; height: 50px; cursor: pointer; border: none;">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Background</label>
+                                <div
+                                    style="display: flex; gap: 12px; align-items: center; background: var(--input-bg); padding: 8px; border-radius: 12px;">
+                                    <div
+                                        style="position: relative; width: 32px; height: 32px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color);">
+                                        <input type="color" id="collage-bg-color" value="#ffffff"
+                                            style="position: absolute; top: -5px; left: -5px; width: 50px; height: 50px; cursor: pointer; border: none;">
                                     </div>
                                     <span style="font-size: 0.85rem; font-weight: 600;">Canvas Color</span>
                                 </div>
@@ -2134,9 +2150,11 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div style="margin-top: 2rem;">
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Manage Images (Drag to Reorder)</label>
+                        <label
+                            style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Manage
+                            Images (Drag to Reorder)</label>
                         <div class="preview-grid" id="collage-previews" style="min-height: 100px;"></div>
                     </div>
                 </div>
@@ -4224,11 +4242,11 @@
                 const url = URL.createObjectURL(file);
                 const imgObj = await loadImage(url);
                 collageItems.push({ id, file, url, scale: 1.0, offsetX: 0, offsetY: 0, img: imgObj });
-                
+
                 const div = createPreviewItem(id, collageItems.length, 'image');
                 collagePreviews.appendChild(div);
                 div.innerHTML = '';
-                
+
                 const thumbImg = document.createElement('img');
                 thumbImg.src = url;
                 thumbImg.style.height = '100px';
@@ -4260,7 +4278,7 @@
 
         // Modify existing addRemoveBtn to handle 'collage'
         const originalAddRemoveBtn = window.addRemoveBtn;
-        window.addRemoveBtn = function(parent, id, type) {
+        window.addRemoveBtn = function (parent, id, type) {
             if (type === 'collage') {
                 const btn = document.createElement('button');
                 btn.className = 'remove-btn';
@@ -4293,7 +4311,7 @@
                 else if (type === 'compress-img') compressImgFiles = compressImgFiles.filter(p => p.id !== id);
                 else if (type === 'collage') collageItems = collageItems.filter(p => p.id !== id);
                 else mergeItems = mergeItems.filter(p => p.id !== id);
-                
+
                 parent.remove();
                 updatePageNumbers(type);
                 if (type === 'collage') { updateCollagePageNumbers(); drawCollage(); }
@@ -4494,7 +4512,7 @@
                     const imgRatio = img.width / img.height;
                     const boxRatio = box.w / box.h;
                     let sw, sh, sx, sy;
-                    
+
                     // Base crop logic (cover)
                     if (imgRatio > boxRatio) {
                         sh = img.height;
@@ -4503,25 +4521,25 @@
                         sw = img.width;
                         sh = sw / boxRatio;
                     }
-                    
+
                     // Apply user scale
                     const userScale = item.scale || 1.0;
                     sw /= userScale;
                     sh /= userScale;
-                    
+
                     // Apply user offsets (shifting)
                     const offX = (item.offsetX || 0) * (img.width / 100);
                     const offY = (item.offsetY || 0) * (img.height / 100);
 
                     sx = (img.width - sw) / 2 + offX;
                     sy = (img.height - sh) / 2 + offY;
-                    
+
                     // Clamp sx, sy to keep image within bounds
                     const minSX = 0;
                     const maxSX = img.width - sw;
                     const minSY = 0;
                     const maxSY = img.height - sh;
-                    
+
                     if (sx < minSX) { sx = minSX; item.offsetX = (sx - (img.width - sw) / 2) / (img.width / 100); }
                     if (sx > maxSX) { sx = maxSX; item.offsetX = (sx - (img.width - sw) / 2) / (img.width / 100); }
                     if (sy < minSY) { sy = minSY; item.offsetY = (sy - (img.height - sh) / 2) / (img.height / 100); }
@@ -4539,7 +4557,7 @@
             const overlay = document.getElementById('collage-overlay');
             const wrapper = document.getElementById('collage-canvas-wrapper');
             overlay.innerHTML = '';
-            
+
             const scaleX = collageCanvas.clientWidth / collageCanvas.width;
             const scaleY = collageCanvas.clientHeight / collageCanvas.height;
 
@@ -4575,7 +4593,7 @@
                 slider.style.height = '4px';
                 slider.style.accentColor = 'var(--accent-color)';
                 slider.style.pointerEvents = 'auto';
-                
+
                 slider.oninput = (e) => {
                     item.scale = parseFloat(e.target.value);
                     drawCollage(false);
@@ -4599,7 +4617,7 @@
 
                 const moveDrag = (clientX, clientY) => {
                     if (!isLocalDragging) return;
-                    
+
                     const dxDisp = clientX - startX;
                     const dyDisp = clientY - startY;
 
@@ -4617,7 +4635,7 @@
 
                     // Ratio of source pixels to canvas pixels
                     const sPerC = sw / box.w;
-                    
+
                     const dxSrc = dxCanvas * sPerC;
                     const dySrc = dyCanvas * sPerC;
 
@@ -4682,10 +4700,10 @@
 
         // Add handleDrop support for collage reordering
         const originalHandleDrop = window.handleDrop;
-        window.handleDrop = function(e) {
+        window.handleDrop = function (e) {
             const target = e.target.closest('.preview-item');
             if (!target || target.dataset.id === draggedId) return;
-            
+
             const tabContent = target.closest('.tab-content');
             if (tabContent.id === 'collage-maker') {
                 target.classList.remove('drag-over');
@@ -4694,7 +4712,7 @@
                 const draggedElement = container.querySelector(`[data-id="${draggedId}"]`);
                 const fromIndex = items.indexOf(draggedElement);
                 const toIndex = items.indexOf(target);
-                
+
                 if (fromIndex < toIndex) target.after(draggedElement);
                 else target.before(draggedElement);
 
