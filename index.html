@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swift File Convertor - PDF & Image Tools</title>
+    <title>Swift File Tools - PDF & Image Tools</title>
     <link rel="icon" type="image/png" href="logo.png">
     <meta name="description" content="A modern, minimal, and beautiful PDF to Image and Image to PDF converter.">
 
@@ -1181,11 +1181,24 @@
             }
 
             .header-content {
-                padding: 0.25rem 0;
+                padding: 0.75rem 0 !important;
             }
 
             .logo {
-                font-size: 1.2rem;
+                font-size: 1.1rem !important;
+            }
+
+            #theme-toggle {
+                padding: 0.5rem !important;
+                border-radius: 10px !important;
+                margin-right: 0.25rem !important;
+                width: 36px !important;
+                height: 36px !important;
+            }
+
+            #theme-toggle i {
+                width: 18px !important;
+                height: 18px !important;
             }
 
             .preview-scroll,
@@ -1452,8 +1465,8 @@
     <header>
         <div class="container header-content">
             <div class="logo">
-                <img src="logo.png" alt="Swift File Convertor" class="logo-img">
-                <span>Swift File Convertor</span>
+                <img src="logo.png" alt="Swift File" class="logo-img">
+                <span>Swift File</span>
             </div>
             <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
                 <i data-lucide="sun" id="sun-icon" class="hidden"></i>
@@ -1485,28 +1498,28 @@
             <button class="tab-btn" data-tab="pdf-to-img" onclick="switchTab('pdf-to-img')">
                 <i data-lucide="file-text"></i> PDF to Image
             </button>
-            <button class="tab-btn" data-tab="merge-pdf">
+            <button class="tab-btn" data-tab="merge-pdf" onclick="switchTab('merge-pdf')">
                 <i data-lucide="copy"></i> Merge PDF
             </button>
-            <button class="tab-btn" data-tab="split-pdf">
+            <button class="tab-btn" data-tab="split-pdf" onclick="switchTab('split-pdf')">
                 <i data-lucide="scissors"></i> Split PDF
             </button>
-            <button class="tab-btn" data-tab="compress-pdf">
+            <button class="tab-btn" data-tab="compress-pdf" onclick="switchTab('compress-pdf')">
                 <i data-lucide="minimize-2"></i> Compress PDF
             </button>
-            <button class="tab-btn" data-tab="compress-image">
+            <button class="tab-btn" data-tab="compress-image" onclick="switchTab('compress-image')">
                 <i data-lucide="image"></i> Compress Image
             </button>
-            <button class="tab-btn" data-tab="unlock-pdf">
+            <button class="tab-btn" data-tab="unlock-pdf" onclick="switchTab('unlock-pdf')">
                 <i data-lucide="unlock"></i> Unlock PDF
             </button>
-            <button class="tab-btn" data-tab="protect-pdf">
+            <button class="tab-btn" data-tab="protect-pdf" onclick="switchTab('protect-pdf')">
                 <i data-lucide="lock"></i> Protect PDF
             </button>
-            <button class="tab-btn" data-tab="bg-remover">
+            <button class="tab-btn" data-tab="bg-remover" onclick="switchTab('bg-remover')">
                 <i data-lucide="image-minus"></i> Remove BG
             </button>
-            <button class="tab-btn" data-tab="collage-maker">
+            <button class="tab-btn" data-tab="collage-maker" onclick="switchTab('collage-maker')">
                 <i data-lucide="layout"></i> Collage Maker
             </button>
         </div>
@@ -2174,7 +2187,7 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2026 Swift File Convertor. Privacy first. All processing happens locally.</p>
+            <p>&copy; 2026 Swift File Tools. Privacy first. All processing happens locally. Aashish Giri H.</p>
         </div>
     </footer>
 
