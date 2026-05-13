@@ -1043,20 +1043,26 @@
             }
 
             .converter-tabs {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.5rem;
-                margin-bottom: 1.25rem;
-                max-width: 100%;
-                padding: 0;
+                display: flex;
+                overflow-x: auto;
+                white-space: nowrap;
+                justify-content: flex-start;
+                gap: 0.75rem;
+                margin-bottom: 1.5rem;
+                padding: 4px 0;
+                scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .converter-tabs::-webkit-scrollbar {
+                display: none;
             }
 
             .tab-btn {
-                min-width: 0;
-                padding: 0.5rem 0.25rem;
-                font-size: 0.8rem;
-                flex-direction: column;
-                gap: 0.25rem;
+                flex: 0 0 auto;
+                min-width: unset;
+                padding: 0.6rem 1.25rem;
+                font-size: 0.85rem;
             }
 
             .tab-btn i {
@@ -1181,67 +1187,64 @@
             }
 
             .drop-zone {
-                padding: 2rem 1rem !important;
-                border-radius: 20px !important;
+                padding: 2.5rem 1.5rem !important;
+                border: 2px dashed rgba(99, 102, 241, 0.2) !important;
+                background: rgba(99, 102, 241, 0.02) !important;
+                margin: 0.5rem !important;
             }
 
             .drop-zone-content h3 {
-                font-size: 1.1rem !important;
-                margin-bottom: 0.25rem !important;
-            }
-
-            .drop-zone-content p {
-                font-size: 0.8rem !important;
-                margin-bottom: 0.5rem !important;
-            }
-
-            .icon-wrapper {
-                width: 48px !important;
-                height: 48px !important;
-                margin-bottom: 1rem !important;
-            }
-
-            .icon-wrapper i {
-                width: 24px !important;
-            }
-
-            .converter-card {
-                padding: 1rem !important;
-                margin-top: 0 !important;
-                border-radius: 24px !important;
-                box-shadow: none !important;
-                border: none !important;
-                background: transparent !important;
-            }
-
-            .tab-content {
-                background: var(--surface-color) !important;
-                padding: 1.25rem !important;
-                border-radius: 24px !important;
-                border: 1px solid var(--border-color) !important;
-                box-shadow: var(--shadow) !important;
-            }
-
-            .preview-container {
+                font-size: 1.25rem !important;
                 margin-top: 1rem !important;
             }
 
-            .hero {
-                padding: 1.5rem 0 1rem 0 !important;
+            .drop-zone-content p {
+                display: none !important; /* Hide 'drag and drop' on mobile */
+            }
+
+            .drop-zone-content .file-info {
+                font-size: 0.9rem !important;
+                color: var(--accent-color) !important;
+                font-weight: 600 !important;
+                display: block !important;
+                margin-top: 0.5rem !important;
+            }
+
+            .file-info::before {
+                content: "Tap to browse files";
+            }
+            .file-info span, .file-info {
+                visibility: hidden;
+                position: relative;
+            }
+            .file-info::after {
+                content: "Tap to browse files";
+                visibility: visible;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                white-space: nowrap;
+            }
+
+            .converter-card {
+                padding: 0.75rem !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            .tab-content {
+                padding: 1rem !important;
+                border-radius: 28px !important;
             }
 
             .hero h1 {
-                font-size: 1.75rem !important;
-                letter-spacing: -0.02em !important;
+                font-size: 2rem !important;
             }
 
             .hero p {
-                font-size: 0.85rem !important;
-                opacity: 0.8 !important;
-            }
-
-            .converter-tabs {
-                margin-bottom: 1rem !important;
+                font-size: 0.9rem !important;
+                padding: 0 1rem !important;
             }
         }
 
