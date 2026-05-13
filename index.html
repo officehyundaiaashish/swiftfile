@@ -1043,26 +1043,38 @@
             }
 
             .converter-tabs {
-                display: flex;
-                overflow-x: auto;
-                white-space: nowrap;
-                justify-content: flex-start;
-                gap: 0.75rem;
-                margin-bottom: 1.5rem;
-                padding: 4px 0;
-                scrollbar-width: none;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .converter-tabs::-webkit-scrollbar {
-                display: none;
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 0.6rem !important;
+                margin-bottom: 2rem !important;
+                padding: 0 !important;
             }
 
             .tab-btn {
-                flex: 0 0 auto;
-                min-width: unset;
-                padding: 0.6rem 1.25rem;
-                font-size: 0.85rem;
+                flex: 1 1 auto !important;
+                min-width: 0 !important;
+                padding: 0.8rem 0.25rem !important;
+                font-size: 0.72rem !important;
+                flex-direction: column !important;
+                gap: 0.5rem !important;
+                height: 85px !important;
+                justify-content: center !important;
+                text-align: center !important;
+                border-radius: 16px !important;
+                border: 1px solid rgba(0,0,0,0.05) !important;
+                background: white !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+            }
+
+            .tab-btn i {
+                width: 24px !important;
+                height: 24px !important;
+                margin-bottom: 2px !important;
+            }
+
+            .dark-theme .tab-btn {
+                background: var(--surface-color) !important;
+                border-color: var(--border-color) !important;
             }
 
             .tab-btn i {
@@ -1187,27 +1199,34 @@
             }
 
             .drop-zone {
-                padding: 2.5rem 1.5rem !important;
+                padding: 3rem 1.5rem !important;
                 border: 2px dashed rgba(99, 102, 241, 0.2) !important;
                 background: rgba(99, 102, 241, 0.02) !important;
-                margin: 0.5rem !important;
+                margin: 0.5rem 0.5rem 2.5rem 0.5rem !important;
+                min-height: 220px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
 
             .drop-zone-content h3 {
                 font-size: 1.25rem !important;
                 margin-top: 1rem !important;
+                margin-bottom: 0.5rem !important;
             }
 
             .drop-zone-content p {
-                display: none !important; /* Hide 'drag and drop' on mobile */
+                display: none !important;
             }
 
             .drop-zone-content .file-info {
-                font-size: 0.9rem !important;
+                font-size: 0.85rem !important;
                 color: var(--accent-color) !important;
                 font-weight: 600 !important;
                 display: block !important;
-                margin-top: 0.5rem !important;
+                margin-top: 1rem !important;
+                padding: 0.5rem !important;
+                border-top: 1px dashed rgba(99, 102, 241, 0.1) !important;
             }
 
             .file-info::before {
@@ -1222,7 +1241,8 @@
                 visibility: visible;
                 position: absolute;
                 left: 50%;
-                transform: translateX(-50%);
+                top: 50%;
+                transform: translate(-50%, -50%);
                 white-space: nowrap;
             }
 
@@ -1231,11 +1251,12 @@
                 background: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
+                margin-bottom: 3rem !important; /* More space before footer */
             }
 
             .tab-content {
-                padding: 1rem !important;
-                border-radius: 28px !important;
+                padding: 0.75rem !important;
+                border-radius: 32px !important;
             }
 
             .hero h1 {
@@ -3552,7 +3573,10 @@
                 } else {
                     // RemBG Mode: Use local engine
                     const removeBG = await getRemBG();
-                    blob = await removeBG(currentImgSrc);
+                    const isMobile = window.innerWidth <= 768;
+                    blob = await removeBG(currentImgSrc, {
+                        model: isMobile ? 'small' : 'medium'
+                    });
                 }
 
                 window.bgProcessedBlob = blob;
@@ -4036,7 +4060,7 @@
                 const id = Math.random().toString(36).substr(2, 9);
                 const url = URL.createObjectURL(file);
                 const imgObj = await loadImage(url);
-                collageItems.push({ id, file, url, scale: 1.0, img: imgObj });
+                collageItems.push({ id, file, url, scale: 1.0, offsetX: 0, offsetY: 0, img: imgObj });
                 
                 const div = createPreviewItem(id, collageItems.length, 'image');
                 collagePreviews.appendChild(div);
@@ -4322,9 +4346,17 @@
                     sw /= userScale;
                     sh /= userScale;
                     
-                    sx = (img.width - sw) / 2;
-                    sy = (img.height - sh) / 2;
+                    // Apply user offsets (shifting)
+                    const offX = (item.offsetX || 0) * (img.width / 100);
+                    const offY = (item.offsetY || 0) * (img.height / 100);
+
+                    sx = (img.width - sw) / 2 + offX;
+                    sy = (img.height - sh) / 2 + offY;
                     
+                    // Clamp sx, sy to keep image within bounds
+                    sx = Math.max(0, Math.min(img.width - sw, sx));
+                    sy = Math.max(0, Math.min(img.height - sh, sy));
+
                     ctx.drawImage(img, sx, sy, sw, sh, box.x, box.y, box.w, box.h);
                     ctx.restore();
                 } catch (e) { console.error(e); }
@@ -4353,12 +4385,45 @@
                 zone.style.height = (box.h * scaleY) + 'px';
                 zone.style.pointerEvents = 'auto';
                 zone.style.display = 'flex';
-                zone.style.alignItems = 'flex-end';
+                zone.style.flexDirection = 'column';
+                zone.style.alignItems = 'center';
                 zone.style.justifyContent = 'center';
+                zone.style.gap = '8px';
                 zone.style.padding = '8px';
                 zone.style.opacity = '0';
                 zone.style.transition = 'opacity 0.2s';
                 zone.style.cursor = 'default';
+                zone.style.background = 'rgba(255,255,255,0.05)';
+
+                const panPad = document.createElement('div');
+                panPad.style.display = 'grid';
+                panPad.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                panPad.style.gap = '4px';
+                panPad.style.pointerEvents = 'auto';
+
+                const createShiftBtn = (icon, dx, dy) => {
+                    const b = document.createElement('button');
+                    b.innerHTML = `<i data-lucide="chevron-${icon}" style="width:12px; height:12px;"></i>`;
+                    b.style.cssText = `background: rgba(255, 255, 255, 0.95); border: none; border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--accent-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.1s;`;
+                    b.onmousedown = (e) => {
+                        e.stopPropagation();
+                        item.offsetX = (item.offsetX || 0) + dx;
+                        item.offsetY = (item.offsetY || 0) + dy;
+                        drawCollage(false);
+                    };
+                    return b;
+                };
+
+                const empty = () => document.createElement('div');
+                panPad.appendChild(empty());
+                panPad.appendChild(createShiftBtn('up', 0, -2));
+                panPad.appendChild(empty());
+                panPad.appendChild(createShiftBtn('left', -2, 0));
+                panPad.appendChild(empty());
+                panPad.appendChild(createShiftBtn('right', 2, 0));
+                panPad.appendChild(empty());
+                panPad.appendChild(createShiftBtn('down', 0, 2));
+                panPad.appendChild(empty());
 
                 const slider = document.createElement('input');
                 slider.type = 'range';
@@ -4366,20 +4431,23 @@
                 slider.max = '3';
                 slider.step = '0.05';
                 slider.value = item.scale || 1;
-                slider.style.width = '80%';
+                slider.style.width = '70%';
                 slider.style.height = '4px';
                 slider.style.accentColor = 'var(--accent-color)';
+                slider.style.pointerEvents = 'auto';
                 
                 slider.oninput = (e) => {
                     item.scale = parseFloat(e.target.value);
-                    drawCollage(false); // Only re-draw canvas, don't recreate overlay
+                    drawCollage(false);
                 };
 
                 zone.onmouseenter = () => zone.style.opacity = '1';
                 zone.onmouseleave = () => zone.style.opacity = '0';
 
+                zone.appendChild(panPad);
                 zone.appendChild(slider);
                 overlay.appendChild(zone);
+                lucide.createIcons({ root: zone });
             });
         }
 
