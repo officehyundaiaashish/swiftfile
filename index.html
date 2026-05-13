@@ -4425,36 +4425,6 @@
                 zone.style.cursor = 'default';
                 zone.style.background = 'rgba(255,255,255,0.05)';
 
-                const panPad = document.createElement('div');
-                panPad.style.display = 'grid';
-                panPad.style.gridTemplateColumns = 'repeat(3, 1fr)';
-                panPad.style.gap = '4px';
-                panPad.style.pointerEvents = 'auto';
-
-                const createShiftBtn = (icon, dx, dy) => {
-                    const b = document.createElement('button');
-                    b.innerHTML = `<i data-lucide="chevron-${icon}" style="width:12px; height:12px;"></i>`;
-                    b.style.cssText = `background: rgba(255, 255, 255, 0.95); border: none; border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--accent-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.1s;`;
-                    b.onmousedown = (e) => {
-                        e.stopPropagation();
-                        item.offsetX = (item.offsetX || 0) + dx;
-                        item.offsetY = (item.offsetY || 0) + dy;
-                        drawCollage(false);
-                    };
-                    return b;
-                };
-
-                const empty = () => document.createElement('div');
-                panPad.appendChild(empty());
-                panPad.appendChild(createShiftBtn('up', 0, -2));
-                panPad.appendChild(empty());
-                panPad.appendChild(createShiftBtn('left', -2, 0));
-                panPad.appendChild(empty());
-                panPad.appendChild(createShiftBtn('right', 2, 0));
-                panPad.appendChild(empty());
-                panPad.appendChild(createShiftBtn('down', 0, 2));
-                panPad.appendChild(empty());
-
                 const slider = document.createElement('input');
                 slider.type = 'range';
                 slider.min = '1';
@@ -4547,7 +4517,6 @@
                 }, { passive: false });
                 window.addEventListener('touchend', endDrag);
 
-                zone.appendChild(panPad);
                 zone.appendChild(slider);
                 overlay.appendChild(zone);
                 lucide.createIcons({ root: zone });
