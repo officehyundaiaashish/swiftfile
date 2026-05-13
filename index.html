@@ -1227,6 +1227,54 @@
         /* Specialized Mobile Optimizations */
         @media (max-width: 768px) {
 
+            /* Mobile performance: keep the glass feel but remove heavy blur */
+            :root {
+                --glass-blur: none;
+                --surface-color: rgba(255, 255, 255, 0.9);
+                --card-bg: rgba(255, 255, 255, 0.92);
+                --input-bg: rgba(255, 255, 255, 0.88);
+            }
+
+            .dark-theme {
+                --surface-color: rgba(15, 23, 42, 0.92);
+                --card-bg: rgba(15, 23, 42, 0.94);
+                --input-bg: rgba(30, 41, 59, 0.9);
+            }
+
+            .background-blobs .blob {
+                opacity: 0.08;
+                filter: blur(32px);
+                animation-duration: 30s;
+            }
+
+            .blob-3 {
+                display: none;
+            }
+
+            .icon-btn,
+            .tab-btn,
+            .converter-card,
+            .drop-zone,
+            .bg-controls-panel,
+            .toast,
+            .notification,
+            .preview-scroll,
+            .preview-grid,
+            .password-input,
+            .preview-tab-btn,
+            .secondary-btn,
+            .primary-btn,
+            .tool-select-btn,
+            .bg-option-btn {
+                -webkit-backdrop-filter: none !important;
+                backdrop-filter: none !important;
+            }
+
+            #bg-loader {
+                -webkit-backdrop-filter: none !important;
+                backdrop-filter: none !important;
+            }
+
             .bg-tool-layout,
             .collage-tool-layout {
                 grid-template-columns: 1fr !important;
