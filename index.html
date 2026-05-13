@@ -1042,88 +1042,58 @@
                 padding: 0 1rem;
             }
 
-            /* Mobile Tool Dropdown - Premium Custom Style */
-            .mobile-tool-selector {
-                display: block !important;
-                margin: 0 0 1.5rem 0 !important;
-                position: relative !important;
-                z-index: 1000 !important;
-            }
-
-            .tool-select-btn {
-                width: 100% !important;
-                background: white !important;
-                border: 1px solid rgba(0,0,0,0.05) !important;
-                padding: 0.9rem 1.25rem !important;
-                border-radius: 16px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                color: var(--text-primary) !important;
-                font-weight: 600 !important;
-                font-size: 0.95rem !important;
-                cursor: pointer !important;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
-                transition: all 0.3s ease !important;
-            }
-
-            .dark-theme .tool-select-btn {
-                background: rgba(255,255,255,0.05) !important;
-                border-color: rgba(255,255,255,0.1) !important;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-                backdrop-filter: blur(10px) !important;
-            }
-
-            .tool-dropdown-menu {
-                position: absolute !important;
-                top: calc(100% + 8px) !important;
-                left: 0 !important;
-                width: 100% !important;
-                background: white !important;
-                border: 1px solid rgba(0,0,0,0.08) !important;
-                border-radius: 20px !important;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
-                overflow: hidden !important;
-                opacity: 0 !important;
-                transform: translateY(-10px) !important;
-                pointer-events: none !important;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            }
-
-            .dark-theme .tool-dropdown-menu {
-                background: #1e1e2e !important;
-                border-color: rgba(255,255,255,0.1) !important;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important;
-            }
-
-            .tool-dropdown-menu.show {
-                opacity: 1 !important;
-                transform: translateY(0) !important;
-                pointer-events: auto !important;
-            }
-
-            .tool-option {
-                padding: 0.85rem 1.25rem !important;
-                display: flex !important;
-                align-items: center !important;
-                gap: 12px !important;
-                color: var(--text-primary) !important;
-                font-weight: 500 !important;
-                font-size: 0.9rem !important;
-                border-bottom: 1px solid rgba(0,0,0,0.03) !important;
-                transition: background 0.2s !important;
-            }
-
-            .dark-theme .tool-option {
-                border-bottom-color: rgba(255,255,255,0.05) !important;
-            }
-
-            .tool-option:last-child { border-bottom: none !important; }
-            .tool-option:active { background: rgba(99, 102, 241, 0.08) !important; }
-            .tool-option i { width: 18px !important; color: var(--accent-color) !important; }
-
             .converter-tabs {
-                display: none !important;
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 0.75rem !important;
+                margin-bottom: 2.5rem !important;
+                padding: 0.25rem !important;
+            }
+
+            .tab-btn {
+                flex: 1 1 auto !important;
+                min-width: 0 !important;
+                padding: 1rem 0.25rem !important;
+                font-size: 0.75rem !important;
+                font-weight: 500 !important;
+                flex-direction: column !important;
+                gap: 0.6rem !important;
+                height: 90px !important;
+                justify-content: center !important;
+                text-align: center !important;
+                border-radius: 18px !important;
+                border: 1px solid rgba(0,0,0,0.04) !important;
+                background: white !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.04) !important;
+                color: var(--text-primary) !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .tab-btn i {
+                width: 26px !important;
+                height: 26px !important;
+                color: var(--accent-color) !important;
+                stroke-width: 2 !important;
+            }
+
+            .tab-btn.active {
+                background: var(--accent-color) !important;
+                color: white !important;
+                border-color: var(--accent-color) !important;
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+                transform: scale(0.96) !important;
+            }
+
+            .tab-btn.active i {
+                color: white !important;
+                transform: scale(1.1) !important;
+            }
+
+            .dark-theme .tab-btn {
+                background: rgba(255, 255, 255, 0.05) !important;
+                border-color: rgba(255, 255, 255, 0.08) !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+                backdrop-filter: blur(10px) !important;
             }
 
             .converter-card {
@@ -1141,6 +1111,10 @@
             .icon-wrapper {
                 margin-top: 1.5rem !important; /* Shift icon down */
                 margin-bottom: 1.5rem !important;
+            }
+
+            .hero {
+                padding: 2.5rem 0 1.5rem 0 !important;
             }
 
             .hero {
@@ -1373,7 +1347,6 @@
             background: var(--accent-hover);
         }
     </style>
-    <script>
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
@@ -1381,68 +1354,8 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.toggle('active', content.id === tabId);
             });
-            
-            // Sync Mobile Dropdown Label if needed
-            const toolLabels = {
-                'img-to-pdf': 'Image to PDF',
-                'pdf-to-img': 'PDF to Image',
-                'merge-pdf': 'Merge PDF',
-                'split-pdf': 'Split PDF',
-                'compress-pdf': 'Compress PDF',
-                'compress-image': 'Compress Image',
-                'unlock-pdf': 'Unlock PDF',
-                'protect-pdf': 'Protect PDF',
-                'bg-remover': 'Remove BG',
-                'collage-maker': 'Collage Maker'
-            };
-            const toolIcons = {
-                'img-to-pdf': 'image',
-                'pdf-to-img': 'file-image',
-                'merge-pdf': 'copy',
-                'split-pdf': 'scissors',
-                'compress-pdf': 'shrink',
-                'compress-image': 'image-plus',
-                'unlock-pdf': 'unlock',
-                'protect-pdf': 'lock',
-                'bg-remover': 'eraser',
-                'collage-maker': 'layout'
-            };
-            
-            const label = document.getElementById('current-tool-label');
-            const icon = document.getElementById('current-tool-icon');
-            if (label && toolLabels[tabId]) {
-                label.textContent = toolLabels[tabId];
-                if (icon) {
-                    icon.setAttribute('data-lucide', toolIcons[tabId]);
-                    lucide.createIcons({root: document.getElementById('mobile-tool-selector')});
-                }
-            }
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        // Mobile Tool Dropdown Logic
-        document.addEventListener('DOMContentLoaded', () => {
-            const toolSelectTrigger = document.getElementById('tool-select-trigger');
-            const toolDropdownMenu = document.getElementById('tool-dropdown-menu');
-
-            if (toolSelectTrigger) {
-                toolSelectTrigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toolDropdownMenu.classList.toggle('show');
-                });
-            }
-
-            window.addEventListener('click', () => {
-                if (toolDropdownMenu) toolDropdownMenu.classList.remove('show');
-            });
-        });
-
-        function handleMobileToolSelect(tabId, labelText, iconName) {
-            switchTab(tabId);
-            document.getElementById('tool-dropdown-menu').classList.remove('show');
-        }
-    </script>
 </head>
 
 <body class="light-theme">
@@ -1471,28 +1384,7 @@
             <p>Convert your documents and images instantly, securely in your browser.</p>
         </section>
 
-        <!-- Mobile Tool Selector (Custom Dropdown) -->
-        <div class="mobile-tool-selector hidden" id="mobile-tool-selector">
-            <button class="tool-select-btn" id="tool-select-trigger">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <i id="current-tool-icon" data-lucide="image"></i>
-                    <span id="current-tool-label">Image to PDF</span>
-                </div>
-                <i data-lucide="chevron-down"></i>
-            </button>
-            <div class="tool-dropdown-menu" id="tool-dropdown-menu">
-                <div class="tool-option" onclick="handleMobileToolSelect('img-to-pdf', 'Image to PDF', 'image')"><i data-lucide="image"></i> Image to PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('pdf-to-img', 'PDF to Image', 'file-image')"><i data-lucide="file-image"></i> PDF to Image</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('merge-pdf', 'Merge PDF', 'copy')"><i data-lucide="copy"></i> Merge PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('split-pdf', 'Split PDF', 'scissors')"><i data-lucide="scissors"></i> Split PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('compress-pdf', 'Compress PDF', 'shrink')"><i data-lucide="shrink"></i> Compress PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('compress-image', 'Compress Image', 'image-plus')"><i data-lucide="image-plus"></i> Compress Image</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('unlock-pdf', 'Unlock PDF', 'unlock')"><i data-lucide="unlock"></i> Unlock PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('protect-pdf', 'Protect PDF', 'lock')"><i data-lucide="lock"></i> Protect PDF</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('bg-remover', 'Remove BG', 'eraser')"><i data-lucide="eraser"></i> Remove BG</div>
-                <div class="tool-option" onclick="handleMobileToolSelect('collage-maker', 'Collage Maker', 'layout')"><i data-lucide="layout"></i> Collage Maker</div>
-            </div>
-        </div>
+
 
         <div class="converter-tabs">
             <button class="tab-btn active" data-tab="img-to-pdf" onclick="switchTab('img-to-pdf')">
