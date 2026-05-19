@@ -25,40 +25,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
         :root {
-            /* Color Palette - Light Theme (Default) */
-            --bg-color: #f8fafc;
-            --surface-color: rgba(255, 255, 255, 0.7);
-            --border-color: rgba(0, 0, 0, 0.05);
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --accent-color: #4f46e5;
-            --accent-hover: #4338ca;
-            --glass-blur: blur(16px);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --input-bg: rgba(241, 245, 249, 0.8);
+            /* Color Palette - Light Theme (Innovative Solid) */
+            --bg-color: #f0f4f8;
+            --surface-color: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --glass-blur: none;
+            --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --input-bg: #f8fafc;
 
             /* Animation Constants */
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .dark-theme {
-            --bg-color: #0f172a;
-            --surface-color: rgba(30, 41, 59, 0.7);
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-color: #0b1120;
+            --surface-color: #1e293b;
+            --border-color: rgba(255, 255, 255, 0.08);
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --accent-color: #6366f1;
-            --accent-hover: #4f46e5;
-            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            --card-bg: rgba(30, 41, 59, 0.6);
-            --input-bg: rgba(15, 23, 42, 0.6);
+            --accent-color: #3b82f6;
+            --accent-hover: #60a5fa;
+            --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            --card-bg: #1e293b;
+            --input-bg: #0f172a;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            cursor: default;
+            user-select: none;
+        }
+
+        input, textarea, [contenteditable="true"] {
+            user-select: auto;
+            cursor: text;
         }
 
         body {
@@ -94,7 +101,7 @@
             height: 400px;
             background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
             opacity: 0.15;
-            filter: blur(80px);
+            /* filter: blur(80px); removed for performance */
             border-radius: 50%;
             animation: move 20s infinite alternate;
         }
@@ -1071,7 +1078,7 @@
                 border: 1px solid rgba(255, 255, 255, 0.08) !important;
                 border-left: 4px solid var(--accent-color) !important;
                 box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
-                backdrop-filter: blur(15px) !important;
+                /* backdrop-filter removed for performance */
             }
 
             .tool-dropdown-menu {
@@ -1226,54 +1233,6 @@
 
         /* Specialized Mobile Optimizations */
         @media (max-width: 768px) {
-
-            /* Mobile performance: keep the glass feel but remove heavy blur */
-            :root {
-                --glass-blur: none;
-                --surface-color: rgba(255, 255, 255, 0.9);
-                --card-bg: rgba(255, 255, 255, 0.92);
-                --input-bg: rgba(255, 255, 255, 0.88);
-            }
-
-            .dark-theme {
-                --surface-color: rgba(15, 23, 42, 0.92);
-                --card-bg: rgba(15, 23, 42, 0.94);
-                --input-bg: rgba(30, 41, 59, 0.9);
-            }
-
-            .background-blobs .blob {
-                opacity: 0.08;
-                filter: blur(32px);
-                animation-duration: 30s;
-            }
-
-            .blob-3 {
-                display: none;
-            }
-
-            .icon-btn,
-            .tab-btn,
-            .converter-card,
-            .drop-zone,
-            .bg-controls-panel,
-            .toast,
-            .notification,
-            .preview-scroll,
-            .preview-grid,
-            .password-input,
-            .preview-tab-btn,
-            .secondary-btn,
-            .primary-btn,
-            .tool-select-btn,
-            .bg-option-btn {
-                -webkit-backdrop-filter: none !important;
-                backdrop-filter: none !important;
-            }
-
-            #bg-loader {
-                -webkit-backdrop-filter: none !important;
-                backdrop-filter: none !important;
-            }
 
             .bg-tool-layout,
             .collage-tool-layout {
@@ -1801,7 +1760,7 @@
                                 <img id="bg-preview-img"
                                     style="max-width: 100%; max-height: 600px; display: block; transition: var(--transition);">
                                 <div id="bg-loader" class="hidden"
-                                    style="position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; backdrop-filter: blur(8px);">
+                                    style="position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
                                     <div class="bg-loader-content">
                                         <div class="spin" style="margin-bottom: 1.5rem;">
                                             <i data-lucide="loader-2"
