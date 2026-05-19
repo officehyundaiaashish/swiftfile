@@ -8,6 +8,22 @@
     <link rel="icon" type="image/png" href="logo.png">
     <meta name="description" content="A modern, minimal, and beautiful PDF to Image and Image to PDF converter.">
 
+    <!-- Anti-Automation Script -->
+    <script>
+        (function() {
+            function blockAutomation() {
+                document.documentElement.innerHTML = '<div style="font-family:sans-serif;text-align:center;padding:50px;color:#1e293b;background:#f0f4f8;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;"><h1>Access Denied</h1><p style="margin-top:10px;color:#475569;">Automated access is not permitted on this tool.</p></div>';
+                try { window.stop(); } catch(e) {}
+            }
+            
+            if (navigator.webdriver) { blockAutomation(); }
+            
+            var vars = ['_phantom', '__nightmare', '_selenium', 'callPhantom', 'callSelenium', '_Selenium_IDE_Recorder', '__playwright', '__puppeteer', 'webdriver'];
+            for (var i = 0; i < vars.length; i++) { if (window[vars[i]]) { blockAutomation(); } }
+            if (document.__webdriver_evaluate || document.$cdc_asdjflasutopfhvcZLmcfl_) { blockAutomation(); }
+        })();
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
