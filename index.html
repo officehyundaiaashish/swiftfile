@@ -63,7 +63,9 @@
             user-select: none;
         }
 
-        input, textarea, [contenteditable="true"] {
+        input,
+        textarea,
+        [contenteditable="true"] {
             user-select: auto;
             cursor: text;
         }
@@ -1453,7 +1455,38 @@
 
         // Mobile Tool Dropdown Logic removed as requested
         document.addEventListener('DOMContentLoaded', () => {
-            // Dropdown triggers removed
+            // Block View Source, DevTools, and Right Click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+                // Prevent F12
+                if (e.key === 'F12' || e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Prevent Ctrl+U (View Source)
+                if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Prevent Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C (DevTools)
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73 ||
+                    e.key === 'J' || e.key === 'j' || e.keyCode === 74 ||
+                    e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Prevent Mac Cmd+Opt+I / Cmd+Opt+J / Cmd+Opt+C and Cmd+U
+                if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73 ||
+                    e.key === 'J' || e.key === 'j' || e.keyCode === 74 ||
+                    e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.metaKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
         });
 
         function handleMobileToolSelect(tabId, labelText, iconName) {
