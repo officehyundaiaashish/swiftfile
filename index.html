@@ -10,14 +10,14 @@
 
     <!-- Anti-Automation Script -->
     <script>
-        (function() {
+        (function () {
             function blockAutomation() {
                 document.documentElement.innerHTML = '<div style="font-family:sans-serif;text-align:center;padding:50px;color:#1e293b;background:#f0f4f8;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;"><h1>Access Denied</h1><p style="margin-top:10px;color:#475569;">Automated access is not permitted on this tool.</p></div>';
-                try { window.stop(); } catch(e) {}
+                try { window.stop(); } catch (e) { }
             }
-            
+
             if (navigator.webdriver) { blockAutomation(); }
-            
+
             var vars = ['_phantom', '__nightmare', '_selenium', 'callPhantom', 'callSelenium', '_Selenium_IDE_Recorder', '__playwright', '__puppeteer', 'webdriver'];
             for (var i = 0; i < vars.length; i++) { if (window[vars[i]]) { blockAutomation(); } }
             if (document.__webdriver_evaluate || document.$cdc_asdjflasutopfhvcZLmcfl_) { blockAutomation(); }
@@ -2297,18 +2297,8 @@
                 tabContents.forEach(c => c.classList.remove('active'));
                 tab.classList.add('active');
                 document.getElementById(target).classList.add('active');
-
-                // Save active tab
-                localStorage.setItem('activeTab', target);
             });
         });
-
-        // Load saved tab
-        const savedTab = localStorage.getItem('activeTab');
-        if (savedTab) {
-            const tabToClick = document.querySelector(`.tab-btn[data-tab="${savedTab}"]`);
-            if (tabToClick) tabToClick.click();
-        }
 
         // State Management
         let pdfFiles = []; // [File objects]
@@ -2434,13 +2424,17 @@
                 if (type === 'pdf') pdfPages = pdfPages.filter(p => p.id !== id);
                 else if (type === 'image') imageItems = imageItems.filter(p => p.id !== id);
                 else if (type === 'split') splitPages = splitPages.filter(p => p.id !== id);
-                else if (type === 'compress') {
-                    // Handled separately or can be added here
-                }
+                else if (type === 'compress') compressPages = compressPages.filter(p => p.id !== id);
                 else if (type === 'compress-img') compressImgFiles = compressImgFiles.filter(p => p.id !== id);
+                else if (type === 'collage') collageItems = collageItems.filter(p => p.id !== id);
+                else if (type === 'unlock') unlockItem = null;
+                else if (type === 'protect') protectItem = null;
                 else mergeItems = mergeItems.filter(p => p.id !== id);
+
                 parent.remove();
                 updatePageNumbers(type);
+                if (type === 'collage') { updateCollagePageNumbers(); drawCollage(); }
+
                 if (parent.parentElement && parent.parentElement.children.length === 0) {
                     if (type === 'pdf') resetPdf();
                     else if (type === 'image') resetImg();
@@ -2451,6 +2445,9 @@
                         compressImgPreviewContainer.classList.add('hidden');
                     }
                     else if (type === 'compress') resetCompress();
+                    else if (type === 'collage') resetCollage();
+                    else if (type === 'unlock') resetUnlock();
+                    else if (type === 'protect') resetProtect();
                     else resetMerge();
                 }
             };
@@ -3169,6 +3166,7 @@
 
                 if (!pdf) {
                     div.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-secondary);"><i data-lucide="lock" style="width:40px; height:40px; margin-bottom:10px;"></i><span>Locked Preview</span></div>';
+                    addRemoveBtn(div, id, type);
                     addRotateBtn(div, id, type);
                     lucide.createIcons({ root: div });
                     return;
@@ -3184,6 +3182,7 @@
 
                 div.innerHTML = '';
                 div.appendChild(canvas);
+                addRemoveBtn(div, id, type);
                 addRotateBtn(div, id, type);
                 addBadge(div, '1 Page');
             } catch (e) { console.error(e); }
@@ -4341,66 +4340,7 @@
             });
         }
 
-        // Add to the existing addRemoveBtn for collage support
-        // (I'll need to modify the original addRemoveBtn slightly or just handle it here)
-        // Actually, I already added a 'collage' type in my head, let's make it work.
 
-        // Modify existing addRemoveBtn to handle 'collage'
-        const originalAddRemoveBtn = window.addRemoveBtn;
-        window.addRemoveBtn = function (parent, id, type) {
-            if (type === 'collage') {
-                const btn = document.createElement('button');
-                btn.className = 'remove-btn';
-                btn.innerHTML = '&times;';
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    collageItems = collageItems.filter(p => p.id !== id);
-                    parent.remove();
-                    updateCollagePageNumbers();
-                    drawCollage();
-                    if (collageItems.length === 0) resetCollage();
-                };
-                parent.appendChild(btn);
-            } else {
-                // If it's a known type, we can call the original if we had a reference
-                // But since I'm in the same file, I'll just update the original function instead.
-            }
-        };
-
-        // Re-defining addRemoveBtn to support all types correctly
-        function addRemoveBtn(parent, id, type) {
-            const btn = document.createElement('button');
-            btn.className = 'remove-btn';
-            btn.innerHTML = '&times;';
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                if (type === 'pdf') pdfPages = pdfPages.filter(p => p.id !== id);
-                else if (type === 'image') imageItems = imageItems.filter(p => p.id !== id);
-                else if (type === 'split') splitPages = splitPages.filter(p => p.id !== id);
-                else if (type === 'compress-img') compressImgFiles = compressImgFiles.filter(p => p.id !== id);
-                else if (type === 'collage') collageItems = collageItems.filter(p => p.id !== id);
-                else mergeItems = mergeItems.filter(p => p.id !== id);
-
-                parent.remove();
-                updatePageNumbers(type);
-                if (type === 'collage') { updateCollagePageNumbers(); drawCollage(); }
-
-                if (parent.parentElement && parent.parentElement.children.length === 0) {
-                    if (type === 'pdf') resetPdf();
-                    else if (type === 'image') resetImg();
-                    else if (type === 'split') resetSplit();
-                    else if (type === 'compress-img') {
-                        compressImgFiles = [];
-                        compressImgDropZone.classList.remove('hidden');
-                        compressImgPreviewContainer.classList.add('hidden');
-                    }
-                    else if (type === 'collage') resetCollage();
-                    else if (type === 'compress') resetCompress();
-                    else resetMerge();
-                }
-            };
-            parent.appendChild(btn);
-        }
 
         function resetCollage() {
             collageItems.forEach(item => URL.revokeObjectURL(item.url));
