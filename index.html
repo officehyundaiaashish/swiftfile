@@ -49,6 +49,9 @@
             --text-secondary: #475569;
             --accent-color: #2563eb;
             --accent-hover: #1d4ed8;
+            --accent-shadow: rgba(37, 99, 235, 0.25);
+            --accent-alpha: rgba(37, 99, 235, 0.08);
+            --accent-border-alpha: rgba(37, 99, 235, 0.2);
             --glass-blur: none;
             --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
             --card-bg: #ffffff;
@@ -66,6 +69,9 @@
             --text-secondary: #94a3b8;
             --accent-color: #3b82f6;
             --accent-hover: #60a5fa;
+            --accent-shadow: rgba(59, 130, 246, 0.35);
+            --accent-alpha: rgba(59, 130, 246, 0.12);
+            --accent-border-alpha: rgba(59, 130, 246, 0.3);
             --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
             --card-bg: #1e293b;
             --input-bg: #0f172a;
@@ -115,41 +121,27 @@
 
         .blob {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
-            opacity: 0.15;
-            /* filter: blur(80px); removed for performance */
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent-alpha) 0%, transparent 70%);
             border-radius: 50%;
-            animation: move 20s infinite alternate;
+            pointer-events: none;
         }
 
         .blob-1 {
-            top: -100px;
-            left: -100px;
+            top: -150px;
+            left: -150px;
         }
 
         .blob-2 {
-            bottom: -100px;
-            right: -100px;
-            animation-delay: -5s;
+            bottom: -150px;
+            right: -150px;
         }
 
         .blob-3 {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0.1;
-        }
-
-        @keyframes move {
-            from {
-                transform: translate(0, 0) scale(1);
-            }
-
-            to {
-                transform: translate(100px, 100px) scale(1.2);
-            }
         }
 
         /* Header */
@@ -221,9 +213,20 @@
             font-weight: 700;
             margin-bottom: 0.5rem;
             letter-spacing: -0.04em;
-            background: linear-gradient(to right, var(--text-primary), var(--accent-color));
+            background: linear-gradient(to right, var(--text-primary), var(--accent-color), var(--text-primary));
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: textShine 4s linear infinite;
+        }
+
+        @keyframes textShine {
+            0% {
+                background-position: 0% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
         }
 
         .hero p {
@@ -326,9 +329,9 @@
         }
 
         .secondary-btn {
-            background: rgba(99, 102, 241, 0.1);
+            background: var(--accent-alpha);
             color: var(--accent-color);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--accent-border-alpha);
             padding: 0.75rem 1.5rem;
             border-radius: 12px;
             font-weight: 600;
@@ -360,7 +363,7 @@
             background: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 12px var(--accent-shadow);
         }
 
         @keyframes spin {
@@ -397,12 +400,15 @@
             background: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 15px var(--accent-shadow);
+            transform: translateY(-2px);
         }
 
         .tab-btn:hover:not(.active) {
             border-color: var(--accent-color);
             color: var(--text-primary);
+            background: var(--accent-alpha);
+            transform: translateY(-2px);
         }
 
         /* Converter Card */
@@ -536,19 +542,28 @@
         .drop-zone:hover,
         .drop-zone.drag-over {
             border-color: var(--accent-color);
-            background: rgba(99, 102, 241, 0.05);
+            background: var(--accent-alpha);
+            box-shadow: 0 15px 30px -10px var(--accent-shadow);
+            transform: translateY(-2px);
         }
 
         .icon-wrapper {
             width: 64px;
             height: 64px;
-            background: rgba(99, 102, 241, 0.1);
+            background: var(--accent-alpha);
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem;
             color: var(--accent-color);
+            transition: var(--transition);
+        }
+
+        .drop-zone:hover .icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--accent-color);
+            color: white;
         }
 
         .drop-zone h3 {
@@ -663,6 +678,25 @@
             scrollbar-color: var(--accent-color) transparent;
         }
 
+        .preview-scroll::-webkit-scrollbar,
+        .preview-grid::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .preview-scroll::-webkit-scrollbar-track,
+        .preview-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .preview-scroll::-webkit-scrollbar-thumb,
+        .preview-grid::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 99px;
+        }
+        .preview-scroll::-webkit-scrollbar-thumb:hover,
+        .preview-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
         @media (max-width: 1000px) {
 
             .preview-scroll,
@@ -685,13 +719,19 @@
             overflow: hidden;
             border: 2px solid var(--border-color);
             background: var(--surface-color);
-            transition: transform 0.2s, border-color 0.2s, opacity 0.2s;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, opacity 0.2s, box-shadow 0.2s;
             aspect-ratio: 3/4;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: grab;
             user-select: none;
+        }
+
+        .preview-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 20px -10px var(--accent-shadow);
         }
 
         .preview-item.image-type {
@@ -712,7 +752,7 @@
         .preview-item.drag-over {
             border-color: var(--accent-color);
             transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 20px var(--accent-shadow);
         }
 
         .preview-item canvas,
@@ -833,19 +873,19 @@
             align-items: center;
             gap: 0.75rem;
             transition: var(--transition);
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 20px var(--accent-shadow);
         }
 
         .primary-btn:hover {
             background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 6px 24px var(--accent-shadow);
         }
 
         .add-more-btn {
-            background: rgba(99, 102, 241, 0.1);
+            background: var(--accent-alpha);
             color: var(--accent-color);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--accent-border-alpha);
             padding: 8px 16px;
             border-radius: 12px;
             font-size: 0.85rem;
@@ -873,7 +913,7 @@
         }
 
         .add-more-btn:hover {
-            background: rgba(99, 102, 241, 0.2);
+            background: var(--accent-border-alpha);
             transform: translateY(-1px);
         }
 
@@ -982,7 +1022,7 @@
         }
 
         .notification.info .notification-icon {
-            background: rgba(99, 102, 241, 0.1);
+            background: var(--accent-alpha);
             color: var(--accent-color);
         }
 
@@ -1022,7 +1062,7 @@
         .password-input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 0 4px var(--accent-alpha);
         }
 
         /* Responsive Improvements */
@@ -1124,7 +1164,7 @@
             }
 
             .tool-option:active {
-                background: rgba(99, 102, 241, 0.08) !important;
+                background: var(--accent-alpha) !important;
             }
 
             .tool-option i {
@@ -1314,8 +1354,8 @@
 
             .drop-zone {
                 padding: 3rem 1.5rem !important;
-                border: 2px dashed rgba(99, 102, 241, 0.2) !important;
-                background: rgba(99, 102, 241, 0.02) !important;
+                border: 2px dashed var(--accent-border-alpha) !important;
+                background: var(--accent-alpha) !important;
                 margin: 0.5rem 0.5rem 2.5rem 0.5rem !important;
                 min-height: 220px !important;
                 display: flex !important;
@@ -1340,7 +1380,7 @@
                 display: block !important;
                 margin-top: 1rem !important;
                 padding: 0.5rem !important;
-                border-top: 1px dashed rgba(99, 102, 241, 0.1) !important;
+                border-top: 1px dashed var(--accent-border-alpha) !important;
             }
 
             .file-info::before {
@@ -1756,7 +1796,7 @@
                                 <div id="original-size-text" style="font-weight: 700; font-size: 1.1rem;">0 KB</div>
                             </div>
                             <div
-                                style="background: rgba(99, 102, 241, 0.08); padding: 1rem; border-radius: 16px; text-align: center; border: 1px solid rgba(99, 102, 241, 0.2);">
+                                style="background: var(--accent-alpha); padding: 1rem; border-radius: 16px; text-align: center; border: 1px solid var(--accent-border-alpha);">
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">
                                     Estimated Size</div>
                                 <div id="estimated-size-text"
@@ -1959,7 +1999,7 @@
                                 </div>
                             </div>
                             <div
-                                style="background: rgba(99, 102, 241, 0.08); padding: 1rem; border-radius: 16px; text-align: center; border: 1px solid rgba(99, 102, 241, 0.2);">
+                                style="background: var(--accent-alpha); padding: 1rem; border-radius: 16px; text-align: center; border: 1px solid var(--accent-border-alpha);">
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">
                                     Estimated Size</div>
                                 <div id="compress-img-estimated-size"
@@ -2312,6 +2352,9 @@
         let protectFile = null;
         let compressPages = []; // Global storage for compression pages rotation/state
         let compressSettings = { quality: 0.5 }; // Shared settings
+        let pdfDocCache = {};
+        let isEstimatingPdf = false;
+        let estimatePdfTimeout = null;
         // PDF to Image Logic
         const pdfInput = document.getElementById('pdf-input');
         const pdfDropZone = document.getElementById('pdf-drop-zone');
@@ -2434,6 +2477,8 @@
                 parent.remove();
                 updatePageNumbers(type);
                 if (type === 'collage') { updateCollagePageNumbers(); drawCollage(); }
+                if (type === 'compress') updateEstimatedSize();
+                if (type === 'compress-img') updateCompressImgStats();
 
                 if (parent.parentElement && parent.parentElement.children.length === 0) {
                     if (type === 'pdf') resetPdf();
@@ -2479,6 +2524,8 @@
                         el.style.transform = `rotate(${item.rotation}deg)`;
                         el.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
                     }
+                    if (type === 'compress') updateEstimatedSize();
+                    if (type === 'compress-img') updateCompressImgStats();
                 }
             };
             parent.appendChild(btn);
@@ -3054,23 +3101,79 @@
             }
         }
 
+        function getCompressScale(sliderValue) {
+            if (sliderValue < 30) return 2.0;
+            if (sliderValue <= 60) return 1.5;
+            if (sliderValue <= 80) return 1.0;
+            return 0.75;
+        }
+
         compressionSlider.addEventListener('input', () => {
             compressionValueText.textContent = compressionSlider.value + '%';
             updateEstimatedSize();
         });
 
         function updateEstimatedSize() {
-            if (compressFiles.length === 0) return;
+            if (compressFiles.length === 0) {
+                originalSizeText.textContent = '0 KB';
+                estimatedSizeText.textContent = '0 KB';
+                return;
+            }
             const totalSize = compressFiles.reduce((acc, f) => acc + f.size, 0);
-            const factor = 1 - (compressionSlider.value / 100) * 0.8;
-            const estSize = totalSize * factor;
-
             originalSizeText.textContent = formatBytes(totalSize);
-            estimatedSizeText.textContent = formatBytes(estSize);
+
+            // Debounce actual estimation to prevent lag on slider drag
+            clearTimeout(estimatePdfTimeout);
+            estimatePdfTimeout = setTimeout(async () => {
+                if (isEstimatingPdf) return;
+                isEstimatingPdf = true;
+
+                try {
+                    const quality = (100 - compressionSlider.value) / 100;
+                    const scale = getCompressScale(compressionSlider.value);
+                    let totalEstSize = 0;
+
+                    for (let f = 0; f < compressFiles.length; f++) {
+                        const file = compressFiles[f];
+                        const filePages = compressPages.filter(p => p.fileIndex === f);
+                        if (filePages.length === 0) continue;
+
+                        const firstRemainingPageItem = filePages[0];
+
+                        if (!pdfDocCache[f]) {
+                            const arrayBuffer = await file.arrayBuffer();
+                            pdfDocCache[f] = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        }
+                        const pdfDoc = pdfDocCache[f];
+                        
+                        const page = await pdfDoc.getPage(firstRemainingPageItem.originalIndex);
+                        const viewport = page.getViewport({ scale: scale });
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                        const imgData = canvas.toDataURL('image/jpeg', quality);
+                        const singlePageCompressedSize = imgData.length * 0.75;
+                        
+                        totalEstSize += (singlePageCompressedSize * filePages.length) + (filePages.length * 1024);
+                    }
+
+                    estimatedSizeText.textContent = formatBytes(totalEstSize);
+                } catch (err) {
+                    console.error("PDF estimation failed", err);
+                    const factor = 1 - (compressionSlider.value / 100) * 0.8;
+                    estimatedSizeText.textContent = formatBytes(totalSize * factor);
+                } finally {
+                    isEstimatingPdf = false;
+                }
+            }, 250);
         }
 
         function resetCompress() {
             compressFiles = []; compressPages = []; compressInput.value = ''; compressPreviews.innerHTML = '';
+            pdfDocCache = {};
             compressDropZone.classList.remove('hidden'); compressPreviewContainer.classList.add('hidden');
         }
         clearCompressBtn.addEventListener('click', resetCompress);
@@ -3081,22 +3184,25 @@
             try {
                 const { jsPDF } = window.jspdf;
                 const quality = (100 - compressionSlider.value) / 100;
+                const scale = getCompressScale(compressionSlider.value);
 
                 for (let f = 0; f < compressFiles.length; f++) {
                     const file = compressFiles[f];
+                    const filePages = compressPages.filter(p => p.fileIndex === f);
+                    if (filePages.length === 0) continue;
+
                     showStatus(`Compressing File ${f + 1} of ${compressFiles.length}...`);
 
                     const arrayBuffer = await file.arrayBuffer();
                     const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                    const outPdf = new jsPDF();
+                    let outPdf = null;
 
-                    for (let i = 1; i <= pdfDoc.numPages; i++) {
-                        const page = await pdfDoc.getPage(i);
-                        // Find user's rotation for this specific page
-                        const pageItem = compressPages.find(p => p.fileIndex === f && p.originalIndex === i);
-                        const userRotation = pageItem ? pageItem.rotation : 0;
+                    for (let i = 0; i < filePages.length; i++) {
+                        const pageItem = filePages[i];
+                        const page = await pdfDoc.getPage(pageItem.originalIndex);
+                        const userRotation = pageItem.rotation || 0;
 
-                        const viewport = page.getViewport({ scale: 1.5, rotation: userRotation });
+                        const viewport = page.getViewport({ scale: scale, rotation: userRotation });
                         const canvas = document.createElement('canvas');
                         const context = canvas.getContext('2d');
                         canvas.height = viewport.height;
@@ -3104,20 +3210,27 @@
                         await page.render({ canvasContext: context, viewport: viewport }).promise;
 
                         const imgData = canvas.toDataURL('image/jpeg', quality);
-                        const pageWidth = outPdf.internal.pageSize.getWidth();
-                        const pageHeight = outPdf.internal.pageSize.getHeight();
-                        const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
-                        const imgWidth = canvas.width * ratio;
-                        const imgHeight = canvas.height * ratio;
+                        const orientation = canvas.width > canvas.height ? 'l' : 'p';
 
-                        if (i > 1) outPdf.addPage();
-                        outPdf.addImage(imgData, 'JPEG', (pageWidth - imgWidth) / 2, (pageHeight - imgHeight) / 2, imgWidth, imgHeight);
+                        if (i === 0) {
+                            outPdf = new jsPDF({
+                                orientation: orientation,
+                                unit: 'pt',
+                                format: [canvas.width, canvas.height]
+                            });
+                        } else {
+                            outPdf.addPage([canvas.width, canvas.height], orientation);
+                        }
+
+                        outPdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
 
                         if (i % 5 === 0) await new Promise(r => setTimeout(r, 50));
                     }
 
-                    outPdf.save(file.name.replace(/\.[^/.]+$/, "") + '_Compressed.pdf');
-                    await new Promise(r => setTimeout(r, 500)); // Gap between downloads
+                    if (outPdf) {
+                        outPdf.save(file.name.replace(/\.[^/.]+$/, "") + '_Compressed.pdf');
+                    }
+                    await new Promise(r => setTimeout(r, 500));
                 }
 
                 showStatus('Batch Compression Success!', 2000);
@@ -3899,17 +4012,79 @@
             updateCompressImgStats();
         });
 
+        let isEstimatingImages = false;
+        let estimateImgTimeout = null;
+
         function updateCompressImgStats() {
+            if (compressImgFiles.length === 0) {
+                compressImgOriginalSizeText.textContent = '0 KB';
+                compressImgEstimatedSizeText.textContent = '0 KB';
+                return;
+            }
             let totalSize = 0;
             compressImgFiles.forEach(item => {
                 totalSize += item.file.size;
             });
             compressImgOriginalSizeText.textContent = formatBytes(totalSize);
 
-            const quality = parseInt(compressImgSlider.value) / 100;
-            // Rough estimation for image compression (empirical)
-            const estimatedSize = totalSize * (quality * 0.9);
-            compressImgEstimatedSizeText.textContent = formatBytes(estimatedSize);
+            // Debounce actual estimation to prevent lag on slider drag
+            clearTimeout(estimateImgTimeout);
+            estimateImgTimeout = setTimeout(async () => {
+                if (isEstimatingImages) return;
+                isEstimatingImages = true;
+
+                try {
+                    const quality = parseInt(compressImgSlider.value) / 100;
+                    let totalEstSize = 0;
+
+                    const promises = compressImgFiles.map(async (item) => {
+                        if (!item.imgElement) {
+                            const img = new Image();
+                            const dataUrl = await new Promise((resolve) => {
+                                const reader = new FileReader();
+                                reader.onload = (e) => resolve(e.target.result);
+                                reader.readAsDataURL(item.file);
+                            });
+                            await new Promise((resolve) => {
+                                img.onload = resolve;
+                                img.src = dataUrl;
+                            });
+                            item.imgElement = img;
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const rotation = item.rotation || 0;
+                        const isPortrait = rotation % 180 === 0;
+                        canvas.width = isPortrait ? item.imgElement.width : item.imgElement.height;
+                        canvas.height = isPortrait ? item.imgElement.height : item.imgElement.width;
+
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        ctx.translate(canvas.width / 2, canvas.height / 2);
+                        ctx.rotate((rotation * Math.PI) / 180);
+                        ctx.drawImage(item.imgElement, -item.imgElement.width / 2, -item.imgElement.height / 2);
+                        ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                        return new Promise((resolve) => {
+                            canvas.toBlob((blob) => {
+                                resolve(blob ? blob.size : 0);
+                            }, 'image/jpeg', quality);
+                        });
+                    });
+
+                    const sizes = await Promise.all(promises);
+                    totalEstSize = sizes.reduce((a, b) => a + b, 0);
+                    compressImgEstimatedSizeText.textContent = formatBytes(totalEstSize);
+                } catch (err) {
+                    console.error("Image estimation failed", err);
+                    const quality = parseInt(compressImgSlider.value) / 100;
+                    compressImgEstimatedSizeText.textContent = formatBytes(totalSize * (quality * 0.9));
+                } finally {
+                    isEstimatingImages = false;
+                }
+            }, 250);
         }
 
         function handleCompressImgSelect() {
@@ -3955,6 +4130,7 @@
             compressImgFiles = [];
             compressImgInput.value = '';
             updateCompressImgPreviews();
+            updateCompressImgStats();
         });
 
         compressImgBtn.addEventListener('click', async () => {
@@ -3985,6 +4161,9 @@
                     const isPortrait = rotation % 180 === 0;
                     canvas.width = isPortrait ? img.width : img.height;
                     canvas.height = isPortrait ? img.height : img.width;
+
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                     ctx.translate(canvas.width / 2, canvas.height / 2);
                     ctx.rotate((rotation * Math.PI) / 180);
