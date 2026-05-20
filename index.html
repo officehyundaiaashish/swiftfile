@@ -828,114 +828,6 @@
             transform: scale(1.1);
         }
 
-        /* Page Exclude Feature (Merge tab) */
-        .page-exclude-toggle-btn {
-            position: absolute;
-            top: 6px;
-            left: 36px;
-            background: var(--surface-color);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-            opacity: 0.8;
-            transition: var(--transition);
-        }
-
-        .page-exclude-toggle-btn:hover {
-            opacity: 1;
-            transform: scale(1.1);
-            background: var(--border-color);
-        }
-
-        .page-exclude-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 75%;
-            background: var(--surface-color);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            z-index: 30;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .page-exclude-overlay.show {
-            transform: translateY(0);
-        }
-
-        .exclude-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 4px;
-        }
-
-        .exclude-close {
-            background: none;
-            border: none;
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .exclude-close:hover {
-            color: var(--text-primary);
-        }
-
-        .exclude-pills-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            overflow-y: auto;
-            flex: 1;
-            padding-bottom: 5px;
-        }
-
-        .page-exclude-pill {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 26px;
-            height: 26px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            user-select: none;
-            transition: var(--transition);
-            background: var(--border-color);
-            color: var(--text-secondary);
-            border: 1px solid transparent;
-        }
-
-        .page-exclude-pill.active {
-            background: var(--accent-color);
-            color: white;
-            box-shadow: 0 2px 4px var(--accent-shadow);
-        }
-
-        .page-exclude-pill:hover {
-            transform: translateY(-1px);
-        }
-
         .page-badge,
         .page-count-badge {
             position: absolute;
@@ -2587,6 +2479,7 @@
                 if (type === 'collage') { updateCollagePageNumbers(); drawCollage(); }
                 if (type === 'compress') updateEstimatedSize();
                 if (type === 'compress-img') updateCompressImgStats();
+                if (type === 'merge') mergeCountText.textContent = `${mergeItems.length} pages selected`;
 
                 if (parent.parentElement && parent.parentElement.children.length === 0) {
                     if (type === 'pdf') resetPdf();
@@ -2914,138 +2807,70 @@
             if (e.dataTransfer.files.length > 0) { mergeInput.files = e.dataTransfer.files; handleMergePdfSelect(); }
         });
 
-        function addPageExcludeBtn(parent, id, numPages) {
-            const btn = document.createElement('button');
-            btn.className = 'page-exclude-toggle-btn';
-            btn.title = 'Exclude/Select Pages';
-            btn.innerHTML = '<i data-lucide="list-checks"></i>';
-            
-            const overlay = document.createElement('div');
-            overlay.className = 'page-exclude-overlay';
-            
-            let pillsHtml = '';
-            for (let i = 1; i <= numPages; i++) {
-                pillsHtml += `<span class="page-exclude-pill active" data-page="${i}">${i}</span>`;
-            }
-            
-            overlay.innerHTML = `
-                <div class="exclude-header">
-                    <span>Exclude Pages</span>
-                    <button class="exclude-close">&times;</button>
-                </div>
-                <div class="exclude-pills-container">
-                    ${pillsHtml}
-                </div>
-            `;
-            
-            overlay.addEventListener('dragstart', (e) => e.stopPropagation());
-            overlay.addEventListener('click', (e) => e.stopPropagation());
-            
-            const closeBtn = overlay.querySelector('.exclude-close');
-            closeBtn.onclick = (e) => {
-                e.stopPropagation();
-                overlay.classList.remove('show');
-            };
-            
-            const pills = overlay.querySelectorAll('.page-exclude-pill');
-            pills.forEach(pill => {
-                pill.onclick = (e) => {
-                    e.stopPropagation();
-                    const pageNum = parseInt(pill.dataset.page);
-                    const item = mergeItems.find(m => m.id === id);
-                    if (!item) return;
-                    
-                    if (pill.classList.contains('active')) {
-                        if (item.selectedPages.length <= 1) {
-                            notify('At least one page must be selected.', 'info');
-                            return;
-                        }
-                        pill.classList.remove('active');
-                        item.selectedPages = item.selectedPages.filter(p => p !== pageNum);
-                    } else {
-                        pill.classList.add('active');
-                        if (!item.selectedPages.includes(pageNum)) {
-                            item.selectedPages.push(pageNum);
-                            item.selectedPages.sort((a, b) => a - b);
-                        }
-                    }
-                    
-                    const pageCountBadge = parent.querySelector('.page-count-badge');
-                    if (pageCountBadge) {
-                        pageCountBadge.textContent = `${item.selectedPages.length}/${numPages} Pgs`;
-                    }
-                };
-            });
-            
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                overlay.classList.toggle('show');
-            };
-            
-            parent.appendChild(btn);
-            parent.appendChild(overlay);
-            lucide.createIcons({ props: { width: 14, height: 14 }, nameAttr: 'data-lucide', root: btn });
-        }
-
         async function handleMergePdfSelect() {
             const files = Array.from(mergeInput.files).filter(f => f.type === 'application/pdf');
-            for (const file of files) {
-                const id = Math.random().toString(36).substr(2, 9);
-                mergeItems.push({ id, file, rendered: false, rotation: 0, selectedPages: [] });
-                const div = createPreviewItem(id, mergeItems.length, 'merge');
-                mergePreviews.appendChild(div);
-                renderMergePdfPreview(file, id);
-            }
+            if (files.length === 0 && mergeItems.length === 0) return;
+
             mergeDropZone.classList.add('hidden');
             mergePreviewContainer.classList.remove('hidden');
-            mergeCountText.textContent = `${mergeItems.length} files selected`;
+
+            for (const file of files) {
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const id = Math.random().toString(36).substr(2, 9);
+                        const pageObj = { id, file, originalIndex: i, rotation: 0, rendered: false };
+                        mergeItems.push(pageObj);
+                        
+                        const div = createPreviewItem(id, i, 'merge');
+                        mergePreviews.appendChild(div);
+                    }
+                    
+                    renderMergePagesBackground(pdf, file);
+                } catch (error) {
+                    console.error(error);
+                    if (error.name === 'PasswordException') {
+                        notify(`"${file.name}" is password protected. Please unlock it first.`, 'error');
+                    } else {
+                        notify(`Failed to load "${file.name}".`, 'error');
+                    }
+                }
+            }
+
+            mergeCountText.textContent = `${mergeItems.length} pages selected`;
             updatePageNumbers('merge');
         }
 
-        async function renderMergePdfPreview(file, id) {
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                const page = await pdf.getPage(1);
-                const viewport = page.getViewport({ scale: 0.3 });
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d', { alpha: false });
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                await page.render({ canvasContext: context, viewport: viewport }).promise;
-                const div = document.querySelector(`[data-id="${id}"]`);
-                
-                const item = mergeItems.find(m => m.id === id);
-                if (item) {
-                    item.rendered = true;
-                    item.selectedPages = Array.from({ length: pdf.numPages }, (_, i) => i + 1);
-                }
+        async function renderMergePagesBackground(pdf, file) {
+            const pagesToRender = mergeItems.filter(item => item.file === file && !item.rendered);
+            for (const item of pagesToRender) {
+                const div = document.querySelector(`[data-id="${item.id}"]`);
+                if (!div) continue;
 
-                if (div) {
+                try {
+                    const page = await pdf.getPage(item.originalIndex);
+                    const viewport = page.getViewport({ scale: 0.3 });
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d', { alpha: false });
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+
                     div.innerHTML = '';
                     div.appendChild(canvas);
-                    addRemoveBtn(div, id, 'merge');
-                    addRotateBtn(div, id, 'merge');
-                    addBadge(div, ''); // File index
-                    addBadge(div, `${pdf.numPages} Pgs`, true); // Page count
-                    
-                    if (pdf.numPages > 1) {
-                        addPageExcludeBtn(div, id, pdf.numPages);
-                    }
+                    addRemoveBtn(div, item.id, 'merge');
+                    addRotateBtn(div, item.id, 'merge');
+                    addBadge(div, ''); // Left badge (updated by updatePageNumbers)
+                    addBadge(div, `P. ${item.originalIndex}`, true); // Right badge (Original page number)
+
+                    item.rendered = true;
+                } catch (err) {
+                    console.error("Failed to render page preview", err);
                 }
-                updatePageNumbers('merge');
-            } catch (error) {
-                console.error(error);
-                if (error.name === 'PasswordException') {
-                    notify(`"${file.name}" is password protected. Please unlock it first.`, 'error');
-                } else {
-                    notify(`Failed to preview "${file.name}".`, 'error');
-                }
-                mergeItems = mergeItems.filter(m => m.id !== id);
-                const div = document.querySelector(`[data-id="${id}"]`);
-                if (div) div.remove();
-                if (mergeItems.length === 0) resetMerge();
             }
+            updatePageNumbers('merge');
         }
 
         function resetMerge() {
@@ -3060,22 +2885,26 @@
             try {
                 const { PDFDocument, degrees } = PDFLib;
                 const mergedPdf = await PDFDocument.create();
-                for (const item of mergeItems) {
-                    const donorBuffer = await item.file.arrayBuffer();
-                    const donorPdf = await PDFDocument.load(donorBuffer);
-                    
-                    // Copy only user-selected pages (0-based indices)
-                    const copiedPages = await mergedPdf.copyPages(
-                        donorPdf, 
-                        item.selectedPages.map(p => p - 1)
-                    );
+                
+                // Cache loaded PDFLib documents to avoid loading the same file multiple times
+                const loadedPdfs = new Map();
 
-                    copiedPages.forEach(page => {
-                        const currentRotation = page.getRotation().angle;
-                        page.setRotation(degrees(currentRotation + (item.rotation || 0)));
-                        mergedPdf.addPage(page);
-                    });
+                for (const item of mergeItems) {
+                    let donorPdf = loadedPdfs.get(item.file);
+                    if (!donorPdf) {
+                        const donorBuffer = await item.file.arrayBuffer();
+                        donorPdf = await PDFDocument.load(donorBuffer);
+                        loadedPdfs.set(item.file, donorPdf);
+                    }
+
+                    // Copy the specific page (0-based index)
+                    const [copiedPage] = await mergedPdf.copyPages(donorPdf, [item.originalIndex - 1]);
+                    
+                    const currentRotation = copiedPage.getRotation().angle;
+                    copiedPage.setRotation(degrees(currentRotation + (item.rotation || 0)));
+                    mergedPdf.addPage(copiedPage);
                 }
+
                 const pdfBytes = await mergedPdf.save();
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
