@@ -36,6 +36,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -224,6 +226,7 @@
             0% {
                 background-position: 0% center;
             }
+
             100% {
                 background-position: 200% center;
             }
@@ -683,15 +686,18 @@
             width: 8px;
             height: 8px;
         }
+
         .preview-scroll::-webkit-scrollbar-track,
         .preview-grid::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .preview-scroll::-webkit-scrollbar-thumb,
         .preview-grid::-webkit-scrollbar-thumb {
             background: var(--border-color);
             border-radius: 99px;
         }
+
         .preview-scroll::-webkit-scrollbar-thumb:hover,
         .preview-grid::-webkit-scrollbar-thumb:hover {
             background: var(--accent-color);
@@ -1460,6 +1466,91 @@
             transform: scale(1.1);
             background: var(--accent-hover);
         }
+
+        /* Word Document Preview Styles */
+        .word-preview-wrapper {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 100%;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+        }
+
+        .light-theme .word-preview-wrapper {
+            background: #f7f9fb;
+        }
+
+        .dark-theme .word-preview-wrapper {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .word-preview-paper {
+            background: white;
+            color: #333333;
+            width: 100%;
+            max-width: 800px;
+            min-height: 1000px;
+            padding: 3rem 4rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            text-align: left;
+            font-family: 'Outfit', 'Inter', 'Calibri', 'Arial', sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+        }
+
+        .word-preview-paper h1,
+        .word-preview-paper h2,
+        .word-preview-paper h3,
+        .word-preview-paper h4 {
+            color: #111111;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .word-preview-paper h1 {
+            font-size: 2rem;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 0.5rem;
+        }
+
+        .word-preview-paper h2 {
+            font-size: 1.5rem;
+        }
+
+        .word-preview-paper h3 {
+            font-size: 1.25rem;
+        }
+
+        .word-preview-paper p {
+            margin-bottom: 1rem;
+        }
+
+        .word-preview-paper table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .word-preview-paper th,
+        .word-preview-paper td {
+            border: 1px solid #dddddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .word-preview-paper th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
     </style>
     <script>
         function switchTab(tabId) {
@@ -1481,7 +1572,8 @@
                 'unlock-pdf': 'Unlock PDF',
                 'protect-pdf': 'Protect PDF',
                 'bg-remover': 'Remove BG',
-                'collage-maker': 'Collage Maker'
+                'collage-maker': 'Collage Maker',
+                'word-to-pdf': 'Word to PDF'
             };
             const toolIcons = {
                 'img-to-pdf': 'image',
@@ -1493,7 +1585,8 @@
                 'unlock-pdf': 'unlock',
                 'protect-pdf': 'lock',
                 'bg-remover': 'eraser',
-                'collage-maker': 'layout'
+                'collage-maker': 'layout',
+                'word-to-pdf': 'file-up'
             };
 
             const label = document.getElementById('current-tool-label');
@@ -1617,6 +1710,9 @@
             </button>
             <button class="tab-btn" data-tab="collage-maker" onclick="switchTab('collage-maker')">
                 <i data-lucide="layout"></i> Collage Maker
+            </button>
+            <button class="tab-btn" data-tab="word-to-pdf" onclick="switchTab('word-to-pdf')">
+                <i data-lucide="file-up"></i> Word to PDF
             </button>
         </div>
 
@@ -2268,7 +2364,42 @@
                     </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Word to PDF Section -->
+            <div id="word-to-pdf" class="tab-content">
+                <div class="drop-zone" id="word-to-pdf-drop-zone">
+                    <input type="file" id="word-to-pdf-input" accept=".docx" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="file-up"></i>
+                        </div>
+                        <h3>Upload Word Document</h3>
+                        <p>Drag and drop a Word document (.docx) or click to browse</p>
+                        <span class="file-info">Only .docx files are supported for offline conversion</span>
+                    </div>
+                </div>
+
+                <div id="word-to-pdf-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="word-to-pdf-filename">Document Ready</span>
+                        <button id="clear-word-to-pdf" class="text-btn danger">Clear All</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; margin: 1rem 0; width: 100%;">
+                        <div id="word-to-pdf-preview-wrapper" class="word-preview-wrapper">
+                            <div id="word-to-pdf-preview" class="word-preview-paper"></div>
+                        </div>
+                    </div>
+
+                    <div class="action-bar">
+                        <button id="convert-word-to-pdf-btn" class="primary-btn btn-download-success"
+                            style="width: 100%; justify-content: center;">
+                            <span>Convert & Download PDF</span>
+                            <i data-lucide="download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="status-toast" class="toast hidden">
@@ -2355,6 +2486,7 @@
         let pdfDocCache = {};
         let isEstimatingPdf = false;
         let estimatePdfTimeout = null;
+        let wordFile = null;
         // PDF to Image Logic
         const pdfInput = document.getElementById('pdf-input');
         const pdfDropZone = document.getElementById('pdf-drop-zone');
@@ -2823,11 +2955,11 @@
                         const id = Math.random().toString(36).substr(2, 9);
                         const pageObj = { id, file, originalIndex: i, rotation: 0, rendered: false };
                         mergeItems.push(pageObj);
-                        
+
                         const div = createPreviewItem(id, i, 'merge');
                         mergePreviews.appendChild(div);
                     }
-                    
+
                     renderMergePagesBackground(pdf, file);
                 } catch (error) {
                     console.error(error);
@@ -2885,7 +3017,7 @@
             try {
                 const { PDFDocument, degrees } = PDFLib;
                 const mergedPdf = await PDFDocument.create();
-                
+
                 // Cache loaded PDFLib documents to avoid loading the same file multiple times
                 const loadedPdfs = new Map();
 
@@ -2899,7 +3031,7 @@
 
                     // Copy the specific page (0-based index)
                     const [copiedPage] = await mergedPdf.copyPages(donorPdf, [item.originalIndex - 1]);
-                    
+
                     const currentRotation = copiedPage.getRotation().angle;
                     copiedPage.setRotation(degrees(currentRotation + (item.rotation || 0)));
                     mergedPdf.addPage(copiedPage);
@@ -3169,7 +3301,7 @@
                             pdfDocCache[f] = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                         }
                         const pdfDoc = pdfDocCache[f];
-                        
+
                         const page = await pdfDoc.getPage(firstRemainingPageItem.originalIndex);
                         const viewport = page.getViewport({ scale: scale });
                         const canvas = document.createElement('canvas');
@@ -3180,7 +3312,7 @@
 
                         const imgData = canvas.toDataURL('image/jpeg', quality);
                         const singlePageCompressedSize = imgData.length * 0.75;
-                        
+
                         totalEstSize += (singlePageCompressedSize * filePages.length) + (filePages.length * 1024);
                     }
 
@@ -4938,6 +5070,141 @@
                 originalHandleDrop(e);
             }
         };
+
+        // Word to PDF Logic
+        const wordToPdfInput = document.getElementById('word-to-pdf-input');
+        const wordToPdfDropZone = document.getElementById('word-to-pdf-drop-zone');
+        const wordToPdfPreviewContainer = document.getElementById('word-to-pdf-preview-container');
+        const wordToPdfPreview = document.getElementById('word-to-pdf-preview');
+        const wordToPdfFilename = document.getElementById('word-to-pdf-filename');
+        const clearWordToPdfBtn = document.getElementById('clear-word-to-pdf');
+        const convertWordToPdfBtn = document.getElementById('convert-word-to-pdf-btn');
+
+        // Word to PDF Event Listeners
+        wordToPdfDropZone.addEventListener('click', () => wordToPdfInput.click());
+        wordToPdfInput.addEventListener('change', handleWordSelect);
+        wordToPdfDropZone.addEventListener('dragover', (e) => { e.preventDefault(); wordToPdfDropZone.classList.add('drag-over'); });
+        wordToPdfDropZone.addEventListener('dragleave', () => wordToPdfDropZone.classList.remove('drag-over'));
+        wordToPdfDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            wordToPdfDropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) {
+                wordToPdfInput.files = e.dataTransfer.files;
+                handleWordSelect();
+            }
+        });
+
+        function handleWordSelect() {
+            const file = wordToPdfInput.files[0];
+            if (!file) return;
+
+            if (file.size > 50 * 1024 * 1024) {
+                notify("File exceeds the 50MB limit.", 'error');
+                return;
+            }
+
+            wordFile = file;
+            wordToPdfFilename.textContent = file.name;
+            wordToPdfDropZone.classList.add('hidden');
+            wordToPdfPreviewContainer.classList.remove('hidden');
+
+            showStatus('Reading Word document...');
+
+            const reader = new FileReader();
+            reader.onload = function (loadEvent) {
+                const arrayBuffer = loadEvent.target.result;
+                mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+                    .then(function (result) {
+                        wordToPdfPreview.innerHTML = result.value || "<p style='color: var(--text-secondary); text-align: center;'>Empty Document</p>";
+                        hideStatus();
+                        notify("Word document loaded successfully.", "success");
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                        hideStatus();
+                        notify("Error reading Word file. Make sure it's a valid .docx file.", 'error');
+                        resetWordToPdf();
+                    });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function resetWordToPdf() {
+            wordFile = null;
+            wordToPdfInput.value = '';
+            wordToPdfPreview.innerHTML = '';
+            wordToPdfDropZone.classList.remove('hidden');
+            wordToPdfPreviewContainer.classList.add('hidden');
+        }
+
+        clearWordToPdfBtn.addEventListener('click', resetWordToPdf);
+
+        convertWordToPdfBtn.addEventListener('click', async () => {
+            if (!wordFile) return;
+
+            showStatus('Converting Word to PDF...');
+            try {
+                const outName = wordFile.name.replace(/\.[^/.]+$/, "") + ".pdf";
+                await convertHtmlToPdf(wordToPdfPreview, outName);
+                showStatus('Success!', 2000);
+                notify('Document converted to PDF successfully.', 'success');
+            } catch (error) {
+                console.error(error);
+                notify('Failed to generate PDF.', 'error');
+                hideStatus();
+            }
+        });
+
+        async function convertHtmlToPdf(element, filename) {
+            const { jsPDF } = window.jspdf;
+
+            // Temporary styles for capturing full content without scrollbars
+            const originalMaxHeight = element.style.maxHeight;
+            const originalOverflowY = element.style.overflowY;
+
+            element.style.maxHeight = 'none';
+            element.style.overflowY = 'visible';
+
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+
+                element.style.maxHeight = originalMaxHeight;
+                element.style.overflowY = originalOverflowY;
+
+                const imgWidth = 595.28; // A4 width in pt
+                const pageHeight = 841.89; // A4 height in pt
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+                const imgHeight = (canvasHeight * imgWidth) / canvasWidth;
+
+                const pdf = new jsPDF('p', 'pt', 'a4');
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                // Add page 1
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save(filename);
+            } catch (err) {
+                element.style.maxHeight = originalMaxHeight;
+                element.style.overflowY = originalOverflowY;
+                throw err;
+            }
+        }
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
