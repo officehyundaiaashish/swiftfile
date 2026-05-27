@@ -8110,7 +8110,12 @@
         });
 
         // Vercel proxy URL - UPDATE THIS after deploying your Vercel project
-        const VERCEL_PROXY_URL = 'https://swiftfile-proxy.vercel.app/api/chat';
+        // Vercel proxy URL - dynamically uses the current domain if hosted on Vercel,
+        // or falls back to your Vercel deployment URL if hosted on GitHub Pages.
+        // UPDATE the URL below with your actual Vercel app URL (e.g. https://swiftfile.vercel.app/api/chat).
+        const VERCEL_PROXY_URL = window.location.hostname.includes('vercel.app') 
+            ? '/api/chat' 
+            : 'https://swiftfile.vercel.app/api/chat';
 
         // Toggle settings visibility based on provider
         function updateProviderUI() {
