@@ -2423,9 +2423,12 @@
                         </div>
                         <h3>Document Scanner</h3>
                         <p>Use your camera to scan, autocrop, and enhance documents in real-time</p>
-                        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 1.5rem auto 0 auto; align-items: center;">
-                            <select id="scanner-camera-select" class="password-input" style="margin-bottom: 0; padding: 0.75rem; font-size: 0.9rem; text-align-last: center;"></select>
-                            <button id="scanner-start-btn" class="primary-btn" style="width: 100%; justify-content: center;">
+                        <div
+                            style="display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 1.5rem auto 0 auto; align-items: center;">
+                            <select id="scanner-camera-select" class="password-input"
+                                style="margin-bottom: 0; padding: 0.75rem; font-size: 0.9rem; text-align-last: center;"></select>
+                            <button id="scanner-start-btn" class="primary-btn"
+                                style="width: 100%; justify-content: center;">
                                 <i data-lucide="camera"></i> Start Camera
                             </button>
                         </div>
@@ -2438,15 +2441,19 @@
                         <span id="scanner-status-text">Detecting edges...</span>
                         <button id="scanner-stop-btn" class="text-btn danger">Close Camera</button>
                     </div>
-                    
-                    <div class="large-preview-box" id="scanner-video-container" style="background: #000; min-height: 450px;">
-                        <video id="scanner-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: contain; transform: scaleX(1);"></video>
-                        <canvas id="scanner-overlay-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;"></canvas>
+
+                    <div class="large-preview-box" id="scanner-video-container"
+                        style="background: #000; min-height: 450px;">
+                        <video id="scanner-video" autoplay playsinline
+                            style="width: 100%; height: 100%; object-fit: contain; transform: scaleX(1);"></video>
+                        <canvas id="scanner-overlay-canvas"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;"></canvas>
                         <div class="scanner-line" id="scanner-line-active" style="display: block;"></div>
                     </div>
 
                     <div class="action-bar" style="margin-top: 1.5rem;">
-                        <button id="scanner-capture-btn" class="primary-btn btn-pro-ai" style="padding: 1.25rem 2.5rem; border-radius: 50px;">
+                        <button id="scanner-capture-btn" class="primary-btn btn-pro-ai"
+                            style="padding: 1.25rem 2.5rem; border-radius: 50px;">
                             <i data-lucide="camera" style="width: 24px; height: 24px;"></i>
                             <span style="font-size: 1.1rem; font-weight: 700;">CAPTURE DOCUMENT</span>
                         </button>
@@ -2457,19 +2464,24 @@
                 <div id="scanner-preview-screen" class="hidden">
                     <div class="preview-header">
                         <span>Scan Result</span>
-                        <button id="scanner-retake-btn" class="text-btn"><i data-lucide="rotate-ccw"></i> Retake</button>
+                        <button id="scanner-retake-btn" class="text-btn"><i data-lucide="rotate-ccw"></i>
+                            Retake</button>
                     </div>
 
-                    <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                    <div class="bg-tool-layout"
+                        style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
                         <div class="bg-main-preview">
                             <div class="large-preview-box" id="scanner-preview-box" style="padding: 10px;">
-                                <img id="scanner-result-img" style="max-width: 100%; max-height: 600px; display: block; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: 4px;">
+                                <img id="scanner-result-img"
+                                    style="max-width: 100%; max-height: 600px; display: block; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: 4px;">
                             </div>
                         </div>
 
                         <div class="bg-controls-panel">
                             <div class="control-group">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Enhancement Filters</label>
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Enhancement
+                                    Filters</label>
                                 <div class="bg-option-tabs" style="margin-bottom: 1.5rem;">
                                     <button class="bg-option-btn active" id="filter-orig">Original</button>
                                     <button class="bg-option-btn" id="filter-magic">Magic Color</button>
@@ -2478,19 +2490,31 @@
                             </div>
 
                             <div class="control-group" style="margin-top: 1rem;">
-                                <button id="scanner-recrop-btn" class="secondary-btn" style="width: 100%; justify-content: center;">
+                                <button id="scanner-recrop-btn" class="secondary-btn"
+                                    style="width: 100%; justify-content: center;">
                                     <i data-lucide="crop" style="width:18px;"></i> Adjust Borders (Recrop)
                                 </button>
                             </div>
 
-                            <div style="margin-top: 2rem; pt: 1rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;">
-                                <button id="scanner-save-jpg-btn" class="primary-btn btn-swift-engine" style="width: 100%; justify-content: center;">
+                            <div class="control-group" style="margin-top: 1rem; background: var(--input-bg); padding: 1rem; border-radius: 16px; border: 1px solid var(--border-color);">
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); cursor: pointer; user-select: none;">
+                                    <input type="checkbox" id="scanner-watermark-toggle" style="cursor: pointer; width: 16px; height: 16px;"> Add Watermark
+                                </label>
+                                <input type="text" id="scanner-watermark-text" value="Scanned with Swift File" placeholder="Watermark text..." class="password-input" style="margin-top: 8px; margin-bottom: 0; padding: 8px 12px; font-size: 0.85rem; display: none;">
+                            </div>
+
+                            <div
+                                style="margin-top: 2rem; pt: 1rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;">
+                                <button id="scanner-save-jpg-btn" class="primary-btn btn-swift-engine"
+                                    style="width: 100%; justify-content: center;">
                                     <i data-lucide="image"></i> Save as JPG
                                 </button>
-                                <button id="scanner-save-pdf-btn" class="primary-btn btn-pro-ai" style="width: 100%; justify-content: center;">
+                                <button id="scanner-save-pdf-btn" class="primary-btn btn-pro-ai"
+                                    style="width: 100%; justify-content: center;">
                                     <i data-lucide="file-text"></i> Save as PDF
                                 </button>
-                                <button id="scanner-send-to-pdf-btn" class="secondary-btn" style="width: 100%; justify-content: center;">
+                                <button id="scanner-send-to-pdf-btn" class="secondary-btn"
+                                    style="width: 100%; justify-content: center;">
                                     <i data-lucide="plus"></i> Add to Image-to-PDF
                                 </button>
                             </div>
@@ -5321,6 +5345,11 @@
         let scannerCropper = null;
         let detectedCorners = null; // [{x, y}] on video frame scale
         let scannerAnimationId = null;
+        let lastCorners = null;
+        let stabilityCount = 0;
+        let isStable = false;
+        const STABILITY_THRESHOLD_FRAMES = 20;
+        const STABILITY_PIXEL_TOLERANCE = 15;
 
         const scannerStartScreen = document.getElementById('scanner-start-screen');
         const scannerActiveScreen = document.getElementById('scanner-active-screen');
@@ -5484,7 +5513,7 @@
                     cv.cvtColor(dst, gray, cv.COLOR_RGBA2GRAY);
                     cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
                     cv.Canny(blurred, edged, 30, 120);
-                    
+
                     // Dilate the edges to merge near/broken contour segments
                     let kernel = cv.Mat.ones(3, 3, cv.CV_8U);
                     cv.dilate(edged, edged, kernel);
@@ -5503,7 +5532,7 @@
                         if (area > (vw * vh * scale * scale * 0.03)) { // min area 3% of view
                             const perimeter = cv.arcLength(contour, true);
                             const tempApprox = new cv.Mat();
-                            
+
                             // Iterate epsilon to locate a 4-point polygon
                             let foundQuad = false;
                             for (let epsilonFactor = 0.01; epsilonFactor <= 0.05; epsilonFactor += 0.01) {
@@ -5550,6 +5579,44 @@
                 }
             }
 
+            // Stability tracking
+            if (detectedCorners) {
+                if (lastCorners) {
+                    let cornersMatch = true;
+                    for (let i = 0; i < 4; i++) {
+                        let dist = Math.hypot(detectedCorners[i].x - lastCorners[i].x, detectedCorners[i].y - lastCorners[i].y);
+                        if (dist > STABILITY_PIXEL_TOLERANCE) {
+                            cornersMatch = false;
+                            break;
+                        }
+                    }
+                    if (cornersMatch) {
+                        stabilityCount++;
+                        if (stabilityCount >= STABILITY_THRESHOLD_FRAMES) {
+                            if (!isStable) {
+                                isStable = true;
+                                notify('Camera stable. Ready to capture!', 'info');
+                                if (scannerStatusText) scannerStatusText.textContent = 'Stable. Ready to capture!';
+                            }
+                        }
+                    } else {
+                        stabilityCount = 0;
+                        if (isStable) {
+                            isStable = false;
+                            if (scannerStatusText) scannerStatusText.textContent = 'Hold steady to lock borders...';
+                        }
+                    }
+                }
+                lastCorners = detectedCorners;
+            } else {
+                stabilityCount = 0;
+                if (isStable) {
+                    isStable = false;
+                    if (scannerStatusText) scannerStatusText.textContent = 'Detecting document edges...';
+                }
+                lastCorners = null;
+            }
+
             // Draw overlay
             if (detectedCorners) {
                 // Scale corners to canvas display coordinates
@@ -5558,9 +5625,12 @@
                     y: (p.y / vh) * rect.height
                 }));
 
-                ctx.strokeStyle = '#2563eb';
+                const strokeColor = isStable ? '#22c55e' : '#2563eb';
+                const fillColor = isStable ? 'rgba(34, 197, 94, 0.18)' : 'rgba(37, 99, 235, 0.15)';
+
+                ctx.strokeStyle = strokeColor;
                 ctx.lineWidth = 4;
-                ctx.fillStyle = 'rgba(37, 99, 235, 0.15)';
+                ctx.fillStyle = fillColor;
                 ctx.beginPath();
                 ctx.moveTo(displayCorners[0].x, displayCorners[0].y);
                 ctx.lineTo(displayCorners[1].x, displayCorners[1].y);
@@ -5572,7 +5642,7 @@
 
                 // Draw circles at corners
                 ctx.fillStyle = '#ffffff';
-                ctx.strokeStyle = '#1d4ed8';
+                ctx.strokeStyle = strokeColor;
                 ctx.lineWidth = 2;
                 displayCorners.forEach(c => {
                     ctx.beginPath();
@@ -5660,7 +5730,7 @@
                 try {
                     const srcMat = cv.imread(srcCanvas);
                     const dstMat = new cv.Mat();
-                    
+
                     const srcCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [
                         corners[0].x, corners[0].y,
                         corners[1].x, corners[1].y,
@@ -5727,8 +5797,8 @@
                 // High fidelity shadow removal, background whitening, and contrast booster
                 for (let i = 0; i < data.length; i += 4) {
                     let r = data[i];
-                    let g = data[i+1];
-                    let b = data[i+2];
+                    let g = data[i + 1];
+                    let b = data[i + 2];
 
                     // Compute gray intensity
                     let gray = 0.299 * r + 0.587 * g + 0.114 * b;
@@ -5768,24 +5838,59 @@
                     b = ((b - 128) * 1.15) + 128;
 
                     data[i] = Math.min(255, Math.max(0, r));
-                    data[i+1] = Math.min(255, Math.max(0, g));
-                    data[i+2] = Math.min(255, Math.max(0, b));
+                    data[i + 1] = Math.min(255, Math.max(0, g));
+                    data[i + 2] = Math.min(255, Math.max(0, b));
                 }
                 ctx.putImageData(imgData, 0, 0);
             } else if (currentScannerFilter === 'bw') {
                 for (let i = 0; i < data.length; i += 4) {
-                    const gray = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                    const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
                     let newG = ((gray - 128) * 1.6) + 128;
                     const val = newG > 135 ? 255 : 0;
                     data[i] = val;
-                    data[i+1] = val;
-                    data[i+2] = val;
+                    data[i + 1] = val;
+                    data[i + 2] = val;
                 }
                 ctx.putImageData(imgData, 0, 0);
             }
 
+            // Draw watermark if checked
+            const watermarkToggle = document.getElementById('scanner-watermark-toggle');
+            const watermarkText = document.getElementById('scanner-watermark-text');
+            if (watermarkToggle && watermarkToggle.checked) {
+                const text = watermarkText.value || 'Scanned with Swift File';
+                const fontSize = Math.max(16, Math.round(filteredCanvas.width * 0.024));
+                ctx.font = `bold ${fontSize}px Outfit, sans-serif`;
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+                ctx.lineWidth = Math.max(2, Math.round(fontSize * 0.15));
+                
+                const margin = Math.max(12, Math.round(filteredCanvas.width * 0.02));
+                const x = filteredCanvas.width - margin;
+                const y = filteredCanvas.height - margin;
+                
+                ctx.strokeText(text, x, y);
+                ctx.fillText(text, x, y);
+            }
+
             scannerResultImg.src = filteredCanvas.toDataURL('image/jpeg', 0.95);
         }
+
+        // Watermark Controls Listeners
+        document.getElementById('scanner-watermark-toggle').addEventListener('change', function() {
+            const textInput = document.getElementById('scanner-watermark-text');
+            if (this.checked) {
+                textInput.style.display = 'block';
+                textInput.focus();
+            } else {
+                textInput.style.display = 'none';
+            }
+            applyScannerFilter();
+        });
+        document.getElementById('scanner-watermark-text').addEventListener('input', applyScannerFilter);
 
         // Hook filter buttons
         [filterOrig, filterMagic, filterBw].forEach(btn => {
@@ -5837,7 +5942,7 @@
             const scanW = scannerCroppedImage ? scannerCroppedImage.width : 1000;
             const scanH = scannerCroppedImage ? scannerCroppedImage.height : 1414;
             const scale = Math.min(pageWidth / scanW, pageHeight / scanH);
-            const w = scanW * scale;ac
+            const w = scanW * scale;
             const h = scanH * scale;
             pdf.addImage(scannerResultImg.src, 'JPEG', (pageWidth - w) / 2, (pageHeight - h) / 2, w, h);
             pdf.save(`SwiftScan_${Date.now()}.pdf`);
@@ -5848,21 +5953,21 @@
             const res = await fetch(scannerResultImg.src);
             const blob = await res.blob();
             const file = new File([blob], `Scan_${Date.now()}.jpg`, { type: 'image/jpeg' });
-            
+
             const dt = new DataTransfer();
             dt.items.add(file);
-            
+
             const id = Math.random().toString(36).substr(2, 9);
             const url = URL.createObjectURL(file);
             imageItems.push({ id, file, url, rotation: 0 });
-            
+
             const div = createPreviewItem(id, imageItems.length, 'image');
             imgPreviews.appendChild(div);
             div.innerHTML = '';
             const img = document.createElement('img');
             img.src = url;
             div.appendChild(img);
-            
+
             addRemoveBtn(div, id, 'image');
             addRotateBtn(div, id, 'image');
             addBadge(div, imageItems.length);
