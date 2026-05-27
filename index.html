@@ -1739,25 +1739,34 @@
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
+                width: 100vw !important;
+                height: 100vh !important;
                 z-index: 9999 !important;
                 background: var(--bg-color) !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 border: none !important;
                 border-radius: 0 !important;
+                overflow: hidden !important;
             }
             #swift-assistant.mobile-fullscreen > div {
-                height: 100vh !important;
+                height: 100% !important;
+                max-height: 100% !important;
                 border-radius: 0 !important;
                 border: none !important;
                 padding: 0.75rem !important;
                 gap: 0.5rem !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
             }
             #swift-assistant.mobile-fullscreen #assistant-chat-log {
                 flex: 1 !important;
+                height: 0 !important;
+                min-height: 0 !important;
                 max-height: none !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
             }
             #swift-assistant > div {
                 padding: 0.75rem !important;
