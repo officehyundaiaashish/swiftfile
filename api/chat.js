@@ -1,6 +1,3 @@
-// Vercel Serverless Function — Groq API Proxy
-// This keeps your API key secure on the server side
-
 export default async function handler(req, res) {
   // CORS headers — allow your GitHub Pages domain
   res.setHeader('Access-Control-Allow-Origin', '*');
