@@ -91,6 +91,7 @@
         input,
         textarea,
         [contenteditable="true"] {
+            -webkit-user-select: auto;
             user-select: auto;
             cursor: text;
         }
@@ -1591,6 +1592,24 @@
             line-height: 1.5;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            -webkit-user-select: text;
+            user-select: text;
+            cursor: text;
+        }
+        .assistant-chat-bubble p,
+        .assistant-chat-bubble span,
+        .assistant-chat-bubble li,
+        .assistant-chat-bubble div {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        #assistant-chat-log {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        #assistant-input {
+            -webkit-user-select: auto !important;
+            user-select: auto !important;
         }
 
         @keyframes bubbleFadeIn {
@@ -8665,8 +8684,22 @@
 
         async function copyBotResponse(text) {
             try {
-                await navigator.clipboard.writeText(text);
-                notify('Copied content to clipboard.', 'success');
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    // Fallback for mobile / non-secure contexts
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+                notify('Copied to clipboard ✓', 'success');
             } catch (err) {
                 console.error(err);
                 notify('Failed to copy.', 'error');
