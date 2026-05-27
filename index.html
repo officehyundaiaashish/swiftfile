@@ -2441,16 +2441,14 @@
                         <span id="scanner-status-text">Detecting edges...</span>
                         <button id="scanner-stop-btn" class="text-btn danger">Close Camera</button>
                     </div>
-
                     <div class="large-preview-box" id="scanner-video-container"
-                        style="background: #000; min-height: 450px;">
+                        style="background: #000; min-height: 450px; position: relative;">
                         <video id="scanner-video" autoplay playsinline
                             style="width: 100%; height: 100%; object-fit: contain; transform: scaleX(1);"></video>
                         <canvas id="scanner-overlay-canvas"
                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;"></canvas>
                         <div class="scanner-line" id="scanner-line-active" style="display: block;"></div>
                     </div>
-
                     <div class="action-bar" style="margin-top: 1.5rem;">
                         <button id="scanner-capture-btn" class="primary-btn btn-pro-ai"
                             style="padding: 1.25rem 2.5rem; border-radius: 50px;">
@@ -5473,6 +5471,195 @@
             scannerActiveScreen.classList.add('hidden');
         }
 
+        // Andrew's Monotone Chain Convex Hull algorithm
+        function convexHull(points) {
+            if (points.length <= 3) return points;
+            points.sort((a, b) => a.x !== b.x ? a.x - b.x : a.y - b.y);
+
+            const lower = [];
+            for (let i = 0; i < points.length; i++) {
+                while (lower.length >= 2 && crossProduct(lower[lower.length - 2], lower[lower.length - 1], points[i]) <= 0) {
+                    lower.pop();
+                }
+                lower.push(points[i]);
+            }
+
+            const upper = [];
+            for (let i = points.length - 1; i >= 0; i--) {
+                while (upper.length >= 2 && crossProduct(upper[upper.length - 2], upper[upper.length - 1], points[i]) <= 0) {
+                    upper.pop();
+                }
+                upper.push(points[i]);
+            }
+
+            upper.pop();
+            lower.pop();
+            return lower.concat(upper);
+        }
+
+        function crossProduct(a, b, c) {
+            return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+        }
+
+        // Vanilla JS Sobel Filter & Corner Bounding Box Detector (Runs 100% offline, instantly)
+        function detectDocumentCornersVanilla(video) {
+            const vw = video.videoWidth;
+            const vh = video.videoHeight;
+            if (vw === 0 || vh === 0) return null;
+
+            const procCanvas = document.createElement('canvas');
+            const pw = 200; // downscale for max performance
+            const ph = 150;
+            procCanvas.width = pw;
+            procCanvas.height = ph;
+            const ctx = procCanvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, pw, ph);
+
+            let imgData;
+            try {
+                imgData = ctx.getImageData(0, 0, pw, ph);
+            } catch (e) {
+                return null;
+            }
+
+            const data = imgData.data;
+            const gray = new Uint8Array(pw * ph);
+            for (let i = 0; i < data.length; i += 4) {
+                gray[i / 4] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            }
+
+            const edges = new Uint8Array(pw * ph);
+            const threshold = 25; // Lower threshold to capture lighter documents
+            for (let y = 1; y < ph - 1; y++) {
+                for (let x = 1; x < pw - 1; x++) {
+                    const idx = y * pw + x;
+                    const gx = 
+                        -gray[idx - pw - 1] + gray[idx - pw + 1] +
+                        -2 * gray[idx - 1] + 2 * gray[idx + 1] +
+                        -gray[idx + pw - 1] + gray[idx + pw + 1];
+                    const gy = 
+                        -gray[idx - pw - 1] - 2 * gray[idx - pw] - gray[idx - pw + 1] +
+                        gray[idx + pw - 1] + 2 * gray[idx + pw] + gray[idx + pw + 1];
+                    const mag = Math.sqrt(gx * gx + gy * gy);
+                    edges[idx] = mag > threshold ? 255 : 0;
+                }
+            }
+
+            // Find outer boundary points
+            const points = [];
+            // Row scans
+            for (let y = 5; y < ph - 5; y++) {
+                // Left to right
+                for (let x = 5; x < pw - 5; x++) {
+                    if (edges[y * pw + x] === 255) {
+                        points.push({ x, y });
+                        break;
+                    }
+                }
+                // Right to left
+                for (let x = pw - 6; x >= 5; x--) {
+                    if (edges[y * pw + x] === 255) {
+                        points.push({ x, y });
+                        break;
+                    }
+                }
+            }
+            // Column scans
+            for (let x = 5; x < pw - 5; x++) {
+                // Top to bottom
+                for (let y = 5; y < ph - 5; y++) {
+                    if (edges[y * pw + x] === 255) {
+                        points.push({ x, y });
+                        break;
+                    }
+                }
+                // Bottom to top
+                for (let y = ph - 6; y >= 5; y--) {
+                    if (edges[y * pw + x] === 255) {
+                        points.push({ x, y });
+                        break;
+                    }
+                }
+            }
+
+            if (points.length < 20) return null;
+
+            // Compute the convex hull
+            const hull = convexHull(points);
+            if (hull.length < 4) return null;
+
+            // Find the 4 extreme diagonal points from the convex hull
+            let tl = hull[0], tr = hull[0], br = hull[0], bl = hull[0];
+            let minSum = Infinity, maxSum = -Infinity;
+            let minDiff = Infinity, maxDiff = -Infinity;
+
+            for (let i = 0; i < hull.length; i++) {
+                const p = hull[i];
+                const sum = p.x + p.y;
+                const diff = p.x - p.y;
+
+                if (sum < minSum) { minSum = sum; tl = p; }
+                if (sum > maxSum) { maxSum = sum; br = p; }
+                if (diff > maxDiff) { maxDiff = diff; tr = p; }
+                if (diff < minDiff) { minDiff = diff; bl = p; }
+            }
+
+            // Scale back to full video frame scale
+            const scaleX = vw / pw;
+            const scaleY = vh / ph;
+            return [
+                { x: tl.x * scaleX, y: tl.y * scaleY },
+                { x: tr.x * scaleX, y: tr.y * scaleY },
+                { x: br.x * scaleX, y: br.y * scaleY },
+                { x: bl.x * scaleX, y: bl.y * scaleY }
+            ];
+        }
+
+        // Vanilla JS Bilinear Quadrilateral Warp Approximation (Fallback/Instant Warp)
+        function performWarpCropVanilla(srcCanvas, corners, targetWidth, targetHeight) {
+            scannerCroppedImage = document.createElement('canvas');
+            scannerCroppedImage.width = targetWidth;
+            scannerCroppedImage.height = targetHeight;
+            const dstCtx = scannerCroppedImage.getContext('2d');
+
+            const srcCtx = srcCanvas.getContext('2d');
+            const srcWidth = srcCanvas.width;
+            const srcHeight = srcCanvas.height;
+            const srcData = srcCtx.getImageData(0, 0, srcWidth, srcHeight).data;
+
+            const dstImgData = dstCtx.createImageData(targetWidth, targetHeight);
+            const dstData = dstImgData.data;
+
+            const tl = corners[0];
+            const tr = corners[1];
+            const br = corners[2];
+            const bl = corners[3];
+
+            for (let y = 0; y < targetHeight; y++) {
+                const v = y / targetHeight;
+                for (let x = 0; x < targetWidth; x++) {
+                    const u = x / targetWidth;
+
+                    const targetX = (1 - u) * (1 - v) * tl.x + u * (1 - v) * tr.x + u * v * br.x + (1 - u) * v * bl.x;
+                    const targetY = (1 - u) * (1 - v) * tl.y + u * (1 - v) * tr.y + u * v * br.y + (1 - u) * v * bl.y;
+
+                    const srcX = Math.round(targetX);
+                    const srcY = Math.round(targetY);
+
+                    if (srcX >= 0 && srcX < srcWidth && srcY >= 0 && srcY < srcHeight) {
+                        const srcIdx = (srcY * srcWidth + srcX) * 4;
+                        const dstIdx = (y * targetWidth + x) * 4;
+
+                        dstData[dstIdx] = srcData[srcIdx];
+                        dstData[dstIdx + 1] = srcData[srcIdx + 1];
+                        dstData[dstIdx + 2] = srcData[srcIdx + 2];
+                        dstData[dstIdx + 3] = srcData[srcIdx + 3];
+                    }
+                }
+            }
+            dstCtx.putImageData(dstImgData, 0, 0);
+        }
+
         function processVideoFrame() {
             if (!scannerActive || scannerVideo.paused || scannerVideo.ended) return;
 
@@ -5578,6 +5765,11 @@
                 }
             }
 
+            // Fallback to vanilla JS detection if OpenCV fails to find a contour or isn't loaded
+            if (!detectedCorners) {
+                detectedCorners = detectDocumentCornersVanilla(scannerVideo);
+            }
+
             // Stability tracking
             if (detectedCorners) {
                 if (lastCorners) {
@@ -5616,12 +5808,27 @@
                 lastCorners = null;
             }
 
-            // Draw overlay
+            // Draw overlay aligned with active video element content bounds (compensates for letterbox/pillarbox)
             if (detectedCorners) {
-                // Scale corners to canvas display coordinates
+                const videoRatio = vw / vh;
+                const elementRatio = rect.width / rect.height;
+                let displayWidth, displayHeight;
+                let offsetX = 0, offsetY = 0;
+
+                if (elementRatio > videoRatio) {
+                    displayHeight = rect.height;
+                    displayWidth = displayHeight * videoRatio;
+                    offsetX = (rect.width - displayWidth) / 2;
+                } else {
+                    displayWidth = rect.width;
+                    displayHeight = displayWidth / videoRatio;
+                    offsetY = (rect.height - displayHeight) / 2;
+                }
+
+                // Scale corners to active video content display coordinates
                 const displayCorners = detectedCorners.map(p => ({
-                    x: (p.x / vw) * rect.width,
-                    y: (p.y / vh) * rect.height
+                    x: offsetX + (p.x / vw) * displayWidth,
+                    y: offsetY + (p.y / vh) * displayHeight
                 }));
 
                 const strokeColor = isStable ? '#22c55e' : '#2563eb';
@@ -5756,10 +5963,10 @@
                     M.delete();
                 } catch (e) {
                     console.error('Warp perspective failed with OpenCV, using canvas crop fallback:', e);
-                    fallbackCanvasCrop(srcCanvas, corners, targetWidth, targetHeight);
+                    performWarpCropVanilla(srcCanvas, corners, targetWidth, targetHeight);
                 }
             } else {
-                fallbackCanvasCrop(srcCanvas, corners, targetWidth, targetHeight);
+                performWarpCropVanilla(srcCanvas, corners, targetWidth, targetHeight);
             }
 
             // Apply filter and show
