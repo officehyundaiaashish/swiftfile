@@ -853,6 +853,27 @@
             left: 6px;
         }
 
+        #redact-pages-container canvas {
+            max-width: 100%;
+            height: auto !important;
+            display: block;
+        }
+
+        .flex-mobile-stack {
+            display: flex;
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .flex-mobile-stack {
+                flex-direction: column;
+            }
+            .flex-mobile-stack button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         .page-count-badge {
             right: 6px;
             background: var(--surface-color);
@@ -1558,6 +1579,153 @@
             height: auto !important;
             padding: 2.5rem 1.5rem !important;
         }
+
+        /* Swift Assistant Chat Bubble Styles */
+        .assistant-chat-bubble {
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            max-width: 85%;
+            position: relative;
+            animation: bubbleFadeIn 0.3s ease-out;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        @keyframes bubbleFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .assistant-chat-bubble.user {
+            background: var(--accent-alpha);
+            border: 1px solid var(--accent-border-alpha);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .assistant-chat-bubble.bot {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .assistant-chat-bubble.system {
+            background: rgba(128, 128, 128, 0.05);
+            border: 1px solid var(--border-color);
+            align-self: center;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .chat-bubble-action-btn {
+            background: none !important;
+            border: none !important;
+            cursor: pointer;
+            padding: 2px !important;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            width: 14px;
+            height: 14px;
+        }
+        .chat-bubble-action-btn:hover {
+            color: var(--accent-color);
+        }
+        .chat-bubble-action-btn i {
+            width: 8px;
+            height: 8px;
+        }
+
+        .assistant-chat-bubble pre {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            user-select: text;
+        }
+
+        .assistant-chat-bubble code {
+            font-family: monospace;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            user-select: text;
+        }
+
+        /* Custom Context Menu Styles */
+        .custom-context-menu {
+            position: fixed;
+            z-index: 10000;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 140px;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .custom-context-menu.show {
+            display: flex !important;
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .menu-item {
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .menu-item i {
+            width: 16px;
+            height: 16px;
+            color: var(--text-secondary);
+        }
+
+        .menu-item:hover:not(:disabled) {
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+        }
+
+        .menu-item:hover:not(:disabled) i {
+            color: var(--accent-color);
+        }
+
+        .menu-item:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
     </style>
     <script>
         function switchTab(tabId) {
@@ -1581,7 +1749,11 @@
                 'bg-remover': 'Remove BG',
                 'collage-maker': 'Collage Maker',
                 'word-to-pdf': 'Word to PDF',
-                'scanner': 'Scanner'
+                'scanner': 'Scanner',
+                'webpage-to-pdf': 'Webpage to PDF',
+                'redact-pdf': 'Redact PDF',
+                'watermark-tool': 'Watermark',
+                'swift-assistant': 'Swift Assistant'
             };
             const toolIcons = {
                 'img-to-pdf': 'image',
@@ -1595,7 +1767,11 @@
                 'bg-remover': 'eraser',
                 'collage-maker': 'layout',
                 'word-to-pdf': 'file-up',
-                'scanner': 'scan'
+                'scanner': 'scan',
+                'webpage-to-pdf': 'globe',
+                'redact-pdf': 'eye-off',
+                'watermark-tool': 'stamp',
+                'swift-assistant': 'message-square'
             };
 
             const label = document.getElementById('current-tool-label');
@@ -1604,11 +1780,20 @@
                 label.textContent = toolLabels[tabId];
                 if (icon) {
                     icon.setAttribute('data-lucide', toolIcons[tabId]);
-                    lucide.createIcons({ root: document.getElementById('mobile-tool-selector') });
                 }
             }
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (tabId === 'swift-assistant') {
+                setTimeout(() => {
+                    const inputField = document.getElementById('assistant-input');
+                    if (inputField) {
+                        inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        inputField.focus();
+                    }
+                }, 100);
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
         // Mobile Tool Dropdown Logic removed as requested
@@ -1725,6 +1910,18 @@
             </button>
             <button class="tab-btn" data-tab="scanner" onclick="switchTab('scanner')">
                 <i data-lucide="scan"></i> Scanner
+            </button>
+            <button class="tab-btn" data-tab="webpage-to-pdf" onclick="switchTab('webpage-to-pdf')">
+                <i data-lucide="globe"></i> Webpage to PDF
+            </button>
+            <button class="tab-btn" data-tab="redact-pdf" onclick="switchTab('redact-pdf')">
+                <i data-lucide="eye-off"></i> Redact PDF
+            </button>
+            <button class="tab-btn" data-tab="watermark-tool" onclick="switchTab('watermark-tool')">
+                <i data-lucide="stamp"></i> Watermark
+            </button>
+            <button class="tab-btn" data-tab="swift-assistant" onclick="switchTab('swift-assistant')">
+                <i data-lucide="message-square"></i> Swift Assistant
             </button>
         </div>
 
@@ -2520,6 +2717,325 @@
                     </div>
                 </div>
             </div>
+
+            <div id="webpage-to-pdf" class="tab-content">
+                <div style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Enter Webpage URL / Link</label>
+                        <div class="flex-mobile-stack">
+                            <input type="url" id="webpage-url-input" class="password-input" placeholder="https://en.wikipedia.org/wiki/PDF" style="margin-bottom: 0; flex: 1;">
+                            <button id="webpage-fetch-btn" class="primary-btn" style="padding: 0.75rem 1.5rem;">
+                                <span>Fetch Page</span>
+                                <i data-lucide="globe"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; color: var(--text-secondary); position: relative; margin: 0.5rem 0;">
+                        <span style="background: var(--input-bg); padding: 0 10px; position: relative; z-index: 2; font-weight: 600; font-size: 0.85rem;">OR PASTE HTML DIRECTLY</span>
+                        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border-color); z-index: 1;"></div>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">HTML Source Code</label>
+                        <textarea id="webpage-html-input" class="password-input" rows="8" placeholder="<h1>Hello World</h1><p>Type or paste your HTML here...</p>" style="font-family: monospace; font-size: 0.9rem; resize: vertical; margin-bottom: 0;"></textarea>
+                    </div>
+
+                    <!-- Webpage Preview Comes Underneath -->
+                    <div id="webpage-preview-container" class="preview-container hidden">
+                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Page Preview (Standard A4 Size)</label>
+                        <div class="word-preview-wrapper" style="max-height: 600px; padding: 1.5rem; display: flex; justify-content: center; background: rgba(0,0,0,0.03); border-radius: 16px; overflow-x: auto;">
+                            <iframe id="webpage-preview-iframe" style="width: 794px; height: 1123px; border: 1px solid var(--border-color); background: white; pointer-events: none; box-shadow: var(--shadow); border-radius: 8px;"></iframe>
+                        </div>
+
+                        <!-- PDF Page Setup Controls -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--input-bg); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); margin-top: 1.5rem;">
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Page Size</label>
+                                <select id="webpage-pdf-size" class="password-input" style="padding: 8px 12px; height: 38px; margin-bottom: 0; width: 100%;">
+                                    <option value="a4">A4 (Standard)</option>
+                                    <option value="letter">Letter</option>
+                                    <option value="a3">A3 (Large)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Orientation</label>
+                                <select id="webpage-pdf-orient" class="password-input" style="padding: 8px 12px; height: 38px; margin-bottom: 0; width: 100%;">
+                                    <option value="auto">Auto-Detect</option>
+                                    <option value="p">Portrait</option>
+                                    <option value="l">Landscape</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="action-bar" style="margin-top: 1.5rem; margin-bottom: 1rem;">
+                            <button id="webpage-convert-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                                <span>Convert Webpage to PDF</span>
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Redact PDF Section -->
+            <div id="redact-pdf" class="tab-content">
+                <div class="drop-zone" id="redact-drop-zone">
+                    <input type="file" id="redact-input" accept="application/pdf" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                            <i data-lucide="eye-off"></i>
+                        </div>
+                        <h3>Upload PDF to Redact</h3>
+                        <p>Drag and drop or click to browse</p>
+                        <span class="file-info">Draw boxes to black out and securely remove sensitive content</span>
+                    </div>
+                </div>
+
+                <div id="redact-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="redact-filename">File Ready</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="clear-redact" class="text-btn danger">Clear All</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 280px; gap: 2rem; margin-top: 1rem;">
+                        <div class="collage-main-preview">
+                            <div class="large-preview-box" style="padding: 1rem; overflow-y: auto; flex-direction: column; gap: 2rem; max-height: 650px; min-height: 500px; justify-content: flex-start;" id="redact-pages-container">
+                                <!-- Canvases with redaction shapes will be appended here -->
+                            </div>
+                        </div>
+
+                        <div class="bg-controls-panel">
+                            <div class="control-group">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Redaction Style</label>
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <span style="font-size: 0.85rem; font-weight: 600;">Mask Color</span>
+                                        <div style="position: relative; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 2px solid var(--border-color);">
+                                            <input type="color" id="redact-color-picker" value="#000000" style="position: absolute; top: -10px; left: -10px; width: 80px; height: 80px; border: none; cursor: pointer;">
+                                        </div>
+                                    </div>
+                                    <button id="redact-clear-shapes-btn" class="secondary-btn" style="width: 100%; justify-content: center; font-size: 0.85rem;">
+                                        <i data-lucide="trash-2" style="width:16px;"></i> Clear Drawn Boxes
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="control-group" style="background: var(--input-bg); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-secondary);">
+                                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">💡 How to Redact:</p>
+                                <ul style="padding-left: 14px; display: flex; flex-direction: column; gap: 4px;">
+                                    <li>Click and drag directly over the text/images on the document to draw a box.</li>
+                                    <li>Multiple boxes can be drawn across pages.</li>
+                                    <li>On download, these areas will be permanently removed and masked.</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color);">
+                                <button id="redact-apply-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                                    <i data-lucide="shield-alert"></i> Redact & Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Watermark Tool Section -->
+            <div id="watermark-tool" class="tab-content">
+                <div class="drop-zone" id="watermark-drop-zone">
+                    <input type="file" id="watermark-input" accept="application/pdf,image/*" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper" style="background: var(--accent-alpha); color: var(--accent-color);">
+                            <i data-lucide="stamp"></i>
+                        </div>
+                        <h3>Upload PDF or Image</h3>
+                        <p>Drag and drop or click to browse</p>
+                        <span class="file-info">Supports PDF documents and JPG, PNG, WebP images</span>
+                    </div>
+                </div>
+
+                <div id="watermark-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="watermark-filename">File Ready</span>
+                        <button id="clear-watermark" class="text-btn danger">Clear All</button>
+                    </div>
+
+                    <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                        <div class="collage-main-preview">
+                            <div class="large-preview-box" id="watermark-preview-box">
+                                <canvas id="watermark-preview-canvas" style="max-width: 100%; max-height: 600px; box-shadow: var(--shadow); border-radius: 8px; display: block;"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-controls-panel">
+                            <div class="control-group">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Watermark Type</label>
+                                <div class="bg-option-tabs">
+                                    <button class="bg-option-btn active" id="wm-type-text-btn">Text</button>
+                                    <button class="bg-option-btn" id="wm-type-image-btn">Image</button>
+                                </div>
+
+                                <!-- Text Options -->
+                                <div id="wm-text-options">
+                                    <input type="text" id="wm-text-input" class="password-input" value="CONFIDENTIAL" placeholder="Enter watermark text..." style="margin-top: 12px; margin-bottom: 12px;">
+                                    
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                                        <div>
+                                            <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Color</label>
+                                            <input type="color" id="wm-text-color" value="#ff0000" class="password-input" style="padding: 4px; height: 38px; cursor: pointer;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Font</label>
+                                            <select id="wm-text-font" class="password-input" style="padding: 8px 12px; height: 38px;">
+                                                <option value="Helvetica">Helvetica</option>
+                                                <option value="Courier">Courier</option>
+                                                <option value="Times-Roman">Times New Roman</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Image Options -->
+                                <div id="wm-image-options" class="hidden" style="margin-top: 12px;">
+                                    <button id="wm-upload-btn" class="secondary-btn" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 10px; margin-bottom: 12px;">
+                                        <i data-lucide="image-plus" style="width:16px;"></i> Upload Logo / Image
+                                    </button>
+                                    <input type="file" id="wm-img-file-input" accept="image/*" hidden>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Placement</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                    <button class="bg-option-btn active" data-wm-pos="center">Center</button>
+                                    <button class="bg-option-btn" data-wm-pos="bottom-right">Bottom Right</button>
+                                    <button class="bg-option-btn" data-wm-pos="top-left">Top Left</button>
+                                    <button class="bg-option-btn" data-wm-pos="tiled">Tiled Pattern</button>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Opacity</label>
+                                    <span id="wm-opacity-val" style="font-size: 0.8rem; font-weight: 600;">30%</span>
+                                </div>
+                                <input type="range" id="wm-opacity-slider" min="10" max="100" value="30" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none; margin-bottom: 12px;">
+
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Scale / Size</label>
+                                    <span id="wm-size-val" style="font-size: 0.8rem; font-weight: 600;">100%</span>
+                                </div>
+                                <input type="range" id="wm-size-slider" min="10" max="300" value="100" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none; margin-bottom: 12px;">
+
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Rotation</label>
+                                    <span id="wm-rotation-val" style="font-size: 0.8rem; font-weight: 600;">45&deg;</span>
+                                </div>
+                                <input type="range" id="wm-rotation-slider" min="-180" max="180" value="45" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+                            </div>
+
+                            <div style="margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color);">
+                                <button id="wm-apply-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                                    <i data-lucide="download"></i> Apply & Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Swift Assistant Section -->
+            <div id="swift-assistant" class="tab-content">
+                <div style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem; min-height: 550px;">
+                    
+                    <!-- Chat Interface Container -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem; flex: 1; position: relative;">
+                        <!-- Floating Settings Header Toggle & Status dot in the top-right of chat panel -->
+                        <div style="position: absolute; top: 12px; right: 12px; z-index: 100; display: flex; align-items: center; gap: 8px;">
+                            <span id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; display: inline-block;"></span>
+                            <button id="assistant-settings-toggle-btn" class="chat-bubble-action-btn" title="Model & API Settings" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
+                            </button>
+                        </div>
+
+                        <!-- Floating Popover Dropdown Panel -->
+                        <div id="assistant-settings-popover" class="hidden" style="position: absolute; top: 48px; right: 12px; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Provider</label>
+                                <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
+                                    <option value="gemini">Google Gemini</option>
+                                    <option value="openrouter">OpenRouter</option>
+                                    <option value="groq">Groq Cloud</option>
+                                    <option value="huggingface">Hugging Face</option>
+                                    <option value="custom">Custom API</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Name</label>
+                                <input type="text" id="assistant-model" class="password-input" value="gemini-1.5-flash" placeholder="Model name..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                            </div>
+
+                            <div id="assistant-endpoint-container" class="hidden">
+                                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Endpoint URL</label>
+                                <input type="url" id="assistant-endpoint" class="password-input" placeholder="https://api..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Key</label>
+                                <input type="password" id="assistant-api-key" class="password-input" placeholder="Paste API key..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                            </div>
+
+                            <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px;">
+                                <span id="status-text" style="font-size: 0.75rem; font-weight: 600; color: #ef4444;">Disconnected</span>
+                                <button id="assistant-connect-btn" class="secondary-btn" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; height: 28px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 0;">
+                                    <i data-lucide="radio" style="width: 12px; height: 12px;"></i> Connect
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Log -->
+                        <div id="assistant-chat-log" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; min-height: 350px; max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);">
+                            <!-- Default Welcome Message -->
+                            <div class="assistant-chat-bubble system" style="background: rgba(128,128,128,0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; align-self: center; width: 100%;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <span style="font-weight: 700; font-size: 0.8rem; color: var(--accent-color); display: flex; align-items: center; gap: 6px; margin: 0 auto;">
+                                        <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Swift Assistant
+                                    </span>
+                                </div>
+                                <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am your Swift AI Assistant. I can write HTML/CSS code, explain concepts, edit drafts, or answer questions. Enter an API key in the configuration bar above to get started!</p>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input bar -->
+                        <div style="display: flex; flex-direction: column; width: 100%;">
+                            <!-- Attached files preview container -->
+                            <div id="attached-files-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; padding: 0 4px;"></div>
+                            
+                            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                                <div style="flex: 1; position: relative;">
+                                    <textarea id="assistant-input" class="password-input" placeholder="Ask Swift Assistant anything..." rows="2" style="resize: none; margin-bottom: 0; padding: 12px 16px; font-size: 0.95rem; border-radius: 18px; width: 100%;"></textarea>
+                                </div>
+                                <button id="assistant-attach-btn" class="secondary-btn" title="Attach File" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                    <i data-lucide="paperclip" style="width: 18px; height: 18px;"></i>
+                                    <input type="file" id="assistant-file-input" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.json" style="display: none;">
+                                </button>
+                                <button id="assistant-voice-btn" class="secondary-btn" title="Voice Input" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                    <i data-lucide="mic" style="width: 18px; height: 18px;"></i>
+                                </button>
+                                <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                    <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                                </button>
+                                <button id="assistant-clear-btn" class="secondary-btn" title="Clear Chat" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); color: #ef4444; margin-bottom: 0;">
+                                    <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="status-toast" class="toast hidden">
@@ -2529,6 +3045,13 @@
             </div>
         </div>
     </main>
+
+    <!-- Custom Context Menu for URL/HTML Input fields -->
+    <div id="custom-context-menu" class="custom-context-menu hidden">
+        <button id="menu-cut" class="menu-item"><i data-lucide="scissors"></i> Cut</button>
+        <button id="menu-copy" class="menu-item"><i data-lucide="copy"></i> Copy</button>
+        <button id="menu-paste" class="menu-item"><i data-lucide="clipboard"></i> Paste</button>
+    </div>
 
     <div id="notification-container" class="notification-container"></div>
 
@@ -2588,6 +3111,16 @@
                 tabContents.forEach(c => c.classList.remove('active'));
                 tab.classList.add('active');
                 document.getElementById(target).classList.add('active');
+
+                if (target === 'swift-assistant') {
+                    setTimeout(() => {
+                        const inputField = document.getElementById('assistant-input');
+                        if (inputField) {
+                            inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            inputField.focus();
+                        }
+                    }, 100);
+                }
             });
         });
 
@@ -2607,6 +3140,24 @@
         let isEstimatingPdf = false;
         let estimatePdfTimeout = null;
         let wordFile = null;
+
+        // Webpage to PDF State
+        let webpageHtmlContent = '';
+
+        // Redact PDF State
+        let redactFile = null;
+        let redactDoc = null;
+        let redactPages = []; // [{ id, pageNum, canvas, rects: [] }]
+        let redactActiveColor = '#000000';
+        let isRedactingDrawing = false;
+        let redactStartPoint = null;
+        let redactCurrentRect = null;
+
+        // Watermark State
+        let watermarkFile = null;
+        let watermarkFileType = ''; // 'pdf' or 'image'
+        let watermarkImgLogo = null; // Image object if image watermark uploaded
+        let watermarkSelectedPos = 'center';
         // PDF to Image Logic
         const pdfInput = document.getElementById('pdf-input');
         const pdfDropZone = document.getElementById('pdf-drop-zone');
@@ -5275,8 +5826,11 @@
             }
         });
 
-        async function convertHtmlToPdf(element, filename) {
+        async function convertHtmlToPdf(element, filename, options = {}) {
             const { jsPDF } = window.jspdf;
+
+            const pageSize = options.pageSize || 'a4';
+            const orientation = options.orientation || 'auto';
 
             // Temporary styles for capturing full content without scrollbars
             const originalMaxHeight = element.style.maxHeight;
@@ -5285,44 +5839,108 @@
             element.style.maxHeight = 'none';
             element.style.overflowY = 'visible';
 
+            // Apply page-break-inside avoid rules to prevent text lines, lists, tables, images from being cut across pages
+            const avoidElements = element.querySelectorAll('p, h1, h2, h3, h4, h5, h6, tr, img, pre, code, li, blockquote');
+            const originalAvoidStyles = [];
+            avoidElements.forEach(el => {
+                originalAvoidStyles.push({ el, breakInside: el.style.breakInside, pageBreakInside: el.style.pageBreakInside });
+                el.style.breakInside = 'avoid';
+                el.style.pageBreakInside = 'avoid';
+            });
+
+            // Calculate dimensions based on page size selection
+            let defaultWidth = 595.28; // A4 portrait
+            let defaultHeight = 841.89;
+            if (pageSize === 'letter') {
+                defaultWidth = 612;
+                defaultHeight = 792;
+            } else if (pageSize === 'a3') {
+                defaultWidth = 841.89;
+                defaultHeight = 1190.55;
+            }
+
+            let isLandscape = false;
+            if (orientation === 'l') {
+                isLandscape = true;
+            } else if (orientation === 'p') {
+                isLandscape = false;
+            } else {
+                // Auto-detect based on element dimensions
+                const elWidth = element.offsetWidth || 794;
+                const elHeight = element.offsetHeight || 1123;
+                isLandscape = elWidth > elHeight;
+            }
+
+            const imgWidth = isLandscape ? defaultHeight : defaultWidth;
+            const pageHeight = isLandscape ? defaultWidth : defaultHeight;
+
             try {
-                const canvas = await html2canvas(element, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    logging: false
+                const pdf = new jsPDF(isLandscape ? 'l' : 'p', 'pt', pageSize);
+
+                // Use modern jsPDF html utility for natural text and element pagination without content cutting
+                await new Promise((resolve, reject) => {
+                    pdf.html(element, {
+                        x: 0,
+                        y: 0,
+                        width: imgWidth,
+                        windowWidth: element.offsetWidth || 794,
+                        autoPaging: 'text',
+                        margin: [20, 20, 20, 20],
+                        html2canvas: {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: '#ffffff',
+                            logging: false
+                        },
+                        callback: function (doc) {
+                            doc.save(filename);
+                            resolve();
+                        }
+                    });
                 });
-
-                element.style.maxHeight = originalMaxHeight;
-                element.style.overflowY = originalOverflowY;
-
-                const imgWidth = 595.28; // A4 width in pt
-                const pageHeight = 841.89; // A4 height in pt
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-                const imgHeight = (canvasHeight * imgWidth) / canvasWidth;
-
-                const pdf = new jsPDF('p', 'pt', 'a4');
-                let heightLeft = imgHeight;
-                let position = 0;
-
-                // Add page 1
-                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-
-                pdf.save(filename);
             } catch (err) {
+                console.warn('pdf.html failed, falling back to manual canvas slicing:', err);
+                try {
+                    const canvas = await html2canvas(element, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        logging: false
+                    });
+
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+                    const imgHeight = (canvasHeight * imgWidth) / canvasWidth;
+
+                    const pdfFallback = new jsPDF(isLandscape ? 'l' : 'p', 'pt', pageSize);
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
+                    pdfFallback.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdfFallback.addPage();
+                        pdfFallback.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+
+                    pdfFallback.save(filename);
+                } catch (fallbackErr) {
+                    console.error('HTML to PDF fallback conversion failed:', fallbackErr);
+                    throw fallbackErr;
+                }
+            } finally {
+                // Restore original styles
                 element.style.maxHeight = originalMaxHeight;
                 element.style.overflowY = originalOverflowY;
-                throw err;
+                originalAvoidStyles.forEach(item => {
+                    item.el.style.breakInside = item.breakInside;
+                    item.el.style.pageBreakInside = item.pageBreakInside;
+                });
             }
         }
 
@@ -6191,6 +6809,1783 @@
             notify('Document successfully sent to Image to PDF tool.', 'success');
             switchTab('img-to-pdf');
         });
+
+        // --- Webpage to PDF Logic ---
+        const webpageUrlInput = document.getElementById('webpage-url-input');
+        const webpageFetchBtn = document.getElementById('webpage-fetch-btn');
+        const webpageHtmlInput = document.getElementById('webpage-html-input');
+        const webpagePreviewContainer = document.getElementById('webpage-preview-container');
+        const webpagePreviewIframe = document.getElementById('webpage-preview-iframe');
+        const webpageConvertBtn = document.getElementById('webpage-convert-btn');
+        const webpagePdfSize = document.getElementById('webpage-pdf-size');
+        const webpagePdfOrient = document.getElementById('webpage-pdf-orient');
+
+        function updateIframeContent(html) {
+            if (!webpagePreviewIframe) return;
+            const doc = webpagePreviewIframe.contentDocument || webpagePreviewIframe.contentWindow.document;
+            doc.open();
+            
+            const baseTemplate = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        /* Standard A4 Paper constraints */
+                        html, body {
+                            margin: 0;
+                            padding: 0;
+                            background: #ffffff;
+                            color: #333333;
+                            font-family: system-ui, -apple-system, sans-serif;
+                            font-size: 14px;
+                            line-height: 1.5;
+                        }
+                        body {
+                            width: 794px; /* Force A4 print pixel width */
+                            min-height: 1123px;
+                            padding: 3.5rem;
+                            box-sizing: border-box;
+                            word-wrap: break-word;
+                            overflow-wrap: break-word;
+                            overflow: hidden;
+                        }
+                        /* Prevent images, videos, tables, frames, blocks from breaking boundaries */
+                        img, video, canvas, svg, table, iframe, pre, code {
+                            max-width: 100% !important;
+                            height: auto !important;
+                            box-sizing: border-box;
+                        }
+                        table {
+                            width: 100% !important;
+                            border-collapse: collapse;
+                        }
+                        th, td {
+                            word-break: break-word;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${html}
+                </body>
+                </html>
+            `;
+            doc.write(baseTemplate);
+            doc.close();
+        }
+
+        webpageFetchBtn.addEventListener('click', async () => {
+            const url = webpageUrlInput.value.trim();
+            if (!url) {
+                notify('Please enter a valid URL.', 'info');
+                return;
+            }
+            showStatus('Fetching webpage content...');
+            try {
+                // Use AllOrigins CORS Proxy to fetch raw HTML
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error('Network response was not ok');
+                let html = await response.text();
+
+                // Simple sanitization to resolve relative paths
+                try {
+                    const parsedUrl = new URL(url);
+                    const baseUrl = parsedUrl.origin + parsedUrl.pathname;
+                    // Replace relative links/images
+                    html = html.replace(/src=["'](?!\/\/|http)([^"']+)["']/gi, `src="${parsedUrl.origin}/$1"`);
+                    html = html.replace(/href=["'](?!\/\/|http)([^"']+)["']/gi, `href="${parsedUrl.origin}/$1"`);
+                } catch (e) {
+                    console.warn('URL parsing for asset base replacement failed:', e);
+                }
+
+                webpageHtmlInput.value = html;
+                updateIframeContent(html);
+                webpagePreviewContainer.classList.remove('hidden');
+                showStatus('Page fetched successfully!', 2000);
+                notify('Webpage loaded into preview.', 'success');
+            } catch (err) {
+                console.error(err);
+                notify('CORS restrictions blocked loading this page. Pasting HTML code directly is recommended.', 'error');
+                hideStatus();
+            }
+        });
+
+        webpageHtmlInput.addEventListener('input', () => {
+            const val = webpageHtmlInput.value;
+            updateIframeContent(val);
+            if (val.trim()) {
+                webpagePreviewContainer.classList.remove('hidden');
+            } else {
+                webpagePreviewContainer.classList.add('hidden');
+            }
+        });
+
+        webpageConvertBtn.addEventListener('click', async () => {
+            const html = webpageHtmlInput.value.trim();
+            if (!html) return;
+            showStatus('Converting HTML to PDF...');
+            try {
+                let name = 'Webpage_Export.pdf';
+                if (webpageUrlInput.value.trim()) {
+                    try {
+                        const host = new URL(webpageUrlInput.value.trim()).hostname;
+                        name = `${host.replace(/www\./g, '')}_Webpage.pdf`;
+                    } catch (e) {}
+                }
+                const docBody = webpagePreviewIframe.contentWindow.document.body;
+                const pageSizeVal = webpagePdfSize.value;
+                const orientVal = webpagePdfOrient.value;
+                await convertHtmlToPdf(docBody, name, { pageSize: pageSizeVal, orientation: orientVal });
+                showStatus('Success!', 2000);
+                notify('Webpage successfully converted to PDF.', 'success');
+            } catch (error) {
+                console.error(error);
+                notify('Failed to generate PDF.', 'error');
+                hideStatus();
+            }
+        });
+
+        // Live preview sync for Page Setup Controls
+        function syncIframeDimensions() {
+            if (!webpagePreviewIframe) return;
+            const size = webpagePdfSize.value;
+            const orient = webpagePdfOrient.value;
+            
+            let isLandscape = false;
+            if (orient === 'l') {
+                isLandscape = true;
+            } else if (orient === 'p') {
+                isLandscape = false;
+            } else {
+                // Auto-detect defaults to portrait for display rendering bounds
+                isLandscape = false;
+            }
+
+            let width = 794;
+            let height = 1123;
+
+            if (size === 'letter') {
+                width = isLandscape ? 1056 : 816;
+                height = isLandscape ? 816 : 1056;
+            } else if (size === 'a3') {
+                width = isLandscape ? 1587 : 1123;
+                height = isLandscape ? 1123 : 1587;
+            } else { // a4
+                width = isLandscape ? 1123 : 794;
+                height = isLandscape ? 794 : 1123;
+            }
+
+            webpagePreviewIframe.style.width = `${width}px`;
+            webpagePreviewIframe.style.height = `${height}px`;
+        }
+
+        webpagePdfSize.addEventListener('change', () => {
+            syncIframeDimensions();
+            updateIframeContent(webpageHtmlInput.value);
+        });
+        
+        webpagePdfOrient.addEventListener('change', () => {
+            syncIframeDimensions();
+            updateIframeContent(webpageHtmlInput.value);
+        });
+
+        // --- Webpage Context Menu Logic ---
+        const contextMenu = document.getElementById('custom-context-menu');
+        const menuCut = document.getElementById('menu-cut');
+        const menuCopy = document.getElementById('menu-copy');
+        const menuPaste = document.getElementById('menu-paste');
+        let activeInputTarget = null;
+
+        function showContextMenu(e, target) {
+            e.preventDefault();
+            activeInputTarget = target;
+
+            // Check selection state
+            const hasSelection = (target.selectionStart !== target.selectionEnd);
+            menuCut.disabled = !hasSelection;
+            menuCopy.disabled = !hasSelection;
+
+            // Position context menu
+            contextMenu.style.left = `${e.clientX}px`;
+            contextMenu.style.top = `${e.clientY}px`;
+            contextMenu.classList.remove('hidden');
+            
+            // Allow transition to trigger
+            setTimeout(() => {
+                contextMenu.classList.add('show');
+            }, 10);
+        }
+
+        function hideContextMenu() {
+            contextMenu.classList.remove('show');
+            setTimeout(() => {
+                contextMenu.classList.add('hidden');
+            }, 150);
+        }
+
+        // Event listeners for right click
+        webpageUrlInput.addEventListener('contextmenu', (e) => showContextMenu(e, webpageUrlInput));
+        webpageHtmlInput.addEventListener('contextmenu', (e) => showContextMenu(e, webpageHtmlInput));
+
+        // Click outside context menu to hide it
+        document.addEventListener('click', (e) => {
+            if (!contextMenu.contains(e.target)) {
+                hideContextMenu();
+            }
+        });
+
+        // Cut handler
+        menuCut.addEventListener('click', async () => {
+            if (!activeInputTarget) return;
+            const start = activeInputTarget.selectionStart;
+            const end = activeInputTarget.selectionEnd;
+            const text = activeInputTarget.value.substring(start, end);
+            try {
+                await navigator.clipboard.writeText(text);
+                activeInputTarget.value = activeInputTarget.value.substring(0, start) + activeInputTarget.value.substring(end);
+                activeInputTarget.setSelectionRange(start, start);
+                activeInputTarget.focus();
+                activeInputTarget.dispatchEvent(new Event('input'));
+                notify('Text cut to clipboard', 'success');
+            } catch (err) {
+                console.error(err);
+                notify('Could not cut text.', 'error');
+            }
+            hideContextMenu();
+        });
+
+        // Copy handler
+        menuCopy.addEventListener('click', async () => {
+            if (!activeInputTarget) return;
+            const start = activeInputTarget.selectionStart;
+            const end = activeInputTarget.selectionEnd;
+            const text = activeInputTarget.value.substring(start, end);
+            try {
+                await navigator.clipboard.writeText(text);
+                notify('Text copied to clipboard', 'success');
+            } catch (err) {
+                console.error(err);
+                notify('Could not copy text.', 'error');
+            }
+            hideContextMenu();
+        });
+
+        // Paste handler
+        menuPaste.addEventListener('click', async () => {
+            if (!activeInputTarget) return;
+            try {
+                const text = await navigator.clipboard.readText();
+                const start = activeInputTarget.selectionStart;
+                const end = activeInputTarget.selectionEnd;
+                activeInputTarget.value = activeInputTarget.value.substring(0, start) + text + activeInputTarget.value.substring(end);
+                const newPos = start + text.length;
+                activeInputTarget.setSelectionRange(newPos, newPos);
+                activeInputTarget.focus();
+                activeInputTarget.dispatchEvent(new Event('input'));
+                notify('Pasted from clipboard', 'success');
+            } catch (err) {
+                console.error(err);
+                notify('Clipboard blocked. Click the lock/padlock icon next to the URL, set Clipboard to "Allow", and reload for permanent permission.', 'warning', 8000);
+            }
+            hideContextMenu();
+        });
+
+        // --- Redact PDF Logic ---
+        const redactDropZone = document.getElementById('redact-drop-zone');
+        const redactInput = document.getElementById('redact-input');
+        const redactPreviewContainer = document.getElementById('redact-preview-container');
+        const redactFilename = document.getElementById('redact-filename');
+        const clearRedactBtn = document.getElementById('clear-redact');
+        const redactPagesContainer = document.getElementById('redact-pages-container');
+        const redactColorPicker = document.getElementById('redact-color-picker');
+        const redactClearShapesBtn = document.getElementById('redact-clear-shapes-btn');
+        const redactApplyBtn = document.getElementById('redact-apply-btn');
+
+        redactDropZone.addEventListener('click', () => redactInput.click());
+        redactInput.addEventListener('change', handleRedactSelect);
+        redactDropZone.addEventListener('dragover', (e) => { e.preventDefault(); redactDropZone.classList.add('drag-over'); });
+        redactDropZone.addEventListener('dragleave', () => redactDropZone.classList.remove('drag-over'));
+        redactDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            redactDropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) { redactInput.files = e.dataTransfer.files; handleRedactSelect(); }
+        });
+
+        async function handleRedactSelect() {
+            const file = redactInput.files[0];
+            if (!file || file.type !== 'application/pdf') return;
+
+            showStatus('Loading PDF pages...');
+            redactFile = file;
+            redactFilename.textContent = file.name;
+            redactPagesContainer.innerHTML = '';
+            redactPages = [];
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                redactDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                for (let i = 1; i <= redactDoc.numPages; i++) {
+                    const page = await redactDoc.getPage(i);
+                    const id = Math.random().toString(36).substr(2, 9);
+                    
+                    // Create page element wrapper
+                    const wrapper = document.createElement('div');
+                    wrapper.style.position = 'relative';
+                    wrapper.style.display = 'inline-block';
+                    wrapper.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                    wrapper.style.borderRadius = '4px';
+                    wrapper.style.background = '#ffffff';
+
+                    const viewport = page.getViewport({ scale: 1.0 });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const ctx = canvas.getContext('2d');
+                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+                    // Create overlay canvas for drawing redaction boxes
+                    const overlay = document.createElement('canvas');
+                    overlay.width = viewport.width;
+                    overlay.height = viewport.height;
+                    overlay.style.position = 'absolute';
+                    overlay.style.top = '0';
+                    overlay.style.left = '0';
+                    overlay.style.cursor = 'crosshair';
+
+                    wrapper.appendChild(canvas);
+                    wrapper.appendChild(overlay);
+
+                    const pageBadge = document.createElement('span');
+                    pageBadge.className = 'page-badge';
+                    pageBadge.textContent = `Page ${i}`;
+                    pageBadge.style.bottom = '-24px';
+                    pageBadge.style.left = '0';
+                    wrapper.appendChild(pageBadge);
+
+                    const containerWrapper = document.createElement('div');
+                    containerWrapper.style.paddingBottom = '32px';
+                    containerWrapper.appendChild(wrapper);
+                    redactPagesContainer.appendChild(containerWrapper);
+
+                    const pageState = { id, pageNum: i, canvas, overlay, rects: [] };
+                    redactPages.push(pageState);
+
+                    setupRedactionDrawing(pageState);
+                }
+
+                redactDropZone.classList.add('hidden');
+                redactPreviewContainer.classList.remove('hidden');
+                showStatus('PDF loaded successfully!', 2000);
+            } catch (err) {
+                console.error(err);
+                notify('Failed to load PDF for redaction.', 'error');
+                hideStatus();
+            }
+        }
+
+        function setupRedactionDrawing(pageState) {
+            const overlay = pageState.overlay;
+            const ctx = overlay.getContext('2d');
+
+            function getMousePos(e) {
+                const rect = overlay.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const displayX = clientX - rect.left;
+                const displayY = clientY - rect.top;
+                return {
+                    x: rect.width ? (displayX / rect.width) * overlay.width : displayX,
+                    y: rect.height ? (displayY / rect.height) * overlay.height : displayY
+                };
+            }
+
+            function drawAllRects() {
+                ctx.clearRect(0, 0, overlay.width, overlay.height);
+                pageState.rects.forEach(r => {
+                    ctx.fillStyle = r.color;
+                    ctx.fillRect(r.x, r.y, r.w, r.h);
+                });
+            }
+
+            const startHandler = (e) => {
+                isRedactingDrawing = true;
+                redactStartPoint = getMousePos(e);
+                redactCurrentRect = { x: redactStartPoint.x, y: redactStartPoint.y, w: 0, h: 0 };
+            };
+
+            const moveHandler = (e) => {
+                if (!isRedactingDrawing) return;
+                e.preventDefault();
+                const currentPos = getMousePos(e);
+                
+                const x = Math.min(redactStartPoint.x, currentPos.x);
+                const y = Math.min(redactStartPoint.y, currentPos.y);
+                const w = Math.abs(redactStartPoint.x - currentPos.x);
+                const h = Math.abs(redactStartPoint.y - currentPos.y);
+
+                redactCurrentRect = { x, y, w, h };
+                
+                drawAllRects();
+                
+                // Draw current active rectangle (translucent red guide)
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 1.5;
+                ctx.fillRect(x, y, w, h);
+                ctx.strokeRect(x, y, w, h);
+            };
+
+            const endHandler = () => {
+                if (!isRedactingDrawing) return;
+                isRedactingDrawing = false;
+                if (redactCurrentRect && redactCurrentRect.w > 3 && redactCurrentRect.h > 3) {
+                    redactCurrentRect.color = redactColorPicker.value;
+                    pageState.rects.push(redactCurrentRect);
+                }
+                redactCurrentRect = null;
+                drawAllRects();
+            };
+
+            overlay.addEventListener('mousedown', startHandler);
+            overlay.addEventListener('mousemove', moveHandler);
+            overlay.addEventListener('mouseup', endHandler);
+            overlay.addEventListener('mouseleave', endHandler);
+
+            overlay.addEventListener('touchstart', startHandler);
+            overlay.addEventListener('touchmove', moveHandler, { passive: false });
+            overlay.addEventListener('touchend', endHandler);
+        }
+
+        redactColorPicker.addEventListener('input', () => {
+            redactActiveColor = redactColorPicker.value;
+        });
+
+        redactClearShapesBtn.addEventListener('click', () => {
+            redactPages.forEach(p => {
+                p.rects = [];
+                const ctx = p.overlay.getContext('2d');
+                ctx.clearRect(0, 0, p.overlay.width, p.overlay.height);
+            });
+            notify('Redaction boxes cleared.', 'info');
+        });
+
+        function resetRedact() {
+            redactFile = null;
+            redactDoc = null;
+            redactPages = [];
+            redactInput.value = '';
+            redactPagesContainer.innerHTML = '';
+            redactDropZone.classList.remove('hidden');
+            redactPreviewContainer.classList.add('hidden');
+        }
+        clearRedactBtn.addEventListener('click', resetRedact);
+
+        redactApplyBtn.addEventListener('click', async () => {
+            if (!redactFile) return;
+            const hasBoxes = redactPages.some(p => p.rects.length > 0);
+            if (!hasBoxes) {
+                notify('Please draw at least one redaction box on the document.', 'info');
+                return;
+            }
+
+            showStatus('Applying redaction masks...');
+            try {
+                const { PDFDocument, rgb } = PDFLib;
+                const arrayBuffer = await redactFile.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                const pages = pdfDoc.getPages();
+
+                function hexToRgb(hex) {
+                    const r = parseInt(hex.slice(1, 3), 16) / 255;
+                    const g = parseInt(hex.slice(3, 5), 16) / 255;
+                    const b = parseInt(hex.slice(5, 7), 16) / 255;
+                    return { r, g, b };
+                }
+
+                redactPages.forEach(pState => {
+                    if (pState.rects.length === 0) return;
+                    const page = pages[pState.pageNum - 1];
+                    const pdfWidth = page.getWidth();
+                    const pdfHeight = page.getHeight();
+                    
+                    const canvasWidth = pState.canvas.width;
+                    const canvasHeight = pState.canvas.height;
+                    
+                    const scaleX = pdfWidth / canvasWidth;
+                    const scaleY = pdfHeight / canvasHeight;
+
+                    pState.rects.forEach(r => {
+                        const pdfX = r.x * scaleX;
+                        // Flip Y coordinate system for PDF coordinate system (origin bottom-left)
+                        const pdfY = (canvasHeight - (r.y + r.h)) * scaleY;
+                        const pdfW = r.w * scaleX;
+                        const pdfH = r.h * scaleY;
+
+                        const c = hexToRgb(r.color);
+                        page.drawRectangle({
+                            x: pdfX,
+                            y: pdfY,
+                            width: pdfW,
+                            height: pdfH,
+                            color: rgb(c.r, c.g, c.b)
+                        });
+                    });
+                });
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = redactFile.name.replace(/\.[^/.]+$/, "") + '_Redacted.pdf';
+                link.click();
+                showStatus('Success!', 2000);
+                notify('Document redacted successfully.', 'success');
+            } catch (err) {
+                console.error(err);
+                notify('Redaction failed.', 'error');
+                hideStatus();
+            }
+        });
+
+
+        // --- Watermark Tool Logic ---
+        const watermarkDropZone = document.getElementById('watermark-drop-zone');
+        const watermarkInput = document.getElementById('watermark-input');
+        const watermarkPreviewContainer = document.getElementById('watermark-preview-container');
+        const watermarkFilename = document.getElementById('watermark-filename');
+        const clearWatermarkBtn = document.getElementById('clear-watermark');
+        const watermarkPreviewCanvas = document.getElementById('watermark-preview-canvas');
+        const wmTypeTextBtn = document.getElementById('wm-type-text-btn');
+        const wmTypeImageBtn = document.getElementById('wm-type-image-btn');
+        const wmTextOptions = document.getElementById('wm-text-options');
+        const wmImageOptions = document.getElementById('wm-image-options');
+        const wmUploadBtn = document.getElementById('wm-upload-btn');
+        const wmImgFileInput = document.getElementById('wm-img-file-input');
+        
+        const wmTextInput = document.getElementById('wm-text-input');
+        const wmTextColor = document.getElementById('wm-text-color');
+        const wmTextFont = document.getElementById('wm-text-font');
+        const wmOpacitySlider = document.getElementById('wm-opacity-slider');
+        const wmOpacityVal = document.getElementById('wm-opacity-val');
+        const wmSizeSlider = document.getElementById('wm-size-slider');
+        const wmSizeVal = document.getElementById('wm-size-val');
+        const wmRotationSlider = document.getElementById('wm-rotation-slider');
+        const wmRotationVal = document.getElementById('wm-rotation-val');
+        const wmApplyBtn = document.getElementById('wm-apply-btn');
+
+        let watermarkLogoFile = null;
+        let watermarkLogoImg = null;
+        let watermarkActiveType = 'text'; // text, image
+        let watermarkImageObject = null; // Original image element if user uploaded base image
+        let watermarkPdfDoc = null; // Original PDF document loaded by pdfjsLib
+        let watermarkPdfFirstPageCanvas = null; // Rendered canvas cache of PDF page 1
+
+        watermarkDropZone.addEventListener('click', () => watermarkInput.click());
+        watermarkInput.addEventListener('change', handleWatermarkSelect);
+        watermarkDropZone.addEventListener('dragover', (e) => { e.preventDefault(); watermarkDropZone.classList.add('drag-over'); });
+        watermarkDropZone.addEventListener('dragleave', () => watermarkDropZone.classList.remove('drag-over'));
+        watermarkDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            watermarkDropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) { watermarkInput.files = e.dataTransfer.files; handleWatermarkSelect(); }
+        });
+
+        wmUploadBtn.addEventListener('click', () => wmImgFileInput.click());
+        wmImgFileInput.addEventListener('change', handleWatermarkLogoSelect);
+
+        wmTypeTextBtn.addEventListener('click', () => {
+            wmTypeTextBtn.classList.add('active');
+            wmTypeImageBtn.classList.remove('active');
+            wmTextOptions.classList.remove('hidden');
+            wmImageOptions.classList.add('hidden');
+            watermarkActiveType = 'text';
+            drawWatermarkPreview();
+        });
+
+        wmTypeImageBtn.addEventListener('click', () => {
+            wmTypeImageBtn.classList.add('active');
+            wmTypeTextBtn.classList.remove('active');
+            wmImageOptions.classList.remove('hidden');
+            wmTextOptions.classList.add('hidden');
+            watermarkActiveType = 'image';
+            drawWatermarkPreview();
+        });
+
+        document.querySelectorAll('[data-wm-pos]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-wm-pos]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                watermarkSelectedPos = btn.dataset.wmPos;
+                drawWatermarkPreview();
+            });
+        });
+
+        // Config Sliders Input Listeners
+        wmTextInput.addEventListener('input', drawWatermarkPreview);
+        wmTextColor.addEventListener('input', drawWatermarkPreview);
+        wmTextFont.addEventListener('change', drawWatermarkPreview);
+
+        wmOpacitySlider.addEventListener('input', () => {
+            wmOpacityVal.textContent = wmOpacitySlider.value + '%';
+            drawWatermarkPreview();
+        });
+        wmSizeSlider.addEventListener('input', () => {
+            wmSizeVal.textContent = wmSizeSlider.value + '%';
+            drawWatermarkPreview();
+        });
+        wmRotationSlider.addEventListener('input', () => {
+            wmRotationVal.textContent = wmRotationSlider.value + '°';
+            drawWatermarkPreview();
+        });
+
+        async function handleWatermarkSelect() {
+            const file = watermarkInput.files[0];
+            if (!file) return;
+            showStatus('Reading document...');
+            watermarkFile = file;
+            watermarkFilename.textContent = file.name;
+
+            if (file.type === 'application/pdf') {
+                watermarkFileType = 'pdf';
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    watermarkPdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    const page = await watermarkPdfDoc.getPage(1);
+                    const viewport = page.getViewport({ scale: 1.0 });
+                    watermarkPdfFirstPageCanvas = document.createElement('canvas');
+                    watermarkPdfFirstPageCanvas.width = viewport.width;
+                    watermarkPdfFirstPageCanvas.height = viewport.height;
+                    const ctx = watermarkPdfFirstPageCanvas.getContext('2d');
+                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                } catch (e) {
+                    console.error(e);
+                    notify('Could not parse PDF file.', 'error');
+                    hideStatus();
+                    return;
+                }
+            } else if (file.type.startsWith('image/')) {
+                watermarkFileType = 'image';
+                const url = URL.createObjectURL(file);
+                watermarkImageObject = await loadImage(url);
+            } else {
+                notify('Unsupported file type. Please upload a PDF or an Image.', 'error');
+                hideStatus();
+                return;
+            }
+
+            watermarkDropZone.classList.add('hidden');
+            watermarkPreviewContainer.classList.remove('hidden');
+            drawWatermarkPreview();
+            hideStatus();
+        }
+
+        async function handleWatermarkLogoSelect() {
+            const file = wmImgFileInput.files[0];
+            if (!file) return;
+            watermarkLogoFile = file;
+            const url = URL.createObjectURL(file);
+            watermarkLogoImg = await loadImage(url);
+            drawWatermarkPreview();
+            notify('Watermark logo uploaded successfully.', 'success');
+        }
+
+        function drawWatermarkPreview() {
+            if (!watermarkFile) return;
+
+            const ctx = watermarkPreviewCanvas.getContext('2d');
+            let w = 500, h = 500;
+
+            if (watermarkFileType === 'pdf' && watermarkPdfFirstPageCanvas) {
+                w = watermarkPdfFirstPageCanvas.width;
+                h = watermarkPdfFirstPageCanvas.height;
+            } else if (watermarkFileType === 'image' && watermarkImageObject) {
+                w = watermarkImageObject.width;
+                h = watermarkImageObject.height;
+            }
+
+            watermarkPreviewCanvas.width = w;
+            watermarkPreviewCanvas.height = h;
+
+            // Draw base content
+            if (watermarkFileType === 'pdf' && watermarkPdfFirstPageCanvas) {
+                ctx.drawImage(watermarkPdfFirstPageCanvas, 0, 0);
+            } else if (watermarkFileType === 'image' && watermarkImageObject) {
+                ctx.drawImage(watermarkImageObject, 0, 0);
+            }
+
+            // Draw overlay watermark
+            ctx.save();
+            const opacity = parseInt(wmOpacitySlider.value) / 100;
+            ctx.globalAlpha = opacity;
+
+            const sizeMultiplier = parseInt(wmSizeSlider.value) / 100;
+            const rot = parseInt(wmRotationSlider.value) * Math.PI / 180;
+
+            if (watermarkActiveType === 'text') {
+                const fontName = wmTextFont.value;
+                const baseFontSize = Math.round(w * 0.05);
+                const fontSize = Math.round(baseFontSize * sizeMultiplier);
+                ctx.font = `bold ${fontSize}px ${fontName === 'Times-Roman' ? 'Times New Roman' : fontName}, sans-serif`;
+                ctx.fillStyle = wmTextColor.value;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const text = wmTextInput.value || 'CONFIDENTIAL';
+
+                if (watermarkSelectedPos === 'center') {
+                    ctx.translate(w / 2, h / 2);
+                    ctx.rotate(rot);
+                    ctx.fillText(text, 0, 0);
+                } else if (watermarkSelectedPos === 'bottom-right') {
+                    ctx.translate(w * 0.85, h * 0.9);
+                    ctx.rotate(rot);
+                    ctx.fillText(text, 0, 0);
+                } else if (watermarkSelectedPos === 'top-left') {
+                    ctx.translate(w * 0.15, h * 0.1);
+                    ctx.rotate(rot);
+                    ctx.fillText(text, 0, 0);
+                } else if (watermarkSelectedPos === 'tiled') {
+                    const stepX = Math.max(120, w / 4) * sizeMultiplier;
+                    const stepY = Math.max(120, h / 4) * sizeMultiplier;
+                    for (let x = stepX / 2; x < w; x += stepX) {
+                        for (let y = stepY / 2; y < h; y += stepY) {
+                            ctx.save();
+                            ctx.translate(x, y);
+                            ctx.rotate(rot);
+                            ctx.fillText(text, 0, 0);
+                            ctx.restore();
+                        }
+                    }
+                }
+            } else if (watermarkActiveType === 'image' && watermarkLogoImg) {
+                const logoW = watermarkLogoImg.width;
+                const logoH = watermarkLogoImg.height;
+                const baseLogoSize = w * 0.25;
+                const targetW = baseLogoSize * sizeMultiplier;
+                const targetH = (logoH * targetW) / logoW;
+
+                if (watermarkSelectedPos === 'center') {
+                    ctx.translate(w / 2, h / 2);
+                    ctx.rotate(rot);
+                    ctx.drawImage(watermarkLogoImg, -targetW / 2, -targetH / 2, targetW, targetH);
+                } else if (watermarkSelectedPos === 'bottom-right') {
+                    ctx.translate(w - targetW / 2 - 20, h - targetH / 2 - 20);
+                    ctx.rotate(rot);
+                    ctx.drawImage(watermarkLogoImg, -targetW / 2, -targetH / 2, targetW, targetH);
+                } else if (watermarkSelectedPos === 'top-left') {
+                    ctx.translate(targetW / 2 + 20, targetH / 2 + 20);
+                    ctx.rotate(rot);
+                    ctx.drawImage(watermarkLogoImg, -targetW / 2, -targetH / 2, targetW, targetH);
+                } else if (watermarkSelectedPos === 'tiled') {
+                    const stepX = Math.max(180, w / 3) * sizeMultiplier;
+                    const stepY = Math.max(180, h / 3) * sizeMultiplier;
+                    for (let x = stepX / 2; x < w; x += stepX) {
+                        for (let y = stepY / 2; y < h; y += stepY) {
+                            ctx.save();
+                            ctx.translate(x, y);
+                            ctx.rotate(rot);
+                            ctx.drawImage(watermarkLogoImg, -targetW / 2, -targetH / 2, targetW, targetH);
+                            ctx.restore();
+                        }
+                    }
+                }
+            } else if (watermarkActiveType === 'image') {
+                // If user selected image but hasn't uploaded logo yet, render text guide
+                ctx.font = `14px Outfit, sans-serif`;
+                ctx.fillStyle = '#ef4444';
+                ctx.fillText('Please upload a logo image', w / 2, h / 2);
+            }
+            ctx.restore();
+        }
+
+        function resetWatermark() {
+            watermarkFile = null;
+            watermarkFileType = '';
+            watermarkLogoFile = null;
+            watermarkLogoImg = null;
+            watermarkImageObject = null;
+            watermarkPdfDoc = null;
+            watermarkPdfFirstPageCanvas = null;
+            watermarkInput.value = '';
+            wmImgFileInput.value = '';
+            watermarkPreviewCanvas.width = 100;
+            watermarkPreviewCanvas.height = 100;
+            watermarkDropZone.classList.remove('hidden');
+            watermarkPreviewContainer.classList.add('hidden');
+        }
+        clearWatermarkBtn.addEventListener('click', resetWatermark);
+
+        wmApplyBtn.addEventListener('click', async () => {
+            if (!watermarkFile) return;
+
+            if (watermarkActiveType === 'image' && !watermarkLogoImg) {
+                notify('Please upload a watermark logo image first.', 'info');
+                return;
+            }
+
+            showStatus('Adding watermark...');
+            try {
+                if (watermarkFileType === 'image') {
+                    // Create high resolution output canvas
+                    const outCanvas = document.createElement('canvas');
+                    const w = watermarkImageObject.width;
+                    const h = watermarkImageObject.height;
+                    outCanvas.width = w;
+                    outCanvas.height = h;
+
+                    const ctx = outCanvas.getContext('2d');
+                    ctx.drawImage(watermarkImageObject, 0, 0);
+
+                    // Overlay watermark logic
+                    ctx.save();
+                    const opacity = parseInt(wmOpacitySlider.value) / 100;
+                    ctx.globalAlpha = opacity;
+
+                    const sizeMultiplier = parseInt(wmSizeSlider.value) / 100;
+                    const rot = parseInt(wmRotationSlider.value) * Math.PI / 180;
+
+                    if (watermarkActiveType === 'text') {
+                        const fontName = wmTextFont.value;
+                        const baseFontSize = Math.round(w * 0.05);
+                        const fontSize = Math.round(baseFontSize * sizeMultiplier);
+                        ctx.font = `bold ${fontSize}px ${fontName === 'Times-Roman' ? 'Times New Roman' : fontName}, sans-serif`;
+                        ctx.fillStyle = wmTextColor.value;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        const text = wmTextInput.value || 'CONFIDENTIAL';
+
+                        if (watermarkSelectedPos === 'center') {
+                            ctx.translate(w / 2, h / 2);
+                            ctx.rotate(rot);
+                            ctx.fillText(text, 0, 0);
+                        } else if (watermarkSelectedPos === 'bottom-right') {
+                            ctx.translate(w * 0.85, h * 0.9);
+                            ctx.rotate(rot);
+                            ctx.fillText(text, 0, 0);
+                        } else if (watermarkSelectedPos === 'top-left') {
+                            ctx.translate(w * 0.15, h * 0.1);
+                            ctx.rotate(rot);
+                            ctx.fillText(text, 0, 0);
+                        } else if (watermarkSelectedPos === 'tiled') {
+                            const stepX = Math.max(120, w / 4) * sizeMultiplier;
+                            const stepY = Math.max(120, h / 4) * sizeMultiplier;
+                            for (let x = stepX / 2; x < w; x += stepX) {
+                                for (let y = stepY / 2; y < h; y += stepY) {
+                                    ctx.save();
+                                    ctx.translate(x, y);
+                                    ctx.rotate(rot);
+                                    ctx.fillText(text, 0, 0);
+                                    ctx.restore();
+                                }
+                            }
+                        }
+                    } else if (watermarkActiveType === 'image' && watermarkLogoImg) {
+                        const logoW = watermarkLogoImg.width;
+                        const logoH = watermarkLogoImg.height;
+                        const baseLogoSize = w * 0.25;
+                        const targetW = baseLogoSize * sizeMultiplier;
+                        const targetH = (logoH * targetW) / logoW;
+
+                        if (watermarkSelectedPos === 'center') {
+                            ctx.translate(w / 2, h / 2);
+                            ctx.rotate(rot);
+                            ctx.drawImage(watermarkLogoImg, -targetW / 2, -targetH / 2, targetW, targetH);
+                        } else if (watermarkSelectedPos === 'bottom-right') {
+                            ctx.translate(w - targetW / 2 - 20, h - targetH / 2 - 20);
+                            ctx.rotate(rot);
+                            ctx.drawImage(watermarkLogoImg, -targetW / 2, -targetH / 2, targetW, targetH);
+                        } else if (watermarkSelectedPos === 'top-left') {
+                            ctx.translate(targetW / 2 + 20, targetH / 2 + 20);
+                            ctx.rotate(rot);
+                            ctx.drawImage(watermarkLogoImg, -targetW / 2, -targetH / 2, targetW, targetH);
+                        } else if (watermarkSelectedPos === 'tiled') {
+                            const stepX = Math.max(180, w / 3) * sizeMultiplier;
+                            const stepY = Math.max(180, h / 3) * sizeMultiplier;
+                            for (let x = stepX / 2; x < w; x += stepX) {
+                                for (let y = stepY / 2; y < h; y += stepY) {
+                                    ctx.save();
+                                    ctx.translate(x, y);
+                                    ctx.rotate(rot);
+                                    ctx.drawImage(watermarkLogoImg, -targetW / 2, -targetH / 2, targetW, targetH);
+                                    ctx.restore();
+                                }
+                            }
+                        }
+                    }
+                    ctx.restore();
+
+                    const link = document.createElement('a');
+                    link.download = watermarkFile.name.replace(/\.[^/.]+$/, "") + '_Watermarked.png';
+                    link.href = outCanvas.toDataURL('image/png');
+                    link.click();
+                    showStatus('Success!', 2000);
+                    notify('Image watermarked successfully.', 'success');
+                } else if (watermarkFileType === 'pdf') {
+                    const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
+                    const arrayBuffer = await watermarkFile.arrayBuffer();
+                    const pdfDoc = await PDFDocument.load(arrayBuffer);
+                    const pages = pdfDoc.getPages();
+
+                    const opacity = parseInt(wmOpacitySlider.value) / 100;
+                    const sizeMultiplier = parseInt(wmSizeSlider.value) / 100;
+                    const rotationAngle = parseInt(wmRotationSlider.value);
+
+                    let embeddedLogo = null;
+                    if (watermarkActiveType === 'image' && watermarkLogoFile) {
+                        const logoBuffer = await watermarkLogoFile.arrayBuffer();
+                        const extension = watermarkLogoFile.name.split('.').pop().toLowerCase();
+                        if (extension === 'png') {
+                            embeddedLogo = await pdfDoc.embedPng(logoBuffer);
+                        } else {
+                            embeddedLogo = await pdfDoc.embedJpg(logoBuffer);
+                        }
+                    }
+
+                    function hexToRgb(hex) {
+                        const r = parseInt(hex.slice(1, 3), 16) / 255;
+                        const g = parseInt(hex.slice(3, 5), 16) / 255;
+                        const b = parseInt(hex.slice(5, 7), 16) / 255;
+                        return { r, g, b };
+                    }
+
+                    const cRgb = hexToRgb(wmTextColor.value);
+
+                    for (const page of pages) {
+                        const w = page.getWidth();
+                        const h = page.getHeight();
+
+                        if (watermarkActiveType === 'text') {
+                            const fontName = wmTextFont.value;
+                            let activeFont;
+                            if (fontName === 'Courier') {
+                                activeFont = await pdfDoc.embedFont(StandardFonts.CourierBold);
+                            } else if (fontName === 'Times-Roman') {
+                                activeFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+                            } else {
+                                activeFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+                            }
+
+                            const text = wmTextInput.value || 'CONFIDENTIAL';
+                            const baseFontSize = Math.round(w * 0.05);
+                            const fontSize = Math.round(baseFontSize * sizeMultiplier);
+
+                            const textWidth = activeFont.widthOfTextAtSize(text, fontSize);
+                            const textHeight = fontSize;
+
+                            const drawTextAt = (x, y) => {
+                                page.drawText(text, {
+                                    x: x,
+                                    y: y,
+                                    size: fontSize,
+                                    font: activeFont,
+                                    color: rgb(cRgb.r, cRgb.g, cRgb.b),
+                                    rotate: degrees(rotationAngle),
+                                    opacity: opacity
+                                });
+                            };
+
+                            if (watermarkSelectedPos === 'center') {
+                                // For rotated text, offset calculation is simplified by drawing from center-aligned coords
+                                drawTextAt((w - textWidth) / 2, (h - textHeight) / 2);
+                            } else if (watermarkSelectedPos === 'bottom-right') {
+                                drawTextAt(w - textWidth - 40, 40);
+                            } else if (watermarkSelectedPos === 'top-left') {
+                                drawTextAt(40, h - textHeight - 40);
+                            } else if (watermarkSelectedPos === 'tiled') {
+                                const stepX = Math.max(150, w / 3) * sizeMultiplier;
+                                const stepY = Math.max(150, h / 3) * sizeMultiplier;
+                                for (let x = stepX / 2; x < w; x += stepX) {
+                                    for (let y = stepY / 2; y < h; y += stepY) {
+                                        drawTextAt(x - textWidth / 2, y - textHeight / 2);
+                                    }
+                                }
+                            }
+                        } else if (watermarkActiveType === 'image' && embeddedLogo) {
+                            const logoW = embeddedLogo.width;
+                            const logoH = embeddedLogo.height;
+                            const baseLogoSize = w * 0.25;
+                            const targetW = baseLogoSize * sizeMultiplier;
+                            const targetH = (logoH * targetW) / logoW;
+
+                            const drawImageAt = (x, y) => {
+                                page.drawImage(embeddedLogo, {
+                                    x: x,
+                                    y: y,
+                                    width: targetW,
+                                    height: targetH,
+                                    rotate: degrees(rotationAngle),
+                                    opacity: opacity
+                                });
+                            };
+
+                            if (watermarkSelectedPos === 'center') {
+                                drawImageAt((w - targetW) / 2, (h - targetH) / 2);
+                            } else if (watermarkSelectedPos === 'bottom-right') {
+                                drawImageAt(w - targetW - 40, 40);
+                            } else if (watermarkSelectedPos === 'top-left') {
+                                drawImageAt(40, h - targetH - 40);
+                            } else if (watermarkSelectedPos === 'tiled') {
+                                const stepX = Math.max(180, w / 3) * sizeMultiplier;
+                                const stepY = Math.max(180, h / 3) * sizeMultiplier;
+                                for (let x = stepX / 2; x < w; x += stepX) {
+                                    for (let y = stepY / 2; y < h; y += stepY) {
+                                        drawImageAt(x - targetW / 2, y - targetH / 2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    const pdfBytes = await pdfDoc.save();
+                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = watermarkFile.name.replace(/\.[^/.]+$/, "") + '_Watermarked.pdf';
+                    link.click();
+                    showStatus('Success!', 2000);
+                    notify('PDF watermarked successfully.', 'success');
+                }
+            } catch (err) {
+                console.error(err);
+                notify('Watermark failed.', 'error');
+                hideStatus();
+            }
+        });
+
+        // --- Swift Assistant Logic ---
+        const assistantSettingsToggleBtn = document.getElementById('assistant-settings-toggle-btn');
+        const assistantSettingsPopover = document.getElementById('assistant-settings-popover');
+        const assistantProvider = document.getElementById('assistant-provider');
+        const assistantModel = document.getElementById('assistant-model');
+        const assistantEndpoint = document.getElementById('assistant-endpoint');
+        const assistantEndpointContainer = document.getElementById('assistant-endpoint-container');
+        const assistantApiKey = document.getElementById('assistant-api-key');
+        const assistantConnectBtn = document.getElementById('assistant-connect-btn');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        
+        const assistantChatLog = document.getElementById('assistant-chat-log');
+        const assistantInput = document.getElementById('assistant-input');
+        const assistantSendBtn = document.getElementById('assistant-send-btn');
+        const assistantClearBtn = document.getElementById('assistant-clear-btn');
+
+        let chatHistory = []; // stores {role: 'user'|'assistant', content: '...'}
+
+        // Floating popover settings logic
+        assistantSettingsToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            assistantSettingsPopover.classList.toggle('hidden');
+        });
+
+        // Close popover when clicking outside
+        document.addEventListener('click', (e) => {
+            if (assistantSettingsPopover && !assistantSettingsPopover.classList.contains('hidden')) {
+                if (!assistantSettingsPopover.contains(e.target) && !assistantSettingsToggleBtn.contains(e.target)) {
+                    assistantSettingsPopover.classList.add('hidden');
+                }
+            }
+        });
+
+        // Load cached configurations from localStorage
+        if (localStorage.getItem('assistant-provider')) {
+            assistantProvider.value = localStorage.getItem('assistant-provider');
+        }
+        if (localStorage.getItem('assistant-model')) {
+            let modelVal = localStorage.getItem('assistant-model');
+            if (assistantProvider.value === 'groq' && (modelVal.includes('llama3-8b') || modelVal.includes('llama3-70b') || modelVal === 'llama3-8b-8192' || modelVal === 'llama3-70b-8192')) {
+                modelVal = 'llama-3.3-70b-versatile';
+                localStorage.setItem('assistant-model', modelVal);
+            }
+            assistantModel.value = modelVal;
+        }
+        if (localStorage.getItem('assistant-endpoint')) {
+            assistantEndpoint.value = localStorage.getItem('assistant-endpoint');
+        }
+        if (localStorage.getItem('assistant-api-key')) {
+            assistantApiKey.value = localStorage.getItem('assistant-api-key');
+        }
+
+        // Restore visual connection status state
+        const savedState = localStorage.getItem('assistant-connection-state') || 'disconnected';
+        if (savedState === 'connected') {
+            statusDot.style.backgroundColor = '#22c55e';
+            statusText.parentElement.style.color = '#22c55e';
+            statusText.textContent = 'Connected';
+        } else {
+            statusDot.style.backgroundColor = '#ef4444';
+            statusText.parentElement.style.color = '#ef4444';
+            statusText.textContent = 'Disconnected';
+        }
+
+        function setDisconnectedStatus() {
+            statusDot.style.backgroundColor = '#ef4444';
+            statusText.parentElement.style.color = '#ef4444';
+            statusText.textContent = 'Disconnected';
+            localStorage.setItem('assistant-connection-state', 'disconnected');
+        }
+
+        async function testApiConnection() {
+            const apiKey = assistantApiKey.value.trim();
+            const provider = assistantProvider.value;
+            const model = assistantModel.value.trim() || 'gemini-1.5-flash';
+            let endpoint = assistantEndpoint.value.trim();
+
+            if (!apiKey) {
+                notify('Please enter your API Key first.', 'warning');
+                return false;
+            }
+
+            statusDot.style.backgroundColor = '#eab308'; // yellow
+            statusText.parentElement.style.color = '#eab308';
+            statusText.textContent = 'Connecting...';
+            assistantConnectBtn.disabled = true;
+
+            try {
+                if (provider === 'gemini') {
+                    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    const res = await fetch(geminiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: 'ping' }] }] })
+                    });
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+                    }
+                    const data = await res.json();
+                    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) throw new Error('Invalid response');
+                } else if (provider === 'openrouter' || provider === 'groq' || provider === 'custom') {
+                    if (provider === 'openrouter' && !endpoint) {
+                        endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+                    } else if (provider === 'groq' && !endpoint) {
+                        endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+                    }
+                    if (!endpoint) throw new Error('API endpoint URL is required.');
+
+                    const res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{ role: 'user', content: 'ping' }],
+                            max_tokens: 5
+                        })
+                    });
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+                    }
+                } else if (provider === 'huggingface') {
+                    const hfUrl = `https://api-inference.huggingface.co/models/${model}`;
+                    const res = await fetch(hfUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({ inputs: 'ping' })
+                    });
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error?.message || errData.error || `HTTP ${res.status}`);
+                    }
+                }
+
+                statusDot.style.backgroundColor = '#22c55e'; // green
+                statusText.parentElement.style.color = '#22c55e';
+                statusText.textContent = 'Connected';
+                localStorage.setItem('assistant-connection-state', 'connected');
+                notify(`Successfully connected to ${model}!`, 'success');
+                return true;
+            } catch (err) {
+                console.error(err);
+                statusDot.style.backgroundColor = '#ef4444'; // red
+                statusText.parentElement.style.color = '#ef4444';
+                statusText.textContent = 'Disconnected';
+                localStorage.setItem('assistant-connection-state', 'disconnected');
+                notify(`Connection failed: ${err.message}. Check your key or config.`, 'error');
+                return false;
+            } finally {
+                assistantConnectBtn.disabled = false;
+            }
+        }
+
+        assistantConnectBtn.addEventListener('click', testApiConnection);
+
+        function checkEndpointVisibility() {
+            const prov = assistantProvider.value;
+            if (prov === 'custom') {
+                assistantEndpointContainer.classList.remove('hidden');
+            } else {
+                assistantEndpointContainer.classList.add('hidden');
+            }
+        }
+        checkEndpointVisibility();
+
+        // Update default model on provider changes
+        assistantProvider.addEventListener('change', () => {
+            const prov = assistantProvider.value;
+            checkEndpointVisibility();
+            
+            if (prov === 'gemini') {
+                assistantModel.value = 'gemini-1.5-flash';
+            } else if (prov === 'openrouter') {
+                assistantModel.value = 'google/gemini-2.5-flash:free';
+            } else if (prov === 'groq') {
+                assistantModel.value = 'llama-3.3-70b-versatile';
+            } else if (prov === 'huggingface') {
+                assistantModel.value = 'Qwen/Qwen2.5-Coder-7B-Instruct';
+            } else if (prov === 'custom') {
+                assistantModel.value = '';
+                assistantEndpoint.value = '';
+            }
+            
+            saveAssistantSettings();
+            setDisconnectedStatus();
+        });
+
+        function saveAssistantSettings() {
+            localStorage.setItem('assistant-provider', assistantProvider.value);
+            localStorage.setItem('assistant-model', assistantModel.value);
+            localStorage.setItem('assistant-endpoint', assistantEndpoint.value);
+            localStorage.setItem('assistant-api-key', assistantApiKey.value);
+        }
+
+        // Auto save settings on input changes and reset connection
+        assistantModel.addEventListener('input', () => {
+            saveAssistantSettings();
+            setDisconnectedStatus();
+        });
+        assistantEndpoint.addEventListener('input', () => {
+            saveAssistantSettings();
+            setDisconnectedStatus();
+        });
+        assistantApiKey.addEventListener('input', () => {
+            saveAssistantSettings();
+            setDisconnectedStatus();
+        });
+
+        // Simple Markdown/Code formatter helper
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function formatMessage(text) {
+            let formatted = escapeHtml(text);
+            
+            // Format code blocks: ```code```
+            const codeBlockRegex = /```([\s\S]*?)```/g;
+            formatted = formatted.replace(codeBlockRegex, (match, code) => {
+                return `<pre><code>${code.trim()}</code></pre>`;
+            });
+
+            // Format inline code: `code`
+            const inlineCodeRegex = /`([^`]+)`/g;
+            formatted = formatted.replace(inlineCodeRegex, '<code>$1</code>');
+
+            // Format paragraphs (newlines to br)
+            formatted = formatted.split('\n').join('<br>');
+            
+            return formatted;
+        }
+
+        function createChatBubble(role, content, index, attachment = null) {
+            const bubble = document.createElement('div');
+            bubble.className = `assistant-chat-bubble ${role === 'user' ? 'user' : 'bot'}`;
+            bubble.dataset.index = index;
+
+            const header = document.createElement('div');
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.alignItems = 'center';
+            header.style.marginBottom = '6px';
+
+            const senderLabel = document.createElement('span');
+            senderLabel.style.fontWeight = '700';
+            senderLabel.style.fontSize = '0.8rem';
+            senderLabel.style.color = role === 'user' ? 'var(--accent-color)' : 'var(--text-secondary)';
+            senderLabel.innerHTML = role === 'user' 
+                ? '<i data-lucide="user" style="width:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> You' 
+                : '<i data-lucide="sparkles" style="width:12px;display:inline-block;vertical-align:middle;margin-right:4px;color:var(--accent-color);"></i> Swift Assistant';
+
+            header.appendChild(senderLabel);
+
+            // Action container for top-right buttons
+            if (role === 'user') {
+                const topActions = document.createElement('div');
+                topActions.style.display = 'flex';
+                topActions.style.gap = '6px';
+                topActions.style.alignItems = 'center';
+
+                const editBtn = document.createElement('button');
+                editBtn.className = 'chat-bubble-action-btn';
+                editBtn.title = 'Edit Prompt';
+                editBtn.innerHTML = '<i data-lucide="edit-3"></i>';
+                editBtn.addEventListener('click', () => editUserPrompt(index));
+                topActions.appendChild(editBtn);
+                header.appendChild(topActions);
+            }
+
+            const textContainer = document.createElement('div');
+            textContainer.style.fontSize = '0.9rem';
+            textContainer.innerHTML = formatMessage(content);
+
+            bubble.appendChild(header);
+            bubble.appendChild(textContainer);
+
+            // Add attachment preview inside bubble if any
+            if (attachment) {
+                const attachDiv = document.createElement('div');
+                attachDiv.style.marginTop = '8px';
+                attachDiv.style.padding = '8px';
+                attachDiv.style.borderRadius = '8px';
+                attachDiv.style.background = 'rgba(255,255,255,0.04)';
+                attachDiv.style.border = '1px solid var(--border-color)';
+                attachDiv.style.display = 'inline-flex';
+                attachDiv.style.alignItems = 'center';
+                attachDiv.style.gap = '8px';
+                
+                if (attachment.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = attachment.data;
+                    img.style.maxHeight = '120px';
+                    img.style.maxWidth = '100%';
+                    img.style.borderRadius = '6px';
+                    img.style.objectFit = 'cover';
+                    attachDiv.appendChild(img);
+                } else {
+                    attachDiv.innerHTML = `
+                        <i data-lucide="file" style="width:14px; height:14px;"></i>
+                        <span style="font-size:0.8rem; font-weight:600; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${attachment.name}</span>
+                    `;
+                }
+                bubble.appendChild(attachDiv);
+            }
+
+            // Footer container for bottom-right button
+            const footer = document.createElement('div');
+            footer.style.display = 'flex';
+            footer.style.justifyContent = 'flex-end';
+            footer.style.alignItems = 'center';
+            footer.style.marginTop = '6px';
+
+            const bottomCopyBtn = document.createElement('button');
+            bottomCopyBtn.className = 'chat-bubble-action-btn';
+            bottomCopyBtn.title = 'Copy Content';
+            bottomCopyBtn.innerHTML = '<i data-lucide="copy"></i>';
+            bottomCopyBtn.addEventListener('click', () => copyBotResponse(content));
+            footer.appendChild(bottomCopyBtn);
+
+            bubble.appendChild(footer);
+            
+            return bubble;
+        }
+
+        function editUserPrompt(index) {
+            const userMsg = chatHistory[index];
+            if (!userMsg) return;
+
+            // Set input value
+            assistantInput.value = userMsg.content;
+            assistantInput.focus();
+
+            // Restore attached file if any
+            if (userMsg.attachment) {
+                attachedFile = { ...userMsg.attachment };
+                renderAttachedFile();
+            } else {
+                attachedFile = null;
+                renderAttachedFile();
+            }
+
+            // Truncate history and chat log to this point
+            chatHistory = chatHistory.slice(0, index);
+            renderChatHistory();
+            notify('Prompt loaded for editing', 'info');
+        }
+
+        async function copyBotResponse(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                notify('Copied content to clipboard.', 'success');
+            } catch (err) {
+                console.error(err);
+                notify('Failed to copy.', 'error');
+            }
+        }
+
+        function renderChatHistory() {
+            // Remove all bubbles except system welcome bubble
+            const systemBubble = assistantChatLog.querySelector('.system');
+            assistantChatLog.innerHTML = '';
+            if (systemBubble) assistantChatLog.appendChild(systemBubble);
+
+            chatHistory.forEach((msg, idx) => {
+                const bubble = createChatBubble(msg.role, msg.content, idx, msg.attachment);
+                assistantChatLog.appendChild(bubble);
+            });
+            lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+            scrollChatToBottom();
+        }
+
+        function scrollChatToBottom() {
+            assistantChatLog.scrollTo({
+                top: assistantChatLog.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        assistantClearBtn.addEventListener('click', () => {
+            chatHistory = [];
+            renderChatHistory();
+            notify('Chat history cleared.', 'info');
+        });
+
+        // Trigger send on enter (without shift)
+        assistantInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendAssistantMessage();
+            }
+        });
+
+        assistantSendBtn.addEventListener('click', sendAssistantMessage);
+
+        // Attachment and Speech Recognition logic setup
+        let attachedFile = null;
+
+        const assistantAttachBtn = document.getElementById('assistant-attach-btn');
+        const assistantFileInput = document.getElementById('assistant-file-input');
+        const attachedFilesContainer = document.getElementById('attached-files-container');
+        const assistantVoiceBtn = document.getElementById('assistant-voice-btn');
+
+        assistantAttachBtn.addEventListener('click', () => {
+            assistantFileInput.click();
+        });
+
+        assistantFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            const isText = file.type === 'text/plain' || file.name.endsWith('.txt') || file.name.endsWith('.csv') || file.name.endsWith('.json') || file.name.endsWith('.xml') || file.name.endsWith('.md');
+            
+            reader.onload = () => {
+                attachedFile = {
+                    name: file.name,
+                    type: file.type,
+                    data: reader.result,
+                    isText: isText
+                };
+                renderAttachedFile();
+            };
+
+            if (isText) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function renderAttachedFile() {
+            attachedFilesContainer.innerHTML = '';
+            if (!attachedFile) return;
+
+            const chip = document.createElement('div');
+            chip.style.display = 'inline-flex';
+            chip.style.alignItems = 'center';
+            chip.style.gap = '6px';
+            chip.style.background = 'rgba(255, 255, 255, 0.08)';
+            chip.style.border = '1px solid var(--border-color)';
+            chip.style.padding = '4px 10px';
+            chip.style.borderRadius = '12px';
+            chip.style.fontSize = '0.8rem';
+            chip.style.color = 'var(--text-primary)';
+
+            let iconHtml = '<i data-lucide="file" style="width:12px; height:12px;"></i>';
+            if (attachedFile.type.startsWith('image/')) {
+                iconHtml = '<i data-lucide="image" style="width:12px; height:12px;"></i>';
+            }
+
+            chip.innerHTML = `
+                ${iconHtml}
+                <span style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${attachedFile.name}</span>
+                <button type="button" id="remove-attachment-btn" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; margin-left:4px;">
+                    <i data-lucide="x" style="width:12px; height:12px;"></i>
+                </button>
+            `;
+
+            attachedFilesContainer.appendChild(chip);
+            lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+
+            document.getElementById('remove-attachment-btn').addEventListener('click', () => {
+                attachedFile = null;
+                assistantFileInput.value = '';
+                renderAttachedFile();
+            });
+        }
+
+        // Voice to Text (Speech Recognition)
+        let recognition = null;
+        let isListening = false;
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                assistantVoiceBtn.style.background = 'rgba(239, 68, 68, 0.2)';
+                assistantVoiceBtn.style.color = '#ef4444';
+                assistantVoiceBtn.style.borderColor = '#ef4444';
+                assistantVoiceBtn.innerHTML = '<i data-lucide="mic-off" style="width: 18px; height: 18px;"></i>';
+                lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+                notify('Listening... speak now', 'info');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                assistantVoiceBtn.style.background = '';
+                assistantVoiceBtn.style.color = '';
+                assistantVoiceBtn.style.borderColor = '';
+                assistantVoiceBtn.innerHTML = '<i data-lucide="mic" style="width: 18px; height: 18px;"></i>';
+                lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                if (event.error !== 'no-speech') {
+                    notify(`Speech recognition error: ${event.error}`, 'error');
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                if (transcript) {
+                    const currentVal = assistantInput.value;
+                    assistantInput.value = currentVal ? currentVal + ' ' + transcript : transcript;
+                    assistantInput.focus();
+                }
+            };
+
+            assistantVoiceBtn.addEventListener('click', () => {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            });
+        } else {
+            assistantVoiceBtn.style.opacity = '0.5';
+            assistantVoiceBtn.style.cursor = 'not-allowed';
+            assistantVoiceBtn.title = 'Speech recognition not supported';
+            assistantVoiceBtn.addEventListener('click', () => {
+                notify('Speech recognition is not supported in this browser.', 'warning');
+            });
+        }
+
+        async function sendAssistantMessage() {
+            const prompt = assistantInput.value.trim();
+            if (!prompt && !attachedFile) return;
+
+            const apiKey = assistantApiKey.value.trim();
+            if (!apiKey) {
+                notify('Please enter your API Key in settings first.', 'warning');
+                assistantSettingsPopover.classList.remove('hidden');
+                return;
+            }
+
+            // Append user prompt with attachment to history and render
+            const currentAttachment = attachedFile ? { ...attachedFile } : null;
+            
+            // Reset attachment inputs
+            attachedFile = null;
+            assistantFileInput.value = '';
+            renderAttachedFile();
+
+            chatHistory.push({ 
+                role: 'user', 
+                content: prompt,
+                attachment: currentAttachment
+            });
+            renderChatHistory();
+            
+            // Clear input box
+            assistantInput.value = '';
+
+            // Add bot thinking state bubble
+            const thinkingBubble = document.createElement('div');
+            thinkingBubble.className = 'assistant-chat-bubble bot thinking';
+            thinkingBubble.innerHTML = `
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i data-lucide="loader-2" class="spin" style="width:16px; color:var(--accent-color);"></i>
+                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Thinking...</span>
+                </div>
+            `;
+            assistantChatLog.appendChild(thinkingBubble);
+            lucide.createIcons();
+            scrollChatToBottom();
+
+            const provider = assistantProvider.value;
+            const model = assistantModel.value.trim() || 'gemini-1.5-flash';
+            let endpoint = assistantEndpoint.value.trim();
+
+            try {
+                let responseText = '';
+                
+                if (provider === 'gemini') {
+                    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    
+                    const contentsPayload = chatHistory.map(msg => {
+                        const parts = [{ text: msg.content || 'Attached file details below:' }];
+                        if (msg.attachment) {
+                            if (msg.attachment.type.startsWith('image/')) {
+                                try {
+                                    const base64Data = msg.attachment.data.split(',')[1];
+                                    parts.push({
+                                        inlineData: {
+                                            mimeType: msg.attachment.type,
+                                            data: base64Data
+                                        }
+                                    });
+                                } catch (e) {
+                                    console.error('Error parsing attachment base64', e);
+                                }
+                            } else if (msg.attachment.isText) {
+                                parts.push({ text: `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}` });
+                            } else {
+                                parts.push({ text: `\n\n[Attached File Link: ${msg.attachment.name} (${msg.attachment.type})]` });
+                            }
+                        }
+                        return {
+                            role: msg.role === 'user' ? 'user' : 'model',
+                            parts: parts
+                        };
+                    });
+
+                    const res = await fetch(geminiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: contentsPayload })
+                    });
+
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+                    }
+                    const data = await res.json();
+                    responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
+
+                } else if (provider === 'openrouter' || provider === 'groq' || provider === 'custom') {
+                    if (provider === 'openrouter' && !endpoint) {
+                        endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+                    } else if (provider === 'groq' && !endpoint) {
+                        endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+                    }
+
+                    if (!endpoint) throw new Error('API endpoint URL is required.');
+
+                    const messagesPayload = chatHistory.map(msg => {
+                        if (msg.attachment) {
+                            if (msg.attachment.type.startsWith('image/')) {
+                                const contentArray = [
+                                    { type: 'text', text: msg.content || 'Image attached below:' },
+                                    { type: 'image_url', image_url: { url: msg.attachment.data } }
+                                ];
+                                return {
+                                    role: msg.role,
+                                    content: contentArray
+                                };
+                            } else if (msg.attachment.isText) {
+                                return {
+                                    role: msg.role,
+                                    content: (msg.content || '') + `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}`
+                                };
+                            } else {
+                                return {
+                                    role: msg.role,
+                                    content: (msg.content || '') + `\n\n[Attached File Link: ${msg.attachment.name}]`
+                                };
+                            }
+                        }
+                        return {
+                            role: msg.role,
+                            content: msg.content
+                        };
+                    });
+
+                    const res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            messages: messagesPayload
+                        })
+                    });
+
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+                    }
+                    const data = await res.json();
+                    responseText = data.choices?.[0]?.message?.content || 'No response generated.';
+
+                } else if (provider === 'huggingface') {
+                    const hfUrl = `https://api-inference.huggingface.co/models/${model}`;
+                    
+                    const res = await fetch(hfUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({ inputs: prompt })
+                    });
+
+                    if (!res.ok) {
+                        throw new Error(`Inference call failed: HTTP ${res.status}`);
+                    }
+                    const data = await res.json();
+                    responseText = Array.isArray(data) ? (data[0]?.generated_text || JSON.stringify(data)) : (data.generated_text || JSON.stringify(data));
+                }
+
+                // Remove thinking bubble
+                thinkingBubble.remove();
+
+                // Append assistant response to history
+                chatHistory.push({ role: 'assistant', content: responseText });
+                renderChatHistory();
+
+            } catch (err) {
+                console.error(err);
+                thinkingBubble.remove();
+                
+                const errorBubble = document.createElement('div');
+                errorBubble.className = 'assistant-chat-bubble bot';
+                errorBubble.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                errorBubble.style.background = 'rgba(239, 68, 68, 0.05)';
+                errorBubble.innerHTML = `
+                    <p style="color:#ef4444; font-weight:700; font-size:0.85rem; margin-bottom:4px;">API Request Failed</p>
+                    <p style="font-size:0.85rem; margin-bottom:0;">Error: ${err.message}. Please check your API key, selected provider, model config, or network connection.</p>
+                `;
+                assistantChatLog.appendChild(errorBubble);
+                scrollChatToBottom();
+            }
+        }
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
