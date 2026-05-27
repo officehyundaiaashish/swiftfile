@@ -1728,7 +1728,37 @@
         }
 
         /* Mobile View styles for Swift Assistant */
+        .mobile-only-btn {
+            display: none !important;
+        }
         @media (max-width: 768px) {
+            .mobile-only-btn {
+                display: flex !important;
+            }
+            #swift-assistant.mobile-fullscreen {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                z-index: 9999 !important;
+                background: var(--bg-color) !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+            }
+            #swift-assistant.mobile-fullscreen > div {
+                height: 100vh !important;
+                border-radius: 0 !important;
+                border: none !important;
+                padding: 1rem !important;
+                gap: 0.75rem !important;
+            }
+            #swift-assistant.mobile-fullscreen #assistant-chat-log {
+                flex: 1 !important;
+                max-height: none !important;
+            }
             #swift-assistant > div {
                 padding: 1rem !important;
                 border-radius: 16px !important;
@@ -1763,7 +1793,12 @@
         }
     </style>
     <script>
+        let lastActiveTabId = 'img-to-pdf';
         function switchTab(tabId) {
+            if (tabId !== 'swift-assistant') {
+                lastActiveTabId = tabId;
+            }
+
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
             });
@@ -1819,6 +1854,9 @@
             }
 
             if (tabId === 'swift-assistant') {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('swift-assistant').classList.add('mobile-fullscreen');
+                }
                 setTimeout(() => {
                     const inputField = document.getElementById('assistant-input');
                     if (inputField) {
@@ -2990,6 +3028,9 @@
                         <!-- Dedicated Chat Header Row -->
                         <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
+                                <button id="assistant-close-btn" class="chat-bubble-action-btn mobile-only-btn" title="Minimize" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: none; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 4px;">
+                                    <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                                </button>
                                 <i data-lucide="sparkles" style="width: 18px; height: 18px; color: var(--accent-color);"></i>
                                 <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Swift Assistant</span>
                             </div>
@@ -3066,15 +3107,23 @@
                             <div id="attached-files-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; padding: 0 4px;"></div>
                             
                             <div class="assistant-input-row" style="display: flex; gap: 10px; align-items: flex-end;">
-                                <div style="flex: 1; position: relative;">
-                                    <textarea id="assistant-input" class="password-input" placeholder="Ask Swift Assistant anything..." rows="2" style="resize: none; margin-bottom: 0; padding: 12px 16px; font-size: 0.95rem; border-radius: 18px; width: 100%;"></textarea>
-                                </div>
+                                <!-- Left Attachment Button -->
                                 <button id="assistant-attach-btn" class="secondary-btn" title="Attach File" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="paperclip" style="width: 18px; height: 18px;"></i>
                                     <input type="file" id="assistant-file-input" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.json" style="display: none;">
                                 </button>
+
+                                <!-- Textarea Input Box -->
+                                <div style="flex: 1; position: relative;">
+                                    <textarea id="assistant-input" class="password-input" placeholder="Ask Swift Assistant anything..." rows="2" style="resize: none; margin-bottom: 0; padding: 12px 16px; font-size: 0.95rem; border-radius: 18px; width: 100%;"></textarea>
+                                </div>
+
+                                <!-- Right Control Buttons -->
                                 <button id="assistant-voice-btn" class="secondary-btn" title="Voice Input" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="mic" style="width: 18px; height: 18px;"></i>
+                                </button>
+                                <button id="assistant-new-chat-btn" class="secondary-btn" title="New Chat" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0; border-color: rgba(255,255,255,0.1);">
+                                    <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
                                 </button>
                                 <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="send" style="width: 18px; height: 18px;"></i>
@@ -7925,9 +7974,29 @@
         const assistantChatLog = document.getElementById('assistant-chat-log');
         const assistantInput = document.getElementById('assistant-input');
         const assistantSendBtn = document.getElementById('assistant-send-btn');
+        const assistantCloseBtn = document.getElementById('assistant-close-btn');
+        const assistantNewChatBtn = document.getElementById('assistant-new-chat-btn');
 
         let chatHistory = []; // stores {role: 'user'|'assistant', content: '...', timestamp: '...'}
         let currentConversationId = null;
+
+        // Close/minimize button event
+        if (assistantCloseBtn) {
+            assistantCloseBtn.addEventListener('click', () => {
+                document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
+                switchTab(lastActiveTabId);
+            });
+        }
+
+        // Reordered input bar New Chat button event
+        if (assistantNewChatBtn) {
+            assistantNewChatBtn.addEventListener('click', () => {
+                chatHistory = [];
+                currentConversationId = null;
+                renderChatHistory();
+                notify('Started new chat.', 'info');
+            });
+        }
 
         // Floating popover settings logic
         assistantSettingsToggleBtn.addEventListener('click', (e) => {
@@ -8535,9 +8604,9 @@
 
 
 
-        // Trigger send on enter (without shift)
+        // Trigger send on enter (without shift) - desktop only
         assistantInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 768) {
                 e.preventDefault();
                 sendAssistantMessage();
             }
