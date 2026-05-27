@@ -1761,8 +1761,8 @@
                 min-height: 0 !important;
                 border-radius: 0 !important;
                 border: none !important;
-                padding: 10px !important;
-                padding-bottom: env(safe-area-inset-bottom, 8px) !important;
+                padding: 10px 10px 18px 10px !important;
+                padding-bottom: calc(env(safe-area-inset-bottom, 12px) + 14px) !important;
                 gap: 0 !important;
                 box-sizing: border-box !important;
                 display: flex !important;
@@ -1794,8 +1794,8 @@
             /* Input bar pinned at bottom - NEVER collapse */
             #swift-assistant.mobile-fullscreen .assistant-input-bar {
                 flex-shrink: 0 !important;
-                padding-top: 6px !important;
-                padding-bottom: 4px !important;
+                padding-top: 8px !important;
+                padding-bottom: 0 !important;
             }
             /* ===== Non-fullscreen mobile ===== */
             #swift-assistant > div {
@@ -3120,6 +3120,7 @@
                                     <div>
                                         <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Provider</label>
                                         <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
+                                            <option value="builtin" selected>Swift Assistant (Built-in)</option>
                                             <option value="gemini">Google Gemini</option>
                                             <option value="openrouter">OpenRouter</option>
                                             <option value="groq">Groq Cloud</option>
@@ -8089,6 +8090,28 @@
             }
         });
 
+        // Vercel proxy URL - UPDATE THIS after deploying your Vercel project
+        const VERCEL_PROXY_URL = 'https://swiftfile-proxy.vercel.app/api/chat';
+
+        // Toggle settings visibility based on provider
+        function updateProviderUI() {
+            const isBuiltin = assistantProvider.value === 'builtin';
+            const settingsFields = assistantSettingsPopover.querySelectorAll(':scope > div:not(:first-child):not(:last-child)');
+            settingsFields.forEach(el => el.style.display = isBuiltin ? 'none' : '');
+            // Hide connect row for built-in
+            const connectRow = assistantSettingsPopover.querySelector(':scope > div:last-child');
+            if (connectRow) connectRow.style.display = isBuiltin ? 'none' : '';
+            if (isBuiltin) {
+                statusDot.style.backgroundColor = '#22c55e';
+                statusText.textContent = 'Connected';
+                statusText.style.color = '#22c55e';
+            }
+        }
+        assistantProvider.addEventListener('change', () => {
+            updateProviderUI();
+            localStorage.setItem('assistant-provider', assistantProvider.value);
+        });
+
         // Load cached configurations from localStorage
         if (localStorage.getItem('assistant-provider')) {
             assistantProvider.value = localStorage.getItem('assistant-provider');
@@ -8108,16 +8131,25 @@
             assistantApiKey.value = localStorage.getItem('assistant-api-key');
         }
 
+        // Initialize provider UI
+        updateProviderUI();
+
         // Restore visual connection status state
-        const savedState = localStorage.getItem('assistant-connection-state') || 'disconnected';
-        if (savedState === 'connected') {
+        if (assistantProvider.value === 'builtin') {
             statusDot.style.backgroundColor = '#22c55e';
-            statusText.parentElement.style.color = '#22c55e';
             statusText.textContent = 'Connected';
+            statusText.style.color = '#22c55e';
         } else {
-            statusDot.style.backgroundColor = '#ef4444';
-            statusText.parentElement.style.color = '#ef4444';
-            statusText.textContent = 'Disconnected';
+            const savedState = localStorage.getItem('assistant-connection-state') || 'disconnected';
+            if (savedState === 'connected') {
+                statusDot.style.backgroundColor = '#22c55e';
+                statusText.parentElement.style.color = '#22c55e';
+                statusText.textContent = 'Connected';
+            } else {
+                statusDot.style.backgroundColor = '#ef4444';
+                statusText.parentElement.style.color = '#ef4444';
+                statusText.textContent = 'Disconnected';
+            }
         }
 
         function setDisconnectedStatus() {
@@ -8814,8 +8846,9 @@
             const prompt = assistantInput.value.trim();
             if (!prompt && !attachedFile) return;
 
+            const isBuiltinProvider = assistantProvider.value === 'builtin';
             const apiKey = assistantApiKey.value.trim();
-            if (!apiKey) {
+            if (!isBuiltinProvider && !apiKey) {
                 notify('Please enter your API Key in settings first.', 'warning');
                 assistantSettingsPopover.classList.remove('hidden');
                 return;
@@ -8860,8 +8893,33 @@
 
             try {
                 let responseText = '';
-                
-                if (provider === 'gemini') {
+
+                if (provider === 'builtin') {
+                    // Route through Vercel proxy (API key stored securely on server)
+                    const messagesPayload = chatHistory.map(msg => {
+                        if (msg.attachment) {
+                            if (msg.attachment.isText) {
+                                return { role: msg.role, content: (msg.content || '') + `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}` };
+                            }
+                            return { role: msg.role, content: (msg.content || '') + `\n\n[Attached File: ${msg.attachment.name}]` };
+                        }
+                        return { role: msg.role, content: msg.content };
+                    });
+
+                    const res = await fetch(VERCEL_PROXY_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ messages: messagesPayload })
+                    });
+
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error || `HTTP ${res.status}`);
+                    }
+                    const data = await res.json();
+                    responseText = data.choices?.[0]?.message?.content || data.response || 'No response generated.';
+
+                } else if (provider === 'gemini') {
                     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                     
                     const contentsPayload = chatHistory.map(msg => {
