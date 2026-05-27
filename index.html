@@ -1000,7 +1000,7 @@
             position: fixed;
             top: 2rem;
             right: 2rem;
-            z-index: 1000;
+            z-index: 100000;
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
@@ -1610,6 +1610,20 @@
         #assistant-input {
             -webkit-user-select: auto !important;
             user-select: auto !important;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
+            overflow-y: auto !important;
+        }
+        #assistant-input::-webkit-scrollbar {
+            width: 3px;
+            background: transparent;
+        }
+        #assistant-input::-webkit-scrollbar-thumb {
+            background: rgba(128, 128, 128, 0.25);
+            border-radius: 4px;
+        }
+        #assistant-input::-webkit-scrollbar-track {
+            background: transparent;
         }
 
         @keyframes bubbleFadeIn {
@@ -1863,6 +1877,8 @@
                 max-height: 34px !important;
                 box-sizing: border-box !important;
                 width: 100% !important;
+                scrollbar-width: thin !important;
+                overflow-y: auto !important;
             }
             #assistant-settings-popover, #assistant-history-popover {
                 width: calc(100vw - 24px) !important;
@@ -3137,9 +3153,9 @@
                                 <!-- Floating Popover Dropdown Panel -->
                                 <div id="assistant-settings-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
                                     <div>
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Provider</label>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Provider</label>
                                         <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
-                                            <option value="builtin" selected>Swift Assistant (Built-in)</option>
+                                            <option value="builtin" selected>Swift Assistant (Official)</option>
                                             <option value="gemini">Google Gemini</option>
                                             <option value="openrouter">OpenRouter</option>
                                             <option value="groq">Groq Cloud</option>
@@ -8131,29 +8147,61 @@
                 statusText.style.color = '#22c55e';
             }
         }
+        // Load cached configurations from localStorage
+        function loadProviderSettings() {
+            const prov = assistantProvider.value;
+            let defaultModel = 'gemini-1.5-flash';
+            let defaultEndpoint = '';
+            
+            if (prov === 'builtin') {
+                defaultModel = 'llama-3.3-70b-versatile';
+            } else if (prov === 'openrouter') {
+                defaultModel = 'google/gemini-2.5-flash:free';
+            } else if (prov === 'groq') {
+                defaultModel = 'llama-3.3-70b-versatile';
+            } else if (prov === 'huggingface') {
+                defaultModel = 'Qwen/Qwen2.5-Coder-7B-Instruct';
+            }
+            
+            assistantModel.value = localStorage.getItem(`assistant-model-${prov}`) || localStorage.getItem('assistant-model') || defaultModel;
+            assistantEndpoint.value = localStorage.getItem(`assistant-endpoint-${prov}`) || localStorage.getItem('assistant-endpoint') || defaultEndpoint;
+            assistantApiKey.value = localStorage.getItem(`assistant-api-key-${prov}`) || localStorage.getItem('assistant-api-key') || '';
+            
+            // Clean legacy model keys
+            let modelVal = assistantModel.value;
+            if (prov === 'groq' && (modelVal.includes('llama3-8b') || modelVal.includes('llama3-70b') || modelVal === 'llama3-8b-8192' || modelVal === 'llama3-70b-8192')) {
+                modelVal = 'llama-3.3-70b-versatile';
+                assistantModel.value = modelVal;
+                localStorage.setItem(`assistant-model-${prov}`, modelVal);
+            }
+        }
+
         assistantProvider.addEventListener('change', () => {
             updateProviderUI();
             localStorage.setItem('assistant-provider', assistantProvider.value);
+            loadProviderSettings();
+            // Restore connection state for this provider
+            const prov = assistantProvider.value;
+            if (prov === 'builtin') {
+                statusDot.style.backgroundColor = '#22c55e';
+                statusText.textContent = 'Connected';
+                statusText.style.color = '#22c55e';
+            } else {
+                const savedState = localStorage.getItem(`assistant-connection-state-${prov}`) || 'disconnected';
+                if (savedState === 'connected') {
+                    statusDot.style.backgroundColor = '#22c55e';
+                    statusText.parentElement.style.color = '#22c55e';
+                    statusText.textContent = 'Connected';
+                } else {
+                    setDisconnectedStatus();
+                }
+            }
         });
 
-        // Load cached configurations from localStorage
         if (localStorage.getItem('assistant-provider')) {
             assistantProvider.value = localStorage.getItem('assistant-provider');
         }
-        if (localStorage.getItem('assistant-model')) {
-            let modelVal = localStorage.getItem('assistant-model');
-            if (assistantProvider.value === 'groq' && (modelVal.includes('llama3-8b') || modelVal.includes('llama3-70b') || modelVal === 'llama3-8b-8192' || modelVal === 'llama3-70b-8192')) {
-                modelVal = 'llama-3.3-70b-versatile';
-                localStorage.setItem('assistant-model', modelVal);
-            }
-            assistantModel.value = modelVal;
-        }
-        if (localStorage.getItem('assistant-endpoint')) {
-            assistantEndpoint.value = localStorage.getItem('assistant-endpoint');
-        }
-        if (localStorage.getItem('assistant-api-key')) {
-            assistantApiKey.value = localStorage.getItem('assistant-api-key');
-        }
+        loadProviderSettings();
 
         // Initialize provider UI
         updateProviderUI();
@@ -8164,7 +8212,8 @@
             statusText.textContent = 'Connected';
             statusText.style.color = '#22c55e';
         } else {
-            const savedState = localStorage.getItem('assistant-connection-state') || 'disconnected';
+            const prov = assistantProvider.value;
+            const savedState = localStorage.getItem(`assistant-connection-state-${prov}`) || localStorage.getItem('assistant-connection-state') || 'disconnected';
             if (savedState === 'connected') {
                 statusDot.style.backgroundColor = '#22c55e';
                 statusText.parentElement.style.color = '#22c55e';
@@ -8180,6 +8229,8 @@
             statusDot.style.backgroundColor = '#ef4444';
             statusText.parentElement.style.color = '#ef4444';
             statusText.textContent = 'Disconnected';
+            const prov = assistantProvider.value;
+            localStorage.setItem(`assistant-connection-state-${prov}`, 'disconnected');
             localStorage.setItem('assistant-connection-state', 'disconnected');
         }
 
@@ -8257,6 +8308,7 @@
                 statusText.parentElement.style.color = '#22c55e';
                 statusText.textContent = 'Connected';
                 localStorage.setItem('assistant-connection-state', 'connected');
+                localStorage.setItem(`assistant-connection-state-${provider}`, 'connected');
                 notify(`Successfully connected to ${model}!`, 'success');
                 return true;
             } catch (err) {
@@ -8265,6 +8317,7 @@
                 statusText.parentElement.style.color = '#ef4444';
                 statusText.textContent = 'Disconnected';
                 localStorage.setItem('assistant-connection-state', 'disconnected');
+                localStorage.setItem(`assistant-connection-state-${provider}`, 'disconnected');
                 notify(`Connection failed: ${err.message}. Check your key or config.`, 'error');
                 return false;
             } finally {
@@ -8289,28 +8342,40 @@
             const prov = assistantProvider.value;
             checkEndpointVisibility();
             
-            if (prov === 'gemini') {
-                assistantModel.value = 'gemini-1.5-flash';
-            } else if (prov === 'openrouter') {
-                assistantModel.value = 'google/gemini-2.5-flash:free';
-            } else if (prov === 'groq') {
-                assistantModel.value = 'llama-3.3-70b-versatile';
-            } else if (prov === 'huggingface') {
-                assistantModel.value = 'Qwen/Qwen2.5-Coder-7B-Instruct';
-            } else if (prov === 'custom') {
-                assistantModel.value = '';
-                assistantEndpoint.value = '';
+            // Only set default if no custom value is saved yet
+            if (!localStorage.getItem(`assistant-model-${prov}`)) {
+                if (prov === 'gemini') {
+                    assistantModel.value = 'gemini-1.5-flash';
+                } else if (prov === 'openrouter') {
+                    assistantModel.value = 'google/gemini-2.5-flash:free';
+                } else if (prov === 'groq') {
+                    assistantModel.value = 'llama-3.3-70b-versatile';
+                } else if (prov === 'huggingface') {
+                    assistantModel.value = 'Qwen/Qwen2.5-Coder-7B-Instruct';
+                } else if (prov === 'custom') {
+                    assistantModel.value = '';
+                    assistantEndpoint.value = '';
+                }
+            } else {
+                loadProviderSettings();
             }
             
             saveAssistantSettings();
-            setDisconnectedStatus();
         });
 
         function saveAssistantSettings() {
-            localStorage.setItem('assistant-provider', assistantProvider.value);
+            const prov = assistantProvider.value;
+            localStorage.setItem('assistant-provider', prov);
+            
+            // Save global values (compatibility)
             localStorage.setItem('assistant-model', assistantModel.value);
             localStorage.setItem('assistant-endpoint', assistantEndpoint.value);
             localStorage.setItem('assistant-api-key', assistantApiKey.value);
+            
+            // Save provider-specific values
+            localStorage.setItem(`assistant-model-${prov}`, assistantModel.value);
+            localStorage.setItem(`assistant-endpoint-${prov}`, assistantEndpoint.value);
+            localStorage.setItem(`assistant-api-key-${prov}`, assistantApiKey.value);
         }
 
         // Auto save settings on input changes and reset connection
@@ -8355,7 +8420,7 @@
             if (!isoString) return '';
             try {
                 const date = new Date(isoString);
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
             } catch (e) {
                 return '';
             }
@@ -8401,6 +8466,83 @@
             localStorage.setItem('assistant-conversations', JSON.stringify(list));
         }
 
+        function showCustomConfirm(message, title, onConfirm) {
+            const existing = document.getElementById('custom-confirm-modal');
+            if (existing) existing.remove();
+            
+            const modal = document.createElement('div');
+            modal.id = 'custom-confirm-modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.height = '100dvh';
+            modal.style.background = 'rgba(0, 0, 0, 0.6)';
+            modal.style.backdropFilter = 'blur(8px)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '999999';
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.2s ease-out';
+            
+            const card = document.createElement('div');
+            card.style.background = 'var(--surface-color)';
+            card.style.border = '1px solid var(--border-color)';
+            card.style.borderRadius = '16px';
+            card.style.padding = '1.5rem';
+            card.style.width = '320px';
+            card.style.maxWidth = '90vw';
+            card.style.boxShadow = 'var(--shadow)';
+            card.style.transform = 'scale(0.9)';
+            card.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            card.style.display = 'flex';
+            card.style.flexDirection = 'column';
+            card.style.gap = '16px';
+            
+            card.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">${title || 'Confirm Action'}</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">${message}</p>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px;">
+                    <button id="confirm-cancel-btn" class="secondary-btn" style="margin-bottom:0; padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; cursor: pointer;">Cancel</button>
+                    <button id="confirm-ok-btn" class="primary-btn" style="margin-bottom:0; padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; background: #ef4444; color: white; border: none; cursor: pointer;">Delete</button>
+                </div>
+            `;
+            
+            modal.appendChild(card);
+            document.body.appendChild(modal);
+            lucide.createIcons({ root: modal });
+            
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }, 10);
+            
+            const closeModal = () => {
+                modal.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    modal.remove();
+                }, 200);
+            };
+            
+            modal.querySelector('#confirm-cancel-btn').addEventListener('click', closeModal);
+            modal.querySelector('#confirm-ok-btn').addEventListener('click', () => {
+                onConfirm();
+                closeModal();
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+
         function loadConversationsList() {
             conversationsList.innerHTML = '';
             const list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
@@ -8410,7 +8552,42 @@
                 return;
             }
             
+            // Sort by timestamp descending
+            list.sort((a, b) => b.timestamp - a.timestamp);
+            
+            const getGroupLabel = (timestamp) => {
+                const date = new Date(timestamp);
+                const today = new Date();
+                const yesterday = new Date();
+                yesterday.setDate(today.getDate() - 1);
+                
+                if (date.toDateString() === today.toDateString()) {
+                    return 'Today';
+                } else if (date.toDateString() === yesterday.toDateString()) {
+                    return 'Yesterday';
+                } else {
+                    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+            };
+            
+            let currentGroup = '';
+            
             list.forEach(conv => {
+                const groupLabel = getGroupLabel(conv.timestamp);
+                if (groupLabel !== currentGroup) {
+                    currentGroup = groupLabel;
+                    const header = document.createElement('div');
+                    header.style.fontSize = '0.7rem';
+                    header.style.fontWeight = '700';
+                    header.style.color = 'var(--text-secondary)';
+                    header.style.textTransform = 'uppercase';
+                    header.style.letterSpacing = '0.05em';
+                    header.style.margin = '14px 0 6px 4px';
+                    header.style.opacity = '0.7';
+                    header.textContent = groupLabel;
+                    conversationsList.appendChild(header);
+                }
+                
                 const item = document.createElement('div');
                 item.style.display = 'flex';
                 item.style.justifyContent = 'space-between';
@@ -8441,7 +8618,10 @@
                 timeSpan.style.fontSize = '0.65rem';
                 timeSpan.style.color = 'var(--text-secondary)';
                 const date = new Date(conv.timestamp);
-                timeSpan.textContent = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // Formatted date and time in 12-hour AM/PM format
+                const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                timeSpan.textContent = formattedTime;
                 
                 infoDiv.appendChild(titleSpan);
                 infoDiv.appendChild(timeSpan);
@@ -8478,21 +8658,20 @@
         }
 
         function deleteConversation(id) {
-            if (!confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
-                return;
-            }
-            let list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
-            list = list.filter(c => c.id !== id);
-            localStorage.setItem('assistant-conversations', JSON.stringify(list));
-            
-            if (currentConversationId === id) {
-                chatHistory = [];
-                currentConversationId = null;
-                renderChatHistory();
-            }
-            
-            loadConversationsList();
-            notify('Conversation deleted.', 'info');
+            showCustomConfirm('Are you sure you want to delete this conversation? This action cannot be undone.', 'Delete Chat', () => {
+                let list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
+                list = list.filter(c => c.id !== id);
+                localStorage.setItem('assistant-conversations', JSON.stringify(list));
+                
+                if (currentConversationId === id) {
+                    chatHistory = [];
+                    currentConversationId = null;
+                    renderChatHistory();
+                }
+                
+                loadConversationsList();
+                notify('Conversation deleted.', 'info');
+            });
         }
 
         newChatBtn.addEventListener('click', () => {
