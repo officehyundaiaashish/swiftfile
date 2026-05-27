@@ -1735,12 +1735,14 @@
             .mobile-only-btn {
                 display: flex !important;
             }
+            /* ===== Fullscreen Mode ===== */
             #swift-assistant.mobile-fullscreen {
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
                 width: 100vw !important;
                 height: 100vh !important;
+                height: 100dvh !important;
                 z-index: 9999 !important;
                 background: var(--bg-color) !important;
                 padding: 0 !important;
@@ -1748,18 +1750,36 @@
                 border: none !important;
                 border-radius: 0 !important;
                 overflow: hidden !important;
-            }
-            #swift-assistant.mobile-fullscreen > div {
-                height: 100% !important;
-                max-height: 100% !important;
-                border-radius: 0 !important;
-                border: none !important;
-                padding: 0.75rem !important;
-                gap: 0.5rem !important;
-                box-sizing: border-box !important;
                 display: flex !important;
                 flex-direction: column !important;
             }
+            /* Outer wrapper (the card div) */
+            #swift-assistant.mobile-fullscreen > div,
+            #swift-assistant.mobile-fullscreen .assistant-outer-wrap {
+                height: 100% !important;
+                max-height: 100% !important;
+                min-height: 0 !important;
+                border-radius: 0 !important;
+                border: none !important;
+                padding: 10px !important;
+                padding-bottom: env(safe-area-inset-bottom, 8px) !important;
+                gap: 0 !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
+                flex: 1 !important;
+                overflow: hidden !important;
+            }
+            /* Inner wrapper (the chat interface container) */
+            #swift-assistant.mobile-fullscreen .assistant-inner-wrap {
+                flex: 1 !important;
+                min-height: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0 !important;
+                overflow: hidden !important;
+            }
+            /* Chat log takes remaining space */
             #swift-assistant.mobile-fullscreen #assistant-chat-log {
                 flex: 1 !important;
                 height: 0 !important;
@@ -1767,7 +1787,17 @@
                 max-height: none !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch !important;
+                margin-top: 6px !important;
+                padding: 10px !important;
+                border-radius: 14px !important;
             }
+            /* Input bar pinned at bottom - NEVER collapse */
+            #swift-assistant.mobile-fullscreen .assistant-input-bar {
+                flex-shrink: 0 !important;
+                padding-top: 6px !important;
+                padding-bottom: 4px !important;
+            }
+            /* ===== Non-fullscreen mobile ===== */
             #swift-assistant > div {
                 padding: 0.75rem !important;
                 border-radius: 16px !important;
@@ -1778,36 +1808,42 @@
                 padding: 0.75rem !important;
                 max-height: 45vh !important;
             }
+            /* ===== Input row (shared) ===== */
             .assistant-input-row {
-                gap: 5px !important;
+                gap: 4px !important;
                 width: 100% !important;
                 display: flex !important;
                 align-items: flex-end !important;
+                flex-wrap: nowrap !important;
             }
             .assistant-input-row > div {
                 min-width: 0 !important;
                 flex: 1 !important;
             }
             .assistant-input-row button {
-                width: 36px !important;
-                height: 36px !important;
-                display: inline-flex !important;
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+                display: flex !important;
                 justify-content: center !important;
                 align-items: center !important;
                 flex-shrink: 0 !important;
                 padding: 0 !important;
+                border-radius: 50% !important;
             }
             .assistant-input-row button i {
                 width: 14px !important;
                 height: 14px !important;
             }
             #assistant-input {
-                padding: 8px 12px !important;
+                padding: 8px 10px !important;
                 font-size: 0.85rem !important;
                 border-radius: 12px !important;
-                height: 36px !important;
-                min-height: 36px !important;
+                height: 34px !important;
+                min-height: 34px !important;
+                max-height: 34px !important;
                 box-sizing: border-box !important;
+                width: 100% !important;
             }
             #assistant-settings-popover, #assistant-history-popover {
                 width: calc(100vw - 24px) !important;
@@ -3045,12 +3081,12 @@
 
             <!-- Swift Assistant Section -->
             <div id="swift-assistant" class="tab-content">
-                <div style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem; min-height: 550px;">
+                <div class="assistant-outer-wrap" style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem; min-height: 550px;">
                     
                     <!-- Chat Interface Container -->
-                    <div style="display: flex; flex-direction: column; gap: 1rem; flex: 1; position: relative;">
+                    <div class="assistant-inner-wrap" style="display: flex; flex-direction: column; flex: 1; position: relative; min-height: 0;">
                         <!-- Dedicated Chat Header Row -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; flex-shrink: 0;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <button id="assistant-close-btn" class="chat-bubble-action-btn mobile-only-btn" title="Minimize" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: none; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 4px;">
                                     <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
@@ -3118,7 +3154,7 @@
                         </div>
 
                         <!-- Chat Messages Log -->
-                        <div id="assistant-chat-log" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; min-height: 350px; max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);">
+                        <div id="assistant-chat-log" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; min-height: 200px; max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03); flex: 1;">
                             <!-- Default Welcome Message -->
                             <div class="assistant-chat-bubble system" style="background: rgba(128,128,128,0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; align-self: center; width: 100%;">
                                 <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am your Swift AI Assistant. I can write HTML/CSS code, explain concepts, edit drafts, or answer questions. Configure your API key to get started.</p>
@@ -3126,30 +3162,30 @@
                         </div>
 
                         <!-- Chat Input bar -->
-                        <div style="display: flex; flex-direction: column; width: 100%;">
+                        <div class="assistant-input-bar" style="display: flex; flex-direction: column; width: 100%; flex-shrink: 0; padding-top: 8px;">
                             <!-- Attached files preview container -->
                             <div id="attached-files-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; padding: 0 4px;"></div>
                             
-                            <div class="assistant-input-row" style="display: flex; gap: 10px; align-items: flex-end;">
+                            <div class="assistant-input-row" style="display: flex; gap: 8px; align-items: flex-end; width: 100%;">
                                 <!-- Left Attachment Button -->
-                                <button id="assistant-attach-btn" class="secondary-btn" title="Attach File" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                <button id="assistant-attach-btn" class="secondary-btn" title="Attach File" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="paperclip" style="width: 18px; height: 18px;"></i>
                                     <input type="file" id="assistant-file-input" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.json" style="display: none;">
                                 </button>
 
                                 <!-- Textarea Input Box -->
-                                <div style="flex: 1; position: relative;">
-                                    <textarea id="assistant-input" class="password-input" placeholder="Ask Swift Assistant anything..." rows="2" style="resize: none; margin-bottom: 0; padding: 12px 16px; font-size: 0.95rem; border-radius: 18px; width: 100%;"></textarea>
+                                <div style="flex: 1; min-width: 0;">
+                                    <textarea id="assistant-input" class="password-input" placeholder="Ask anything..." rows="1" style="resize: none; margin-bottom: 0; padding: 10px 14px; font-size: 0.95rem; border-radius: 18px; width: 100%; box-sizing: border-box;"></textarea>
                                 </div>
 
                                 <!-- Right Control Buttons -->
-                                <button id="assistant-voice-btn" class="secondary-btn" title="Voice Input" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                <button id="assistant-voice-btn" class="secondary-btn" title="Voice Input" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="mic" style="width: 18px; height: 18px;"></i>
                                 </button>
-                                <button id="assistant-new-chat-btn" class="secondary-btn" title="New Chat" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0; border-color: rgba(255,255,255,0.1);">
+                                <button id="assistant-new-chat-btn" class="secondary-btn" title="New Chat" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0; border-color: rgba(255,255,255,0.1);">
                                     <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
                                 </button>
-                                <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="send" style="width: 18px; height: 18px;"></i>
                                 </button>
                             </div>
