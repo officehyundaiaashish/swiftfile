@@ -1726,6 +1726,41 @@
             opacity: 0.4;
             cursor: not-allowed;
         }
+
+        /* Mobile View styles for Swift Assistant */
+        @media (max-width: 768px) {
+            #swift-assistant > div {
+                padding: 1rem !important;
+                border-radius: 16px !important;
+                gap: 1rem !important;
+                min-height: 480px !important;
+            }
+            #assistant-chat-log {
+                padding: 1rem !important;
+                max-height: 48vh !important;
+            }
+            .assistant-input-row {
+                gap: 6px !important;
+            }
+            .assistant-input-row button {
+                width: 38px !important;
+                height: 38px !important;
+            }
+            .assistant-input-row button i {
+                width: 15px !important;
+                height: 15px !important;
+            }
+            #assistant-input {
+                padding: 10px 12px !important;
+                font-size: 0.85rem !important;
+                border-radius: 14px !important;
+            }
+            #assistant-settings-popover, #assistant-history-popover {
+                width: calc(100vw - 32px) !important;
+                max-width: 290px !important;
+                right: 0 !important;
+            }
+        }
     </style>
     <script>
         function switchTab(tabId) {
@@ -2952,47 +2987,68 @@
                     
                     <!-- Chat Interface Container -->
                     <div style="display: flex; flex-direction: column; gap: 1rem; flex: 1; position: relative;">
-                        <!-- Floating Settings Header Toggle & Status dot in the top-right of chat panel -->
-                        <div style="position: absolute; top: 12px; right: 12px; z-index: 100; display: flex; align-items: center; gap: 8px;">
-                            <span id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; display: inline-block;"></span>
-                            <button id="assistant-settings-toggle-btn" class="chat-bubble-action-btn" title="Model & API Settings" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
-                                <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
-                            </button>
-                        </div>
-
-                        <!-- Floating Popover Dropdown Panel -->
-                        <div id="assistant-settings-popover" class="hidden" style="position: absolute; top: 48px; right: 12px; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Provider</label>
-                                <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
-                                    <option value="gemini">Google Gemini</option>
-                                    <option value="openrouter">OpenRouter</option>
-                                    <option value="groq">Groq Cloud</option>
-                                    <option value="huggingface">Hugging Face</option>
-                                    <option value="custom">Custom API</option>
-                                </select>
+                        <!-- Dedicated Chat Header Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="sparkles" style="width: 18px; height: 18px; color: var(--accent-color);"></i>
+                                <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Swift Assistant</span>
                             </div>
                             
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Name</label>
-                                <input type="text" id="assistant-model" class="password-input" value="gemini-1.5-flash" placeholder="Model name..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
-                            </div>
-
-                            <div id="assistant-endpoint-container" class="hidden">
-                                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Endpoint URL</label>
-                                <input type="url" id="assistant-endpoint" class="password-input" placeholder="https://api..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
-                            </div>
-
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Key</label>
-                                <input type="password" id="assistant-api-key" class="password-input" placeholder="Paste API key..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
-                            </div>
-
-                            <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px;">
-                                <span id="status-text" style="font-size: 0.75rem; font-weight: 600; color: #ef4444;">Disconnected</span>
-                                <button id="assistant-connect-btn" class="secondary-btn" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; height: 28px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 0;">
-                                    <i data-lucide="radio" style="width: 12px; height: 12px;"></i> Connect
+                            <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+                                <span id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444;"></span>
+                                <button id="assistant-history-toggle-btn" class="chat-bubble-action-btn" title="Previous Conversations" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                    <i data-lucide="history" style="width: 14px; height: 14px;"></i>
                                 </button>
+                                <button id="assistant-settings-toggle-btn" class="chat-bubble-action-btn" title="Model & API Settings" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                    <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
+                                </button>
+
+                                <!-- Floating History Popover Panel -->
+                                <div id="assistant-history-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;">
+                                    <div style="font-weight: 700; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Conversations</span>
+                                        <button id="new-chat-btn" class="secondary-btn" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 6px; height: 24px; margin-bottom: 0;">New Chat</button>
+                                    </div>
+                                    <div id="conversations-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                        <!-- Will be loaded via JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Floating Popover Dropdown Panel -->
+                                <div id="assistant-settings-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Provider</label>
+                                        <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
+                                            <option value="gemini">Google Gemini</option>
+                                            <option value="openrouter">OpenRouter</option>
+                                            <option value="groq">Groq Cloud</option>
+                                            <option value="huggingface">Hugging Face</option>
+                                            <option value="custom">Custom API</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Name</label>
+                                        <input type="text" id="assistant-model" class="password-input" value="gemini-1.5-flash" placeholder="Model name..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div id="assistant-endpoint-container" class="hidden">
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Endpoint URL</label>
+                                        <input type="url" id="assistant-endpoint" class="password-input" placeholder="https://api..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Key</label>
+                                        <input type="password" id="assistant-api-key" class="password-input" placeholder="Paste API key..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px;">
+                                        <span id="status-text" style="font-size: 0.75rem; font-weight: 600; color: #ef4444;">Disconnected</span>
+                                        <button id="assistant-connect-btn" class="secondary-btn" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; height: 28px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 0;">
+                                            <i data-lucide="radio" style="width: 12px; height: 12px;"></i> Connect
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -3000,12 +3056,7 @@
                         <div id="assistant-chat-log" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; min-height: 350px; max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);">
                             <!-- Default Welcome Message -->
                             <div class="assistant-chat-bubble system" style="background: rgba(128,128,128,0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; align-self: center; width: 100%;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                    <span style="font-weight: 700; font-size: 0.8rem; color: var(--accent-color); display: flex; align-items: center; gap: 6px; margin: 0 auto;">
-                                        <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Swift Assistant
-                                    </span>
-                                </div>
-                                <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am your Swift AI Assistant. I can write HTML/CSS code, explain concepts, edit drafts, or answer questions. Enter an API key in the configuration bar above to get started!</p>
+                                <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am your Swift AI Assistant. I can write HTML/CSS code, explain concepts, edit drafts, or answer questions. Configure your API key to get started.</p>
                             </div>
                         </div>
 
@@ -3014,7 +3065,7 @@
                             <!-- Attached files preview container -->
                             <div id="attached-files-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; padding: 0 4px;"></div>
                             
-                            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                            <div class="assistant-input-row" style="display: flex; gap: 10px; align-items: flex-end;">
                                 <div style="flex: 1; position: relative;">
                                     <textarea id="assistant-input" class="password-input" placeholder="Ask Swift Assistant anything..." rows="2" style="resize: none; margin-bottom: 0; padding: 12px 16px; font-size: 0.95rem; border-radius: 18px; width: 100%;"></textarea>
                                 </div>
@@ -3027,9 +3078,6 @@
                                 </button>
                                 <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="send" style="width: 18px; height: 18px;"></i>
-                                </button>
-                                <button id="assistant-clear-btn" class="secondary-btn" title="Clear Chat" style="padding: 0; width: 48px; height: 48px; border-radius: 50%; justify-content: center; align-items: center; flex-shrink: 0; border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); color: #ef4444; margin-bottom: 0;">
-                                    <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
                                 </button>
                             </div>
                         </div>
@@ -7860,6 +7908,11 @@
         // --- Swift Assistant Logic ---
         const assistantSettingsToggleBtn = document.getElementById('assistant-settings-toggle-btn');
         const assistantSettingsPopover = document.getElementById('assistant-settings-popover');
+        const assistantHistoryToggleBtn = document.getElementById('assistant-history-toggle-btn');
+        const assistantHistoryPopover = document.getElementById('assistant-history-popover');
+        const conversationsList = document.getElementById('conversations-list');
+        const newChatBtn = document.getElementById('new-chat-btn');
+
         const assistantProvider = document.getElementById('assistant-provider');
         const assistantModel = document.getElementById('assistant-model');
         const assistantEndpoint = document.getElementById('assistant-endpoint');
@@ -7872,21 +7925,37 @@
         const assistantChatLog = document.getElementById('assistant-chat-log');
         const assistantInput = document.getElementById('assistant-input');
         const assistantSendBtn = document.getElementById('assistant-send-btn');
-        const assistantClearBtn = document.getElementById('assistant-clear-btn');
 
-        let chatHistory = []; // stores {role: 'user'|'assistant', content: '...'}
+        let chatHistory = []; // stores {role: 'user'|'assistant', content: '...', timestamp: '...'}
+        let currentConversationId = null;
 
         // Floating popover settings logic
         assistantSettingsToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            assistantHistoryPopover.classList.add('hidden');
             assistantSettingsPopover.classList.toggle('hidden');
         });
 
-        // Close popover when clicking outside
+        // Floating popover history logic
+        assistantHistoryToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            assistantSettingsPopover.classList.add('hidden');
+            assistantHistoryPopover.classList.toggle('hidden');
+            if (!assistantHistoryPopover.classList.contains('hidden')) {
+                loadConversationsList();
+            }
+        });
+
+        // Close popovers when clicking outside
         document.addEventListener('click', (e) => {
             if (assistantSettingsPopover && !assistantSettingsPopover.classList.contains('hidden')) {
                 if (!assistantSettingsPopover.contains(e.target) && !assistantSettingsToggleBtn.contains(e.target)) {
                     assistantSettingsPopover.classList.add('hidden');
+                }
+            }
+            if (assistantHistoryPopover && !assistantHistoryPopover.classList.contains('hidden')) {
+                if (!assistantHistoryPopover.contains(e.target) && !assistantHistoryToggleBtn.contains(e.target)) {
+                    assistantHistoryPopover.classList.add('hidden');
                 }
             }
         });
@@ -8097,7 +8166,204 @@
             return formatted;
         }
 
-        function createChatBubble(role, content, index, attachment = null) {
+        function formatMessageTime(isoString) {
+            if (!isoString) return '';
+            try {
+                const date = new Date(isoString);
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function saveCurrentConversation() {
+            if (chatHistory.length === 0) return;
+            
+            let list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
+            
+            if (!currentConversationId) {
+                currentConversationId = 'conv_' + Date.now();
+                let firstUserMsg = chatHistory.find(msg => msg.role === 'user');
+                let title = firstUserMsg ? firstUserMsg.content.substring(0, 30) : 'New Chat';
+                if (title.length >= 30) title += '...';
+                
+                list.unshift({
+                    id: currentConversationId,
+                    title: title,
+                    timestamp: new Date().toISOString(),
+                    history: chatHistory
+                });
+            } else {
+                const index = list.findIndex(c => c.id === currentConversationId);
+                if (index !== -1) {
+                    list[index].history = chatHistory;
+                    list[index].timestamp = new Date().toISOString();
+                    const item = list.splice(index, 1)[0];
+                    list.unshift(item);
+                } else {
+                    let firstUserMsg = chatHistory.find(msg => msg.role === 'user');
+                    let title = firstUserMsg ? firstUserMsg.content.substring(0, 30) : 'Chat';
+                    if (title.length >= 30) title += '...';
+                    list.unshift({
+                        id: currentConversationId,
+                        title: title,
+                        timestamp: new Date().toISOString(),
+                        history: chatHistory
+                    });
+                }
+            }
+            
+            localStorage.setItem('assistant-conversations', JSON.stringify(list));
+        }
+
+        function loadConversationsList() {
+            conversationsList.innerHTML = '';
+            const list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
+            
+            if (list.length === 0) {
+                conversationsList.innerHTML = '<p style="font-size:0.75rem; text-align:center; color:var(--text-secondary); margin: 10px 0;">No saved chats</p>';
+                return;
+            }
+            
+            list.forEach(conv => {
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+                item.style.padding = '6px 8px';
+                item.style.borderRadius = '8px';
+                item.style.background = conv.id === currentConversationId ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)';
+                item.style.border = '1px solid var(--border-color)';
+                item.style.cursor = 'pointer';
+                item.style.transition = 'var(--transition)';
+                item.style.marginBottom = '6px';
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.style.flex = '1';
+                infoDiv.style.minWidth = '0';
+                infoDiv.style.display = 'flex';
+                infoDiv.style.flexDirection = 'column';
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.style.fontSize = '0.8rem';
+                titleSpan.style.fontWeight = '600';
+                titleSpan.style.whiteSpace = 'nowrap';
+                titleSpan.style.overflow = 'hidden';
+                titleSpan.style.textOverflow = 'ellipsis';
+                titleSpan.textContent = conv.title || 'Untitled Chat';
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.style.fontSize = '0.65rem';
+                timeSpan.style.color = 'var(--text-secondary)';
+                const date = new Date(conv.timestamp);
+                timeSpan.textContent = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                infoDiv.appendChild(titleSpan);
+                infoDiv.appendChild(timeSpan);
+                
+                infoDiv.addEventListener('click', () => {
+                    chatHistory = conv.history;
+                    currentConversationId = conv.id;
+                    renderChatHistory();
+                    assistantHistoryPopover.classList.add('hidden');
+                });
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.style.background = 'none';
+                deleteBtn.style.border = 'none';
+                deleteBtn.style.cursor = 'pointer';
+                deleteBtn.style.color = '#ef4444';
+                deleteBtn.style.padding = '4px';
+                deleteBtn.style.display = 'flex';
+                deleteBtn.style.alignItems = 'center';
+                deleteBtn.style.justifyContent = 'center';
+                deleteBtn.innerHTML = '<i data-lucide="trash-2" style="width:12px; height:12px;"></i>';
+                
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteConversation(conv.id);
+                });
+                
+                item.appendChild(infoDiv);
+                item.appendChild(deleteBtn);
+                conversationsList.appendChild(item);
+            });
+            
+            lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+        }
+
+        function deleteConversation(id) {
+            if (!confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+                return;
+            }
+            let list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
+            list = list.filter(c => c.id !== id);
+            localStorage.setItem('assistant-conversations', JSON.stringify(list));
+            
+            if (currentConversationId === id) {
+                chatHistory = [];
+                currentConversationId = null;
+                renderChatHistory();
+            }
+            
+            loadConversationsList();
+            notify('Conversation deleted.', 'info');
+        }
+
+        newChatBtn.addEventListener('click', () => {
+            chatHistory = [];
+            currentConversationId = null;
+            renderChatHistory();
+            assistantHistoryPopover.classList.add('hidden');
+            notify('Started new chat.', 'info');
+        });
+
+        function isEmailDraft(text) {
+            const lower = text.toLowerCase();
+            return lower.includes('subject:') || lower.includes('to:') || lower.includes('dear ') || lower.includes('sincerely,') || lower.includes('best regards,');
+        }
+
+        function parseEmailContent(text) {
+            const lines = text.split('\n');
+            let subject = '';
+            let recipient = '';
+            let bodyLines = [];
+            let isBody = false;
+
+            for (let line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.toLowerCase().startsWith('subject:')) {
+                    subject = trimmed.substring(8).trim();
+                } else if (trimmed.toLowerCase().startsWith('to:') || trimmed.toLowerCase().startsWith('recipient:')) {
+                    recipient = trimmed.substring(3).trim();
+                } else if (trimmed.toLowerCase().startsWith('body:')) {
+                    isBody = true;
+                    bodyLines.push(trimmed.substring(5).trim());
+                } else {
+                    if (isBody) {
+                        bodyLines.push(line);
+                    } else if (trimmed.toLowerCase().startsWith('dear') || trimmed.toLowerCase().startsWith('hi ') || trimmed.toLowerCase().startsWith('hello')) {
+                        isBody = true;
+                        bodyLines.push(line);
+                    } else {
+                        bodyLines.push(line);
+                    }
+                }
+            }
+
+            let body = bodyLines.join('\n').trim();
+            if (!body) {
+                body = text;
+            }
+
+            return {
+                recipient: recipient,
+                subject: subject,
+                body: body
+            };
+        }
+
+        function createChatBubble(role, content, index, attachment = null, timestamp = null) {
             const bubble = document.createElement('div');
             bubble.className = `assistant-chat-bubble ${role === 'user' ? 'user' : 'bot'}`;
             bubble.dataset.index = index;
@@ -8170,12 +8436,35 @@
                 bubble.appendChild(attachDiv);
             }
 
-            // Footer container for bottom-right button
+            // Footer container for bottom-right elements (time & copy button)
             const footer = document.createElement('div');
             footer.style.display = 'flex';
             footer.style.justifyContent = 'flex-end';
             footer.style.alignItems = 'center';
+            footer.style.gap = '8px';
             footer.style.marginTop = '6px';
+
+            const timeSpan = document.createElement('span');
+            timeSpan.style.fontSize = '0.65rem';
+            timeSpan.style.color = 'var(--text-secondary)';
+            timeSpan.style.opacity = '0.6';
+            timeSpan.textContent = formatMessageTime(timestamp || new Date().toISOString());
+            footer.appendChild(timeSpan);
+
+            // Gmail Compose Button if email draft detected
+            if (role !== 'user' && isEmailDraft(content)) {
+                const gmailBtn = document.createElement('button');
+                gmailBtn.className = 'chat-bubble-action-btn';
+                gmailBtn.title = 'Compose in Gmail';
+                gmailBtn.style.color = '#ea4335'; // Gmail Red
+                gmailBtn.innerHTML = '<i data-lucide="mail"></i>';
+                gmailBtn.addEventListener('click', () => {
+                    const parsed = parseEmailContent(content);
+                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(parsed.recipient)}&su=${encodeURIComponent(parsed.subject)}&body=${encodeURIComponent(parsed.body)}`;
+                    window.open(gmailUrl, '_blank');
+                });
+                footer.appendChild(gmailBtn);
+            }
 
             const bottomCopyBtn = document.createElement('button');
             bottomCopyBtn.className = 'chat-bubble-action-btn';
@@ -8208,6 +8497,7 @@
 
             // Truncate history and chat log to this point
             chatHistory = chatHistory.slice(0, index);
+            saveCurrentConversation();
             renderChatHistory();
             notify('Prompt loaded for editing', 'info');
         }
@@ -8229,7 +8519,7 @@
             if (systemBubble) assistantChatLog.appendChild(systemBubble);
 
             chatHistory.forEach((msg, idx) => {
-                const bubble = createChatBubble(msg.role, msg.content, idx, msg.attachment);
+                const bubble = createChatBubble(msg.role, msg.content, idx, msg.attachment, msg.timestamp);
                 assistantChatLog.appendChild(bubble);
             });
             lucide.createIcons({ attrs: { class: 'lucide-icon' } });
@@ -8243,11 +8533,7 @@
             });
         }
 
-        assistantClearBtn.addEventListener('click', () => {
-            chatHistory = [];
-            renderChatHistory();
-            notify('Chat history cleared.', 'info');
-        });
+
 
         // Trigger send on enter (without shift)
         assistantInput.addEventListener('keydown', (e) => {
@@ -8417,8 +8703,10 @@
             chatHistory.push({ 
                 role: 'user', 
                 content: prompt,
-                attachment: currentAttachment
+                attachment: currentAttachment,
+                timestamp: new Date().toISOString()
             });
+            saveCurrentConversation();
             renderChatHistory();
             
             // Clear input box
@@ -8567,7 +8855,12 @@
                 thinkingBubble.remove();
 
                 // Append assistant response to history
-                chatHistory.push({ role: 'assistant', content: responseText });
+                chatHistory.push({ 
+                    role: 'assistant', 
+                    content: responseText,
+                    timestamp: new Date().toISOString()
+                });
+                saveCurrentConversation();
                 renderChatHistory();
 
             } catch (err) {
