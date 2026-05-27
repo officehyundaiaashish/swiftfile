@@ -5342,6 +5342,7 @@
         let scannerCroppedImage = null; // Warped canvas
         let scannerCropper = null;
         let detectedCorners = null; // [{x, y}] on video frame scale
+        let smoothedCorners = null; // Smoothed corners across frames to eliminate shaking
         let scannerAnimationId = null;
         let lastCorners = null;
         let stabilityCount = 0;
@@ -5500,7 +5501,6 @@
         function crossProduct(a, b, c) {
             return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
         }
-
         // Vanilla JS Sobel Filter & Corner Bounding Box Detector (Runs 100% offline, instantly)
         function detectDocumentCornersVanilla(video) {
             const vw = video.videoWidth;
@@ -5529,7 +5529,7 @@
             }
 
             const edges = new Uint8Array(pw * ph);
-            const threshold = 25; // Lower threshold to capture lighter documents
+            const threshold = 30; // Clean threshold
             for (let y = 1; y < ph - 1; y++) {
                 for (let x = 1; x < pw - 1; x++) {
                     const idx = y * pw + x;
@@ -5545,44 +5545,34 @@
                 }
             }
 
-            // Find outer boundary points
+            // Radial scanning outwards from center to ignore desk clutter
+            const cx = pw / 2;
+            const cy = ph / 2;
+            const numRays = 40;
             const points = [];
-            // Row scans
-            for (let y = 5; y < ph - 5; y++) {
-                // Left to right
-                for (let x = 5; x < pw - 5; x++) {
-                    if (edges[y * pw + x] === 255) {
-                        points.push({ x, y });
+
+            for (let i = 0; i < numRays; i++) {
+                const angle = (i * 2 * Math.PI) / numRays;
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+                const maxRadius = Math.hypot(pw, ph) / 2;
+
+                for (let r = 5; r < maxRadius; r += 1.5) {
+                    const x = Math.round(cx + r * cos);
+                    const y = Math.round(cy + r * sin);
+
+                    if (x < 3 || x >= pw - 3 || y < 3 || y >= ph - 3) {
                         break;
                     }
-                }
-                // Right to left
-                for (let x = pw - 6; x >= 5; x--) {
+
                     if (edges[y * pw + x] === 255) {
                         points.push({ x, y });
-                        break;
-                    }
-                }
-            }
-            // Column scans
-            for (let x = 5; x < pw - 5; x++) {
-                // Top to bottom
-                for (let y = 5; y < ph - 5; y++) {
-                    if (edges[y * pw + x] === 255) {
-                        points.push({ x, y });
-                        break;
-                    }
-                }
-                // Bottom to top
-                for (let y = ph - 6; y >= 5; y--) {
-                    if (edges[y * pw + x] === 255) {
-                        points.push({ x, y });
-                        break;
+                        break; // Stop at first edge hit
                     }
                 }
             }
 
-            if (points.length < 20) return null;
+            if (points.length < 15) return null;
 
             // Compute the convex hull
             const hull = convexHull(points);
@@ -5770,12 +5760,27 @@
                 detectedCorners = detectDocumentCornersVanilla(scannerVideo);
             }
 
-            // Stability tracking
+            // Smooth the corners temporally to prevent shaking
             if (detectedCorners) {
+                if (!smoothedCorners) {
+                    smoothedCorners = detectedCorners.map(p => ({ ...p }));
+                } else {
+                    const alpha = 0.12; // 12% new coordinate, 88% smoothed coordinates for zero shaking
+                    smoothedCorners = smoothedCorners.map((p, idx) => ({
+                        x: p.x * (1 - alpha) + detectedCorners[idx].x * alpha,
+                        y: p.y * (1 - alpha) + detectedCorners[idx].y * alpha
+                    }));
+                }
+            } else {
+                smoothedCorners = null;
+            }
+
+            // Stability tracking using smoothed corners
+            if (smoothedCorners) {
                 if (lastCorners) {
                     let cornersMatch = true;
                     for (let i = 0; i < 4; i++) {
-                        let dist = Math.hypot(detectedCorners[i].x - lastCorners[i].x, detectedCorners[i].y - lastCorners[i].y);
+                        let dist = Math.hypot(smoothedCorners[i].x - lastCorners[i].x, smoothedCorners[i].y - lastCorners[i].y);
                         if (dist > STABILITY_PIXEL_TOLERANCE) {
                             cornersMatch = false;
                             break;
@@ -5798,7 +5803,7 @@
                         }
                     }
                 }
-                lastCorners = detectedCorners;
+                lastCorners = smoothedCorners.map(p => ({ ...p }));
             } else {
                 stabilityCount = 0;
                 if (isStable) {
@@ -5809,7 +5814,7 @@
             }
 
             // Draw overlay aligned with active video element content bounds (compensates for letterbox/pillarbox)
-            if (detectedCorners) {
+            if (smoothedCorners) {
                 const videoRatio = vw / vh;
                 const elementRatio = rect.width / rect.height;
                 let displayWidth, displayHeight;
@@ -5826,7 +5831,7 @@
                 }
 
                 // Scale corners to active video content display coordinates
-                const displayCorners = detectedCorners.map(p => ({
+                const displayCorners = smoothedCorners.map(p => ({
                     x: offsetX + (p.x / vw) * displayWidth,
                     y: offsetY + (p.y / vh) * displayHeight
                 }));
@@ -5899,7 +5904,7 @@
             // Stop camera since we are previewing/editing
             stopScannerCamera();
 
-            let corners = detectedCorners;
+            let corners = smoothedCorners || detectedCorners;
             if (!corners) {
                 // Default fallback: capture almost the entire frame with a 2% margin to avoid cutting the document logo
                 corners = [
