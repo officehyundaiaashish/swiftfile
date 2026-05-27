@@ -1739,8 +1739,8 @@
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
+                width: 100% !important;
+                height: 100% !important;
                 z-index: 9999 !important;
                 background: var(--bg-color) !important;
                 padding: 0 !important;
@@ -1752,42 +1752,57 @@
                 height: 100vh !important;
                 border-radius: 0 !important;
                 border: none !important;
-                padding: 1rem !important;
-                gap: 0.75rem !important;
+                padding: 0.75rem !important;
+                gap: 0.5rem !important;
             }
             #swift-assistant.mobile-fullscreen #assistant-chat-log {
                 flex: 1 !important;
                 max-height: none !important;
             }
             #swift-assistant > div {
-                padding: 1rem !important;
+                padding: 0.75rem !important;
                 border-radius: 16px !important;
-                gap: 1rem !important;
-                min-height: 480px !important;
+                gap: 0.75rem !important;
+                min-height: 400px !important;
             }
             #assistant-chat-log {
-                padding: 1rem !important;
-                max-height: 48vh !important;
+                padding: 0.75rem !important;
+                max-height: 45vh !important;
             }
             .assistant-input-row {
-                gap: 6px !important;
+                gap: 5px !important;
+                width: 100% !important;
+                display: flex !important;
+                align-items: flex-end !important;
+            }
+            .assistant-input-row > div {
+                min-width: 0 !important;
+                flex: 1 !important;
             }
             .assistant-input-row button {
-                width: 38px !important;
-                height: 38px !important;
+                width: 36px !important;
+                height: 36px !important;
+                display: inline-flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                flex-shrink: 0 !important;
+                padding: 0 !important;
             }
             .assistant-input-row button i {
-                width: 15px !important;
-                height: 15px !important;
+                width: 14px !important;
+                height: 14px !important;
             }
             #assistant-input {
-                padding: 10px 12px !important;
+                padding: 8px 12px !important;
                 font-size: 0.85rem !important;
-                border-radius: 14px !important;
+                border-radius: 12px !important;
+                height: 36px !important;
+                min-height: 36px !important;
+                box-sizing: border-box !important;
             }
             #assistant-settings-popover, #assistant-history-popover {
-                width: calc(100vw - 32px) !important;
-                max-width: 290px !important;
+                width: calc(100vw - 24px) !important;
+                max-width: 280px !important;
                 right: 0 !important;
             }
         }
