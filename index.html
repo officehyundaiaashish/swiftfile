@@ -1552,6 +1552,12 @@
             background-color: #f2f2f2;
             font-weight: bold;
         }
+
+        #scanner-start-screen {
+            min-height: auto !important;
+            height: auto !important;
+            padding: 2.5rem 1.5rem !important;
+        }
     </style>
     <script>
         function switchTab(tabId) {
@@ -5393,7 +5399,12 @@
             if (scannerStream) stopScannerCamera();
             const deviceId = scannerCameraSelect.value;
             const constraints = {
-                video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: 'environment' }
+                video: {
+                    deviceId: deviceId ? { exact: deviceId } : undefined,
+                    facingMode: deviceId ? undefined : 'environment',
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
             };
 
             try {
@@ -5472,25 +5483,38 @@
                     const edged = new cv.Mat();
                     cv.cvtColor(dst, gray, cv.COLOR_RGBA2GRAY);
                     cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
-                    cv.Canny(blurred, edged, 50, 150);
+                    cv.Canny(blurred, edged, 30, 120);
+                    
+                    // Dilate the edges to merge near/broken contour segments
+                    let kernel = cv.Mat.ones(3, 3, cv.CV_8U);
+                    cv.dilate(edged, edged, kernel);
+                    kernel.delete();
 
                     const contours = new cv.MatVector();
                     const hierarchy = new cv.Mat();
                     cv.findContours(edged, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
                     let maxArea = 0;
-                    let approx = new cv.Mat();
                     let bestContour = null;
 
                     for (let i = 0; i < contours.size(); ++i) {
                         const contour = contours.get(i);
                         const area = cv.contourArea(contour);
-                        if (area > (vw * vh * scale * scale * 0.05)) { // At least 5% of viewport
+                        if (area > (vw * vh * scale * scale * 0.03)) { // min area 3% of view
                             const perimeter = cv.arcLength(contour, true);
                             const tempApprox = new cv.Mat();
-                            cv.approxPolyDP(contour, tempApprox, 0.02 * perimeter, true);
+                            
+                            // Iterate epsilon to locate a 4-point polygon
+                            let foundQuad = false;
+                            for (let epsilonFactor = 0.01; epsilonFactor <= 0.05; epsilonFactor += 0.01) {
+                                cv.approxPolyDP(contour, tempApprox, epsilonFactor * perimeter, true);
+                                if (tempApprox.rows === 4) {
+                                    foundQuad = true;
+                                    break;
+                                }
+                            }
 
-                            if (tempApprox.rows === 4 && area > maxArea) {
+                            if (foundQuad && area > maxArea) {
                                 maxArea = area;
                                 if (bestContour) bestContour.delete();
                                 bestContour = tempApprox.clone();
@@ -5558,8 +5582,8 @@
                 });
             } else {
                 // Draw a guide frame in the center
-                const marginX = rect.width * 0.15;
-                const marginY = rect.height * 0.15;
+                const marginX = rect.width * 0.05;
+                const marginY = rect.height * 0.05;
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([15, 10]);
@@ -5605,12 +5629,12 @@
 
             let corners = detectedCorners;
             if (!corners) {
-                // Default fallback: central 70% rect
+                // Default fallback: capture almost the entire frame with a 2% margin to avoid cutting the document logo
                 corners = [
-                    { x: vw * 0.15, y: vh * 0.15 },
-                    { x: vw * 0.85, y: vh * 0.15 },
-                    { x: vw * 0.85, y: vh * 0.85 },
-                    { x: vw * 0.15, y: vh * 0.85 }
+                    { x: vw * 0.02, y: vh * 0.02 },
+                    { x: vw * 0.98, y: vh * 0.02 },
+                    { x: vw * 0.98, y: vh * 0.98 },
+                    { x: vw * 0.02, y: vh * 0.98 }
                 ];
             }
 
