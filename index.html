@@ -41,6 +41,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://docs.opencv.org/4.5.4/opencv.js" async onload="onOpenCvReady()"></script>
     <style>
         :root {
             /* Color Palette - Light Theme (Innovative Solid) */
@@ -1573,7 +1574,8 @@
                 'protect-pdf': 'Protect PDF',
                 'bg-remover': 'Remove BG',
                 'collage-maker': 'Collage Maker',
-                'word-to-pdf': 'Word to PDF'
+                'word-to-pdf': 'Word to PDF',
+                'scanner': 'Scanner'
             };
             const toolIcons = {
                 'img-to-pdf': 'image',
@@ -1586,7 +1588,8 @@
                 'protect-pdf': 'lock',
                 'bg-remover': 'eraser',
                 'collage-maker': 'layout',
-                'word-to-pdf': 'file-up'
+                'word-to-pdf': 'file-up',
+                'scanner': 'scan'
             };
 
             const label = document.getElementById('current-tool-label');
@@ -1713,6 +1716,9 @@
             </button>
             <button class="tab-btn" data-tab="word-to-pdf" onclick="switchTab('word-to-pdf')">
                 <i data-lucide="file-up"></i> Word to PDF
+            </button>
+            <button class="tab-btn" data-tab="scanner" onclick="switchTab('scanner')">
+                <i data-lucide="scan"></i> Scanner
             </button>
         </div>
 
@@ -2397,6 +2403,92 @@
                             <span>Convert & Download PDF</span>
                             <i data-lucide="download"></i>
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scanner Section -->
+            <div id="scanner" class="tab-content">
+                <!-- Start Screen: Grant permission / select camera -->
+                <div id="scanner-start-screen" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="scan"></i>
+                        </div>
+                        <h3>Document Scanner</h3>
+                        <p>Use your camera to scan, autocrop, and enhance documents in real-time</p>
+                        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 1.5rem auto 0 auto; align-items: center;">
+                            <select id="scanner-camera-select" class="password-input" style="margin-bottom: 0; padding: 0.75rem; font-size: 0.9rem; text-align-last: center;"></select>
+                            <button id="scanner-start-btn" class="primary-btn" style="width: 100%; justify-content: center;">
+                                <i data-lucide="camera"></i> Start Camera
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Streaming State -->
+                <div id="scanner-active-screen" class="hidden">
+                    <div class="preview-header">
+                        <span id="scanner-status-text">Detecting edges...</span>
+                        <button id="scanner-stop-btn" class="text-btn danger">Close Camera</button>
+                    </div>
+                    
+                    <div class="large-preview-box" id="scanner-video-container" style="background: #000; min-height: 450px;">
+                        <video id="scanner-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: contain; transform: scaleX(1);"></video>
+                        <canvas id="scanner-overlay-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;"></canvas>
+                        <div class="scanner-line" id="scanner-line-active" style="display: block;"></div>
+                    </div>
+
+                    <div class="action-bar" style="margin-top: 1.5rem;">
+                        <button id="scanner-capture-btn" class="primary-btn btn-pro-ai" style="padding: 1.25rem 2.5rem; border-radius: 50px;">
+                            <i data-lucide="camera" style="width: 24px; height: 24px;"></i>
+                            <span style="font-size: 1.1rem; font-weight: 700;">CAPTURE DOCUMENT</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Capture Edit / Preview State -->
+                <div id="scanner-preview-screen" class="hidden">
+                    <div class="preview-header">
+                        <span>Scan Result</span>
+                        <button id="scanner-retake-btn" class="text-btn"><i data-lucide="rotate-ccw"></i> Retake</button>
+                    </div>
+
+                    <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                        <div class="bg-main-preview">
+                            <div class="large-preview-box" id="scanner-preview-box" style="padding: 10px;">
+                                <img id="scanner-result-img" style="max-width: 100%; max-height: 600px; display: block; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: 4px;">
+                            </div>
+                        </div>
+
+                        <div class="bg-controls-panel">
+                            <div class="control-group">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Enhancement Filters</label>
+                                <div class="bg-option-tabs" style="margin-bottom: 1.5rem;">
+                                    <button class="bg-option-btn active" id="filter-orig">Original</button>
+                                    <button class="bg-option-btn" id="filter-magic">Magic Color</button>
+                                    <button class="bg-option-btn" id="filter-bw">B&W</button>
+                                </div>
+                            </div>
+
+                            <div class="control-group" style="margin-top: 1rem;">
+                                <button id="scanner-recrop-btn" class="secondary-btn" style="width: 100%; justify-content: center;">
+                                    <i data-lucide="crop" style="width:18px;"></i> Adjust Borders (Recrop)
+                                </button>
+                            </div>
+
+                            <div style="margin-top: 2rem; pt: 1rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;">
+                                <button id="scanner-save-jpg-btn" class="primary-btn btn-swift-engine" style="width: 100%; justify-content: center;">
+                                    <i data-lucide="image"></i> Save as JPG
+                                </button>
+                                <button id="scanner-save-pdf-btn" class="primary-btn btn-pro-ai" style="width: 100%; justify-content: center;">
+                                    <i data-lucide="file-text"></i> Save as PDF
+                                </button>
+                                <button id="scanner-send-to-pdf-btn" class="secondary-btn" style="width: 100%; justify-content: center;">
+                                    <i data-lucide="plus"></i> Add to Image-to-PDF
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -5205,6 +5297,512 @@
                 throw err;
             }
         }
+
+        // --- Document Scanner Logic ---
+        let openCvReady = false;
+        function onOpenCvReady() {
+            openCvReady = true;
+            const statusText = document.getElementById('scanner-status-text');
+            if (statusText) statusText.textContent = 'Scanner engine loaded. Ready to scan!';
+            console.log('OpenCV.js loaded successfully.');
+        }
+        window.onOpenCvReady = onOpenCvReady;
+
+        let scannerStream = null;
+        let scannerActive = false;
+        let scannerCapturedImage = null; // Original full-res canvas
+        let scannerCroppedImage = null; // Warped canvas
+        let scannerCropper = null;
+        let detectedCorners = null; // [{x, y}] on video frame scale
+        let scannerAnimationId = null;
+
+        const scannerStartScreen = document.getElementById('scanner-start-screen');
+        const scannerActiveScreen = document.getElementById('scanner-active-screen');
+        const scannerPreviewScreen = document.getElementById('scanner-preview-screen');
+        const scannerVideo = document.getElementById('scanner-video');
+        const scannerOverlayCanvas = document.getElementById('scanner-overlay-canvas');
+        const scannerCameraSelect = document.getElementById('scanner-camera-select');
+        const scannerStartBtn = document.getElementById('scanner-start-btn');
+        const scannerStopBtn = document.getElementById('scanner-stop-btn');
+        const scannerCaptureBtn = document.getElementById('scanner-capture-btn');
+        const scannerRetakeBtn = document.getElementById('scanner-retake-btn');
+        const scannerRecropBtn = document.getElementById('scanner-recrop-btn');
+        const scannerResultImg = document.getElementById('scanner-result-img');
+        const scannerSaveJpgBtn = document.getElementById('scanner-save-jpg-btn');
+        const scannerSavePdfBtn = document.getElementById('scanner-save-pdf-btn');
+        const scannerSendToPdfBtn = document.getElementById('scanner-send-to-pdf-btn');
+        const scannerStatusText = document.getElementById('scanner-status-text');
+
+        // Filter Buttons
+        const filterOrig = document.getElementById('filter-orig');
+        const filterMagic = document.getElementById('filter-magic');
+        const filterBw = document.getElementById('filter-bw');
+        let currentScannerFilter = 'original'; // original, magic, bw
+
+        // Stop camera on tab switch
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                if (tab.dataset.tab !== 'scanner') {
+                    stopScannerCamera();
+                }
+            });
+        });
+
+        // Initialize camera devices list
+        async function initCameraList() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true }); // Request permission first
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(d => d.kind === 'videoinput');
+                scannerCameraSelect.innerHTML = '';
+                videoDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `Camera ${index + 1}`;
+                    scannerCameraSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Error getting cameras:', err);
+                const option = document.createElement('option');
+                option.text = 'No camera found / Permission denied';
+                scannerCameraSelect.appendChild(option);
+            }
+        }
+
+        // Call initCameraList on Document Load
+        document.addEventListener('DOMContentLoaded', () => {
+            initCameraList();
+        });
+
+        scannerStartBtn.addEventListener('click', startScannerCamera);
+        scannerStopBtn.addEventListener('click', stopScannerCamera);
+        scannerCaptureBtn.addEventListener('click', captureDocument);
+        scannerRetakeBtn.addEventListener('click', () => {
+            if (scannerCropper) {
+                scannerCropper.destroy();
+                scannerCropper = null;
+            }
+            scannerRecropBtn.innerHTML = '<i data-lucide="crop"></i> Adjust Borders (Recrop)';
+            lucide.createIcons();
+            scannerPreviewScreen.classList.add('hidden');
+            scannerActiveScreen.classList.remove('hidden');
+            startScannerCamera();
+        });
+
+        async function startScannerCamera() {
+            if (scannerStream) stopScannerCamera();
+            const deviceId = scannerCameraSelect.value;
+            const constraints = {
+                video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: 'environment' }
+            };
+
+            try {
+                scannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+                scannerVideo.srcObject = scannerStream;
+                scannerVideo.onloadedmetadata = () => {
+                    scannerVideo.play();
+                    scannerActive = true;
+                    scannerStartScreen.classList.add('hidden');
+                    scannerActiveScreen.classList.remove('hidden');
+                    scannerPreviewScreen.classList.add('hidden');
+                    if (openCvReady) {
+                        scannerStatusText.textContent = 'Real-time document border detection active.';
+                    } else {
+                        scannerStatusText.textContent = 'Loading intelligent edge tracking...';
+                    }
+                    scannerAnimationId = requestAnimationFrame(processVideoFrame);
+                };
+            } catch (err) {
+                console.error('Camera access failed:', err);
+                notify('Could not access camera stream.', 'error');
+            }
+        }
+
+        function stopScannerCamera() {
+            scannerActive = false;
+            if (scannerAnimationId) {
+                cancelAnimationFrame(scannerAnimationId);
+                scannerAnimationId = null;
+            }
+            if (scannerStream) {
+                scannerStream.getTracks().forEach(track => track.stop());
+                scannerStream = null;
+            }
+            scannerVideo.srcObject = null;
+            scannerStartScreen.classList.remove('hidden');
+            scannerActiveScreen.classList.add('hidden');
+        }
+
+        function processVideoFrame() {
+            if (!scannerActive || scannerVideo.paused || scannerVideo.ended) return;
+
+            const vw = scannerVideo.videoWidth;
+            const vh = scannerVideo.videoHeight;
+            if (vw === 0 || vh === 0) {
+                scannerAnimationId = requestAnimationFrame(processVideoFrame);
+                return;
+            }
+
+            // Match overlay canvas size to layout size
+            const rect = scannerVideo.getBoundingClientRect();
+            scannerOverlayCanvas.width = rect.width;
+            scannerOverlayCanvas.height = rect.height;
+
+            const ctx = scannerOverlayCanvas.getContext('2d');
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            detectedCorners = null;
+
+            if (openCvReady) {
+                try {
+                    // Create mats
+                    const cap = new cv.VideoCapture(scannerVideo);
+                    const src = new cv.Mat(vh, vw, cv.CV_8UC4);
+                    cap.read(src);
+
+                    // Downscale for performance
+                    const scale = 0.5;
+                    const dsize = new cv.Size(vw * scale, vh * scale);
+                    const dst = new cv.Mat();
+                    cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
+
+                    // Find document contours
+                    const gray = new cv.Mat();
+                    const blurred = new cv.Mat();
+                    const edged = new cv.Mat();
+                    cv.cvtColor(dst, gray, cv.COLOR_RGBA2GRAY);
+                    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+                    cv.Canny(blurred, edged, 50, 150);
+
+                    const contours = new cv.MatVector();
+                    const hierarchy = new cv.Mat();
+                    cv.findContours(edged, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+                    let maxArea = 0;
+                    let approx = new cv.Mat();
+                    let bestContour = null;
+
+                    for (let i = 0; i < contours.size(); ++i) {
+                        const contour = contours.get(i);
+                        const area = cv.contourArea(contour);
+                        if (area > (vw * vh * scale * scale * 0.05)) { // At least 5% of viewport
+                            const perimeter = cv.arcLength(contour, true);
+                            const tempApprox = new cv.Mat();
+                            cv.approxPolyDP(contour, tempApprox, 0.02 * perimeter, true);
+
+                            if (tempApprox.rows === 4 && area > maxArea) {
+                                maxArea = area;
+                                if (bestContour) bestContour.delete();
+                                bestContour = tempApprox.clone();
+                            }
+                            tempApprox.delete();
+                        }
+                    }
+
+                    if (bestContour) {
+                        // Extract corners and scale back to full video frame scale
+                        const pts = [];
+                        for (let i = 0; i < 4; i++) {
+                            pts.push({
+                                x: bestContour.data32S[i * 2] / scale,
+                                y: bestContour.data32S[i * 2 + 1] / scale
+                            });
+                        }
+                        detectedCorners = sortCorners(pts);
+                        bestContour.delete();
+                    }
+
+                    // Clean up
+                    src.delete();
+                    dst.delete();
+                    gray.delete();
+                    blurred.delete();
+                    edged.delete();
+                    contours.delete();
+                    hierarchy.delete();
+                    approx.delete();
+                } catch (e) {
+                    console.error('Error in CV frame loop:', e);
+                }
+            }
+
+            // Draw overlay
+            if (detectedCorners) {
+                // Scale corners to canvas display coordinates
+                const displayCorners = detectedCorners.map(p => ({
+                    x: (p.x / vw) * rect.width,
+                    y: (p.y / vh) * rect.height
+                }));
+
+                ctx.strokeStyle = '#2563eb';
+                ctx.lineWidth = 4;
+                ctx.fillStyle = 'rgba(37, 99, 235, 0.15)';
+                ctx.beginPath();
+                ctx.moveTo(displayCorners[0].x, displayCorners[0].y);
+                ctx.lineTo(displayCorners[1].x, displayCorners[1].y);
+                ctx.lineTo(displayCorners[2].x, displayCorners[2].y);
+                ctx.lineTo(displayCorners[3].x, displayCorners[3].y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw circles at corners
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#1d4ed8';
+                ctx.lineWidth = 2;
+                displayCorners.forEach(c => {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 8, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                });
+            } else {
+                // Draw a guide frame in the center
+                const marginX = rect.width * 0.15;
+                const marginY = rect.height * 0.15;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([15, 10]);
+                ctx.strokeRect(marginX, marginY, rect.width - 2 * marginX, rect.height - 2 * marginY);
+                ctx.setLineDash([]);
+            }
+
+            scannerAnimationId = requestAnimationFrame(processVideoFrame);
+        }
+
+        function sortCorners(pts) {
+            const sums = pts.map(p => p.x + p.y);
+            const diffs = pts.map(p => p.y - p.x);
+            const tl = pts[sums.indexOf(Math.min(...sums))];
+            const br = pts[sums.indexOf(Math.max(...sums))];
+            const tr = pts[diffs.indexOf(Math.min(...diffs))];
+            const bl = pts[diffs.indexOf(Math.max(...diffs))];
+            return [tl, tr, br, bl];
+        }
+
+        async function captureDocument() {
+            if (!scannerStream) return;
+            showStatus('Scanning and correcting perspective...');
+
+            // Get current full resolution frame
+            const vw = scannerVideo.videoWidth;
+            const vh = scannerVideo.videoHeight;
+            const captureCanvas = document.createElement('canvas');
+            captureCanvas.width = vw;
+            captureCanvas.height = vh;
+            const captureCtx = captureCanvas.getContext('2d');
+            captureCtx.drawImage(scannerVideo, 0, 0, vw, vh);
+
+            // Store original capture
+            scannerCapturedImage = captureCanvas;
+
+            // Stop camera since we are previewing/editing
+            stopScannerCamera();
+
+            // Set up target width & height (A4 aspect ratio: 1:1.414)
+            const targetWidth = 1000;
+            const targetHeight = 1414;
+
+            let corners = detectedCorners;
+            if (!corners) {
+                // Default fallback: central 70% rect
+                corners = [
+                    { x: vw * 0.15, y: vh * 0.15 },
+                    { x: vw * 0.85, y: vh * 0.15 },
+                    { x: vw * 0.85, y: vh * 0.85 },
+                    { x: vw * 0.15, y: vh * 0.85 }
+                ];
+            }
+
+            performWarpCrop(captureCanvas, corners, targetWidth, targetHeight);
+        }
+
+        function performWarpCrop(srcCanvas, corners, targetWidth, targetHeight) {
+            scannerCroppedImage = document.createElement('canvas');
+            scannerCroppedImage.width = targetWidth;
+            scannerCroppedImage.height = targetHeight;
+
+            if (openCvReady) {
+                try {
+                    const srcMat = cv.imread(srcCanvas);
+                    const dstMat = new cv.Mat();
+                    
+                    const srcCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [
+                        corners[0].x, corners[0].y,
+                        corners[1].x, corners[1].y,
+                        corners[2].x, corners[2].y,
+                        corners[3].x, corners[3].y
+                    ]);
+                    const dstCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [
+                        0, 0,
+                        targetWidth, 0,
+                        targetWidth, targetHeight,
+                        0, targetHeight
+                    ]);
+
+                    const M = cv.getPerspectiveTransform(srcCoords, dstCoords);
+                    cv.warpPerspective(srcMat, dstMat, M, new cv.Size(targetWidth, targetHeight), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+
+                    cv.imshow(scannerCroppedImage, dstMat);
+
+                    // Clean up
+                    srcMat.delete();
+                    dstMat.delete();
+                    srcCoords.delete();
+                    dstCoords.delete();
+                    M.delete();
+                } catch (e) {
+                    console.error('Warp perspective failed with OpenCV, using canvas crop fallback:', e);
+                    fallbackCanvasCrop(srcCanvas, corners, targetWidth, targetHeight);
+                }
+            } else {
+                fallbackCanvasCrop(srcCanvas, corners, targetWidth, targetHeight);
+            }
+
+            // Apply filter and show
+            applyScannerFilter();
+
+            scannerActiveScreen.classList.add('hidden');
+            scannerPreviewScreen.classList.remove('hidden');
+            hideStatus();
+        }
+
+        function fallbackCanvasCrop(srcCanvas, corners, targetWidth, targetHeight) {
+            const minX = Math.min(...corners.map(c => c.x));
+            const maxX = Math.max(...corners.map(c => c.x));
+            const minY = Math.min(...corners.map(c => c.y));
+            const maxY = Math.max(...corners.map(c => c.y));
+
+            const ctx = scannerCroppedImage.getContext('2d');
+            ctx.drawImage(srcCanvas, minX, minY, maxX - minX, maxY - minY, 0, 0, targetWidth, targetHeight);
+        }
+
+        function applyScannerFilter() {
+            if (!scannerCroppedImage) return;
+
+            const filteredCanvas = document.createElement('canvas');
+            filteredCanvas.width = scannerCroppedImage.width;
+            filteredCanvas.height = scannerCroppedImage.height;
+            const ctx = filteredCanvas.getContext('2d');
+            ctx.drawImage(scannerCroppedImage, 0, 0);
+
+            const imgData = ctx.getImageData(0, 0, filteredCanvas.width, filteredCanvas.height);
+            const data = imgData.data;
+
+            if (currentScannerFilter === 'magic') {
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i] * 1.15;
+                    let g = data[i+1] * 1.15;
+                    let b = data[i+2] * 1.15;
+                    r = ((r - 128) * 1.25) + 128;
+                    g = ((g - 128) * 1.25) + 128;
+                    b = ((b - 128) * 1.25) + 128;
+                    data[i] = Math.min(255, Math.max(0, r));
+                    data[i+1] = Math.min(255, Math.max(0, g));
+                    data[i+2] = Math.min(255, Math.max(0, b));
+                }
+                ctx.putImageData(imgData, 0, 0);
+            } else if (currentScannerFilter === 'bw') {
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                    let newG = ((gray - 128) * 1.6) + 128;
+                    const val = newG > 135 ? 255 : 0;
+                    data[i] = val;
+                    data[i+1] = val;
+                    data[i+2] = val;
+                }
+                ctx.putImageData(imgData, 0, 0);
+            }
+
+            scannerResultImg.src = filteredCanvas.toDataURL('image/jpeg', 0.95);
+        }
+
+        // Hook filter buttons
+        [filterOrig, filterMagic, filterBw].forEach(btn => {
+            btn.addEventListener('click', () => {
+                [filterOrig, filterMagic, filterBw].forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (btn === filterOrig) currentScannerFilter = 'original';
+                if (btn === filterMagic) currentScannerFilter = 'magic';
+                if (btn === filterBw) currentScannerFilter = 'bw';
+                applyScannerFilter();
+            });
+        });
+
+        // Re-crop option using Cropper.js
+        scannerRecropBtn.addEventListener('click', () => {
+            if (scannerCropper) {
+                const canvas = scannerCropper.getCroppedCanvas();
+                scannerCroppedImage = canvas;
+                applyScannerFilter();
+                scannerCropper.destroy();
+                scannerCropper = null;
+                scannerRecropBtn.innerHTML = '<i data-lucide="crop"></i> Adjust Borders (Recrop)';
+                lucide.createIcons();
+            } else {
+                scannerCropper = new Cropper(scannerResultImg, {
+                    aspectRatio: NaN,
+                    viewMode: 1,
+                    background: false
+                });
+                scannerRecropBtn.innerHTML = '<i data-lucide="check"></i> Save Crop';
+                lucide.createIcons();
+            }
+        });
+
+        // Saving / Exporting Scanned Image
+        scannerSaveJpgBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `SwiftScan_${Date.now()}.jpg`;
+            link.href = scannerResultImg.src;
+            link.click();
+            notify('Document saved as JPG.', 'success');
+        });
+
+        scannerSavePdfBtn.addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const scale = Math.min(pageWidth / 1000, pageHeight / 1414);
+            const w = 1000 * scale;
+            const h = 1414 * scale;
+            pdf.addImage(scannerResultImg.src, 'JPEG', (pageWidth - w) / 2, (pageHeight - h) / 2, w, h);
+            pdf.save(`SwiftScan_${Date.now()}.pdf`);
+            notify('Document saved as PDF.', 'success');
+        });
+
+        scannerSendToPdfBtn.addEventListener('click', async () => {
+            const res = await fetch(scannerResultImg.src);
+            const blob = await res.blob();
+            const file = new File([blob], `Scan_${Date.now()}.jpg`, { type: 'image/jpeg' });
+            
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            
+            const id = Math.random().toString(36).substr(2, 9);
+            const url = URL.createObjectURL(file);
+            imageItems.push({ id, file, url, rotation: 0 });
+            
+            const div = createPreviewItem(id, imageItems.length, 'image');
+            imgPreviews.appendChild(div);
+            div.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = url;
+            div.appendChild(img);
+            
+            addRemoveBtn(div, id, 'image');
+            addRotateBtn(div, id, 'image');
+            addBadge(div, imageItems.length);
+
+            imgDropZone.classList.add('hidden');
+            imgPreviewContainer.classList.remove('hidden');
+            imgCountText.textContent = `${imageItems.length} images selected`;
+            updatePageNumbers('image');
+
+            notify('Document successfully sent to Image to PDF tool.', 'success');
+            switchTab('img-to-pdf');
+        });
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
