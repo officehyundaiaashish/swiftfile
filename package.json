@@ -1,0 +1,6 @@
+{
+  "name": "swiftfile-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vercel serverless proxy for SwiftFile AI Assistant"
+}
