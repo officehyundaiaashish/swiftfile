@@ -5496,7 +5496,7 @@
             if (openCvReady) {
                 try {
                     // Create mats
-                    const cap = new cv.VideoCapture(scannerVideo);
+                    const cap = new cv.VideoCapture('scanner-video');
                     const src = new cv.Mat(vh, vw, cv.CV_8UC4);
                     cap.read(src);
 
@@ -5532,7 +5532,7 @@
                         if (area > (vw * vh * scale * scale * 0.03)) { // min area 3% of view
                             const perimeter = cv.arcLength(contour, true);
                             const tempApprox = new cv.Mat();
-
+                            
                             // Iterate epsilon to locate a 4-point polygon
                             let foundQuad = false;
                             for (let epsilonFactor = 0.01; epsilonFactor <= 0.05; epsilonFactor += 0.01) {
@@ -5573,7 +5573,6 @@
                     edged.delete();
                     contours.delete();
                     hierarchy.delete();
-                    approx.delete();
                 } catch (e) {
                     console.error('Error in CV frame loop:', e);
                 }
