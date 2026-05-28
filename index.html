@@ -1284,15 +1284,16 @@
                 font-size: 1.1rem !important;
             }
 
-            #theme-toggle {
+            #theme-toggle,
+            #history-btn {
                 padding: 0.5rem !important;
                 border-radius: 10px !important;
-                margin-right: 0.25rem !important;
                 width: 36px !important;
                 height: 36px !important;
             }
 
-            #theme-toggle i {
+            #theme-toggle i,
+            #history-btn i {
                 width: 18px !important;
                 height: 18px !important;
             }
@@ -2101,17 +2102,7 @@
         }
     </style>
     <script>
-        let lastActiveTabId = 'img-to-pdf';
-        // Native Back Button Navigation for Fullscreen Mobile Chat
-        window.addEventListener('popstate', (e) => {
-            const assistantEl = document.getElementById('swift-assistant');
-            if (assistantEl && assistantEl.classList.contains('mobile-fullscreen')) {
-                assistantEl.classList.remove('mobile-fullscreen');
-                switchTab(lastActiveTabId || 'img-to-pdf');
-            }
-        });
-
-        let currentActiveTabId = 'swift-assistant';
+        let lastActiveTabId = 'swift-assistant';
         function switchTab(tabId) {
             if (tabId !== 'swift-assistant') {
                 lastActiveTabId = tabId;
@@ -2171,12 +2162,11 @@
                 }
             }
 
-            currentActiveTabId = tabId;
             if (tabId === 'swift-assistant') {
                 if (window.innerWidth <= 768) {
                     document.getElementById('swift-assistant').classList.add('mobile-fullscreen');
-                    if (window.history.state !== 'assistant-open') {
-                        window.history.pushState('assistant-open', '');
+                    if (window.history.state?.panel !== 'assistant') {
+                        window.history.pushState({ panel: 'assistant' }, '');
                     }
                 }
                 setTimeout(() => {
@@ -2212,15 +2202,13 @@
                 <img src="logo.png" alt="Swift File" class="logo-img">
                 <span>Swift File</span>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <button id="history-btn" class="icon-btn" title="View History">
-                    <i data-lucide="history"></i>
-                </button>
-                <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
-                    <i data-lucide="sun" id="sun-icon" class="hidden"></i>
-                    <i data-lucide="moon" id="moon-icon"></i>
-                </button>
-            </div>
+            <button id="history-btn" class="icon-btn" title="View History" style="margin-right: 0.5rem;">
+                <i data-lucide="history"></i>
+            </button>
+            <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                <i data-lucide="sun" id="sun-icon" class="hidden"></i>
+                <i data-lucide="moon" id="moon-icon"></i>
+            </button>
         </div>
     </header>
 
@@ -2234,8 +2222,8 @@
         <div class="mobile-tool-selector hidden" id="mobile-tool-selector">
             <div class="tool-select-btn">
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <i id="current-tool-icon" data-lucide="message-square"></i>
-                    <span id="current-tool-label">Swift Assistant</span>
+                    <i id="current-tool-icon" data-lucide="image"></i>
+                    <span id="current-tool-label">Image to PDF</span>
                 </div>
             </div>
         </div>
@@ -2289,82 +2277,9 @@
             <button class="tab-btn" data-tab="watermark-tool" onclick="switchTab('watermark-tool')">
                 <i data-lucide="stamp"></i> Watermark
             </button>
-            
         </div>
 
         <div class="converter-card">
-            <div id="swift-assistant" class="tab-content active">
-                <div class="assistant-outer-wrap" style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem; min-height: 550px;">
-                    
-                    <!-- Chat Interface Container -->
-                    <div class="assistant-inner-wrap" style="display: flex; flex-direction: column; flex: 1; position: relative; min-height: 0;">
-                        <!-- Dedicated Chat Header Row -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; flex-shrink: 0;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <button id="assistant-close-btn" class="chat-bubble-action-btn mobile-only-btn" title="Minimize" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: none; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 4px;">
-                                    <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
-                                </button>
-                                <i data-lucide="sparkles" style="width: 18px; height: 18px; color: var(--accent-color);"></i>
-                                <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Swift Assistant</span>
-                            </div>
-                            
-                            <div style="display: flex; align-items: center; gap: 8px; position: relative;">
-                                <span id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444;"></span>
-                                <button id="assistant-history-toggle-btn" class="chat-bubble-action-btn" title="Previous Conversations" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
-                                    <i data-lucide="history" style="width: 14px; height: 14px;"></i>
-                                </button>
-                                <button id="assistant-settings-toggle-btn" class="chat-bubble-action-btn" title="Model & API Settings" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
-                                    <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
-                                </button>
-
-                                <!-- Floating History Popover Panel -->
-                                <div id="assistant-history-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;">
-                                    <div style="font-weight: 700; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                        <span>Conversations</span>
-                                        <button id="new-chat-btn" class="secondary-btn" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 6px; height: 24px; margin-bottom: 0;">New Chat</button>
-                                    </div>
-                                    <div id="conversations-list" style="display: flex; flex-direction: column; gap: 8px;">
-                                        <!-- Will be loaded via JS -->
-                                    </div>
-                                </div>
-
-                                <!-- Floating Popover Dropdown Panel -->
-                                <div id="assistant-settings-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
-                                    <div>
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Provider</label>
-                                        <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
-                                            <option value="builtin" selected>Swift Assistant (Official)</option>
-                                            <option value="gemini">Google Gemini</option>
-                                            <option value="openrouter">OpenRouter</option>
-                                            <option value="groq">Groq Cloud</option>
-                                            <option value="huggingface">Hugging Face</option>
-                                            <option value="custom">Custom API</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div>
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Name</label>
-                                        <input type="text" id="assistant-model" class="password-input" value="gemini-1.5-flash" placeholder="Model name..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
-                                    </div>
-
-                                    <div id="assistant-endpoint-container" class="hidden">
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Endpoint URL</label>
-                                        <input type="url" id="assistant-endpoint" class="password-input" placeholder="https://api..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
-                                    </div>
-
-                                    <div>
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Key</label>
-                                        <input type="password" id="assistant-api-key" class="password-input" placeholder="Paste API key..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
-                                    </div>
-
-                                    <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px;">
-                                        <span id="status-text" style="font-size: 0.75rem; font-weight: 600; color: #ef4444;">Disconnected</span>
-                                        <button id="assistant-connect-btn" class="secondary-btn" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; height: 28px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 0;">
-                                            <i data-lucide="radio" style="width: 12px; height: 12px;"></i> Connect
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
             <!-- Image to PDF Section -->
             <div id="img-to-pdf" class="tab-content">
                 <div class="drop-zone" id="img-drop-zone">
@@ -3386,7 +3301,78 @@
             </div>
 
             <!-- Swift Assistant Section -->
-            
+            <div id="swift-assistant" class="tab-content active">
+                <div class="assistant-outer-wrap" style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem; min-height: 550px;">
+                    
+                    <!-- Chat Interface Container -->
+                    <div class="assistant-inner-wrap" style="display: flex; flex-direction: column; flex: 1; position: relative; min-height: 0;">
+                        <!-- Dedicated Chat Header Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; flex-shrink: 0;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button id="assistant-close-btn" class="chat-bubble-action-btn mobile-only-btn" title="Minimize" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: none; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 4px;">
+                                    <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                                </button>
+                                <i data-lucide="sparkles" style="width: 18px; height: 18px; color: var(--accent-color);"></i>
+                                <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Swift Assistant</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+                                <span id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444;"></span>
+                                <button id="assistant-history-toggle-btn" class="chat-bubble-action-btn" title="Previous Conversations" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                    <i data-lucide="history" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <button id="assistant-settings-toggle-btn" class="chat-bubble-action-btn" title="Model & API Settings" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                    <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
+                                </button>
+
+                                <!-- Floating History Popover Panel -->
+                                <div id="assistant-history-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;">
+                                    <div style="font-weight: 700; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Conversations</span>
+                                        <button id="new-chat-btn" class="secondary-btn" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 6px; height: 24px; margin-bottom: 0;">New Chat</button>
+                                    </div>
+                                    <div id="conversations-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                        <!-- Will be loaded via JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Floating Popover Dropdown Panel -->
+                                <div id="assistant-settings-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Provider</label>
+                                        <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
+                                            <option value="builtin" selected>Swift Assistant (Official)</option>
+                                            <option value="gemini">Google Gemini</option>
+                                            <option value="openrouter">OpenRouter</option>
+                                            <option value="groq">Groq Cloud</option>
+                                            <option value="huggingface">Hugging Face</option>
+                                            <option value="custom">Custom API</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Name</label>
+                                        <input type="text" id="assistant-model" class="password-input" value="gemini-1.5-flash" placeholder="Model name..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div id="assistant-endpoint-container" class="hidden">
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Endpoint URL</label>
+                                        <input type="url" id="assistant-endpoint" class="password-input" placeholder="https://api..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Key</label>
+                                        <input type="password" id="assistant-api-key" class="password-input" placeholder="Paste API key..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px;">
+                                        <span id="status-text" style="font-size: 0.75rem; font-weight: 600; color: #ef4444;">Disconnected</span>
+                                        <button id="assistant-connect-btn" class="secondary-btn" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; height: 28px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 0;">
+                                            <i data-lucide="radio" style="width: 12px; height: 12px;"></i> Connect
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Chat Messages Log -->
@@ -3456,26 +3442,6 @@
         <button id="menu-cut" class="menu-item"><i data-lucide="scissors"></i> Cut</button>
         <button id="menu-copy" class="menu-item"><i data-lucide="copy"></i> Copy</button>
         <button id="menu-paste" class="menu-item"><i data-lucide="clipboard"></i> Paste</button>
-    </div>
-
-    <!-- History Drawer -->
-    <div class="history-overlay" id="history-overlay"></div>
-    <div class="history-drawer" id="history-drawer">
-        <div class="history-drawer-header">
-            <h2><i data-lucide="history"></i> Conversion History</h2>
-            <button id="close-history-btn" class="icon-btn" title="Close">
-                <i data-lucide="x"></i>
-            </button>
-        </div>
-        <div class="history-drawer-content" id="history-drawer-content">
-            <!-- History items go here -->
-        </div>
-        <div class="history-drawer-footer">
-            <span id="history-count" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">0 items</span>
-            <button id="clear-all-history-btn" class="history-action-btn danger">
-                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear All
-            </button>
-        </div>
     </div>
 
     <div id="notification-container" class="notification-container"></div>
@@ -8321,14 +8287,12 @@
         let chatHistory = []; // stores {role: 'user'|'assistant', content: '...', timestamp: '...'}
         let currentConversationId = null;
 
-        // Close/minimize button event
         if (assistantCloseBtn) {
             assistantCloseBtn.addEventListener('click', () => {
-                if (window.history.state === 'assistant-open') {
+                document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
+                switchTab(lastActiveTabId);
+                if (window.history.state?.panel === 'assistant') {
                     window.history.back();
-                } else {
-                    document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
-                    switchTab(lastActiveTabId || 'img-to-pdf');
                 }
             });
         }
@@ -10017,19 +9981,47 @@ User Query: ${prompt}`;
         const historyCount = document.getElementById('history-count');
 
         function openHistoryDrawer() {
-            historyDrawer.classList.add('open');
-            historyOverlay.classList.add('open');
-            renderHistoryList();
+            if (historyDrawer && historyOverlay) {
+                historyDrawer.classList.add('open');
+                historyOverlay.classList.add('open');
+                if (window.history.state?.panel !== 'history') {
+                    window.history.pushState({ panel: 'history' }, '');
+                }
+                renderHistoryList();
+            }
         }
 
         function closeHistoryDrawer() {
-            historyDrawer.classList.remove('open');
-            historyOverlay.classList.remove('open');
+            if (historyDrawer && historyOverlay) {
+                historyDrawer.classList.remove('open');
+                historyOverlay.classList.remove('open');
+                if (window.history.state?.panel === 'history') {
+                    window.history.back();
+                }
+            }
         }
 
-        historyBtn.addEventListener('click', openHistoryDrawer);
-        closeHistoryBtn.addEventListener('click', closeHistoryDrawer);
-        historyOverlay.addEventListener('click', closeHistoryDrawer);
+        if (historyBtn) {
+            historyBtn.addEventListener('click', openHistoryDrawer);
+        }
+        if (closeHistoryBtn) closeHistoryBtn.addEventListener('click', closeHistoryDrawer);
+        if (historyOverlay) historyOverlay.addEventListener('click', closeHistoryDrawer);
+
+        // Handle physical/gestural back button navigation for Android/iOS
+        window.addEventListener('popstate', (e) => {
+            const hDrawer = document.getElementById('history-drawer');
+            if (hDrawer && hDrawer.classList.contains('open')) {
+                hDrawer.classList.remove('open');
+                const hOverlay = document.getElementById('history-overlay');
+                if (hOverlay) hOverlay.classList.remove('open');
+            }
+
+            const assistant = document.getElementById('swift-assistant');
+            if (assistant && assistant.classList.contains('mobile-fullscreen')) {
+                assistant.classList.remove('mobile-fullscreen');
+                switchTab(lastActiveTabId);
+            }
+        });
 
         clearAllHistoryBtn.addEventListener('click', async () => {
             if (confirm("Are you sure you want to clear all conversion history? This will permanently delete local logs and cached files.")) {
@@ -10300,6 +10292,25 @@ User Query: ${prompt}`;
         });
     </script>
     
-    </body>
+    <!-- History Drawer -->
+    <div class="history-overlay" id="history-overlay"></div>
+    <div class="history-drawer" id="history-drawer">
+        <div class="history-drawer-header">
+            <h2><i data-lucide="history"></i> Conversion History</h2>
+            <button id="close-history-btn" class="icon-btn" title="Close">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="history-drawer-content" id="history-drawer-content">
+            <!-- History items go here -->
+        </div>
+        <div class="history-drawer-footer">
+            <span id="history-count" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">0 items</span>
+            <button id="clear-all-history-btn" class="history-action-btn danger">
+                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear All
+            </button>
+        </div>
+    </div>
+</body>
 
 </html>
