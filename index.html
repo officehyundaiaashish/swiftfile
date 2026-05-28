@@ -1648,6 +1648,14 @@
             border-color: var(--accent-color) !important;
             box-shadow: 0 2px 8px var(--accent-shadow) !important;
         }
+        #assistant-send-btn,
+        #assistant-send-btn:focus,
+        #assistant-send-btn:active,
+        #assistant-send-btn:focus-visible {
+            outline: none !important;
+            border: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
         #search-web-toggle.active-auto {
             background: var(--accent-alpha) !important;
             color: var(--accent-color) !important;
@@ -1906,7 +1914,7 @@
                 box-sizing: border-box !important;
                 width: 100% !important;
                 scrollbar-width: thin !important;
-                overflow-y: auto !important;
+                overflow-y: hidden !important;
             }
             #assistant-settings-popover, #assistant-history-popover {
                 width: calc(100vw - 24px) !important;
@@ -8857,7 +8865,7 @@
             };
         }
 
-        function createChatBubble(role, content, index, attachment = null, timestamp = null) {
+        function createChatBubble(role, content, index, attachment = null, timestamp = null, searchResults = null) {
             const bubble = document.createElement('div');
             bubble.className = `assistant-chat-bubble ${role === 'user' ? 'user' : 'bot'}`;
             bubble.dataset.index = index;
@@ -8899,6 +8907,73 @@
             textContainer.innerHTML = formatMessage(content);
 
             bubble.appendChild(header);
+
+            // Search Sources UI Dropdown
+            if (role === 'bot' && searchResults && searchResults.length > 0) {
+                const sourcesContainer = document.createElement('div');
+                sourcesContainer.style.marginBottom = '10px';
+                sourcesContainer.style.padding = '8px 12px';
+                sourcesContainer.style.background = 'var(--input-bg)';
+                sourcesContainer.style.border = '1px solid var(--border-color)';
+                sourcesContainer.style.borderRadius = '12px';
+                sourcesContainer.style.fontSize = '0.8rem';
+                
+                const sourcesHeader = document.createElement('div');
+                sourcesHeader.style.display = 'flex';
+                sourcesHeader.style.justifyContent = 'space-between';
+                sourcesHeader.style.alignItems = 'center';
+                sourcesHeader.style.cursor = 'pointer';
+                sourcesHeader.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:6px; font-weight:600; color:var(--text-primary);">
+                        <i data-lucide="search" style="width:12px; height:12px; color:var(--accent-color);"></i>
+                        Searched the web (${searchResults.length} sources)
+                    </div>
+                    <i data-lucide="chevron-down" class="chevron" style="width:14px; height:14px; transition:transform 0.3s; color:var(--text-secondary);"></i>
+                `;
+                
+                const sourcesList = document.createElement('div');
+                sourcesList.style.display = 'none';
+                sourcesList.style.flexDirection = 'column';
+                sourcesList.style.gap = '6px';
+                sourcesList.style.marginTop = '8px';
+                sourcesList.style.paddingTop = '8px';
+                sourcesList.style.borderTop = '1px dashed var(--border-color)';
+                
+                searchResults.forEach((res, i) => {
+                    const srcLink = document.createElement('a');
+                    srcLink.href = res.url.startsWith('http') ? res.url : `https://${res.url}`;
+                    srcLink.target = '_blank';
+                    srcLink.style.display = 'flex';
+                    srcLink.style.flexDirection = 'column';
+                    srcLink.style.textDecoration = 'none';
+                    srcLink.style.color = 'var(--text-secondary)';
+                    srcLink.style.padding = '6px 8px';
+                    srcLink.style.borderRadius = '8px';
+                    srcLink.style.transition = 'background 0.2s';
+                    srcLink.onmouseenter = () => srcLink.style.background = 'var(--accent-alpha)';
+                    srcLink.onmouseleave = () => srcLink.style.background = '';
+                    
+                    srcLink.innerHTML = `
+                        <span style="font-weight:600; color:var(--accent-color); font-size:0.75rem; display:flex; align-items:center; gap:4px;">
+                            <i data-lucide="link" style="width:10px; height:10px;"></i>
+                            [${i+1}] ${res.title}
+                        </span>
+                        <span style="font-size:0.7rem; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${res.url}</span>
+                    `;
+                    sourcesList.appendChild(srcLink);
+                });
+                
+                sourcesHeader.addEventListener('click', () => {
+                    const isHidden = sourcesList.style.display === 'none';
+                    sourcesList.style.display = isHidden ? 'flex' : 'none';
+                    sourcesHeader.querySelector('.chevron').style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+                });
+                
+                sourcesContainer.appendChild(sourcesHeader);
+                sourcesContainer.appendChild(sourcesList);
+                bubble.appendChild(sourcesContainer);
+            }
+
             bubble.appendChild(textContainer);
 
             // Add attachment preview inside bubble if any
@@ -8945,19 +9020,25 @@
             timeSpan.textContent = formatMessageTime(timestamp || new Date().toISOString());
             footer.appendChild(timeSpan);
 
-            // Gmail Compose Button if email draft detected
+            // Mail Compose Button if email draft detected
             if (role !== 'user' && isEmailDraft(content)) {
-                const gmailBtn = document.createElement('button');
-                gmailBtn.className = 'chat-bubble-action-btn';
-                gmailBtn.title = 'Compose in Gmail';
-                gmailBtn.style.color = '#ea4335'; // Gmail Red
-                gmailBtn.innerHTML = '<i data-lucide="mail"></i>';
-                gmailBtn.addEventListener('click', () => {
+                const mailBtn = document.createElement('button');
+                mailBtn.className = 'chat-bubble-action-btn';
+                const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                mailBtn.title = isMobileDevice ? 'Open default Mail app' : 'Compose in Gmail';
+                mailBtn.style.color = '#ea4335';
+                mailBtn.innerHTML = '<i data-lucide="mail"></i>';
+                mailBtn.addEventListener('click', () => {
                     const parsed = parseEmailContent(content);
-                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(parsed.recipient)}&su=${encodeURIComponent(parsed.subject)}&body=${encodeURIComponent(parsed.body)}`;
-                    window.open(gmailUrl, '_blank');
+                    if (isMobileDevice) {
+                        const mailtoUrl = `mailto:${encodeURIComponent(parsed.recipient)}?subject=${encodeURIComponent(parsed.subject)}&body=${encodeURIComponent(parsed.body)}`;
+                        window.location.href = mailtoUrl;
+                    } else {
+                        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(parsed.recipient)}&su=${encodeURIComponent(parsed.subject)}&body=${encodeURIComponent(parsed.body)}`;
+                        window.open(gmailUrl, '_blank');
+                    }
                 });
-                footer.appendChild(gmailBtn);
+                footer.appendChild(mailBtn);
             }
 
             const bottomCopyBtn = document.createElement('button');
@@ -9027,7 +9108,7 @@
             if (systemBubble) assistantChatLog.appendChild(systemBubble);
 
             chatHistory.forEach((msg, idx) => {
-                const bubble = createChatBubble(msg.role, msg.content, idx, msg.attachment, msg.timestamp);
+                const bubble = createChatBubble(msg.role, msg.content, idx, msg.attachment, msg.timestamp, msg.searchResults);
                 assistantChatLog.appendChild(bubble);
             });
             lucide.createIcons({ attrs: { class: 'lucide-icon' } });
@@ -9264,8 +9345,17 @@
                     const messagesPayload = chatHistory.map((msg, idx) => {
                         let content = msg.content;
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nLink: ${r.url}`).join('\n\n');
-                            content = `[Web Search Results]\n${contextStr}\n\n[User Prompt]\n${msg.content}`;
+                            const contextStr = searchResults.map((r, i) => `[Source ${i+1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                            content = `You have access to web search results to answer the user query.
+Search Results:
+${contextStr}
+
+Instructions:
+1. Synthesize the provided search results to summarize a clear, well-mannered, and accurate response.
+2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
+3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
+
+User Query: ${msg.content}`;
                         }
                         if (msg.attachment) {
                             if (msg.attachment.isText) {
@@ -9295,8 +9385,17 @@
                     const contentsPayload = chatHistory.map((msg, idx) => {
                         let msgContent = msg.content;
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nLink: ${r.url}`).join('\n\n');
-                            msgContent = `[Web Search Results]\n${contextStr}\n\n[User Prompt]\n${msg.content}`;
+                            const contextStr = searchResults.map((r, i) => `[Source ${i+1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                            msgContent = `You have access to web search results to answer the user query.
+Search Results:
+${contextStr}
+
+Instructions:
+1. Synthesize the provided search results to summarize a clear, well-mannered, and accurate response.
+2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
+3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
+
+User Query: ${msg.content}`;
                         }
                         const parts = [{ text: msgContent || 'Attached file details below:' }];
                         if (msg.attachment) {
@@ -9349,8 +9448,17 @@
                     const messagesPayload = chatHistory.map((msg, idx) => {
                         let content = msg.content;
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nLink: ${r.url}`).join('\n\n');
-                            content = `[Web Search Results]\n${contextStr}\n\n[User Prompt]\n${msg.content}`;
+                            const contextStr = searchResults.map((r, i) => `[Source ${i+1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                            content = `You have access to web search results to answer the user query.
+Search Results:
+${contextStr}
+
+Instructions:
+1. Synthesize the provided search results to summarize a clear, well-mannered, and accurate response.
+2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
+3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
+
+User Query: ${msg.content}`;
                         }
                         if (msg.attachment) {
                             if (msg.attachment.type.startsWith('image/')) {
@@ -9403,8 +9511,17 @@
                     const hfUrl = `https://api-inference.huggingface.co/models/${model}`;
                     let hfPrompt = prompt;
                     if (searchResults && searchResults.length > 0) {
-                        const contextStr = searchResults.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nLink: ${r.url}`).join('\n\n');
-                        hfPrompt = `[Web Search Results]\n${contextStr}\n\n[User Prompt]\n${prompt}`;
+                        const contextStr = searchResults.map((r, i) => `[Source ${i+1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                        hfPrompt = `You have access to web search results to answer the user query.
+Search Results:
+${contextStr}
+
+Instructions:
+1. Synthesize the provided search results to summarize a clear, well-mannered, and accurate response.
+2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
+3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
+
+User Query: ${prompt}`;
                     }
                     
                     const res = await fetch(hfUrl, {
@@ -9430,6 +9547,7 @@
                 chatHistory.push({ 
                     role: 'assistant', 
                     content: responseText,
+                    searchResults: searchResults,
                     timestamp: new Date().toISOString()
                 });
                 saveCurrentConversation();
