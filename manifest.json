@@ -4,7 +4,7 @@
   "description": "Convert, merge, split, compress and redact PDF and image files instantly.",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0b1120",
+  "background_color": "#ffffff",
   "theme_color": "#f0f4f8",
   "icons": [
     {
