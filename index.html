@@ -10426,12 +10426,28 @@
             const model = assistantModel.value.trim() || 'gemini-1.5-flash';
             let endpoint = assistantEndpoint.value.trim();
 
+            let userContextInfo = `Current Local Time: ${new Date().toLocaleString()}\nTimezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 1000);
+                const locRes = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (locRes.ok) {
+                    const locData = await locRes.json();
+                    if (locData && locData.city) {
+                        userContextInfo += `\nLocation Context: ${locData.city}, ${locData.region}, ${locData.country_name}`;
+                    }
+                }
+            } catch (e) {
+                console.log('IP Location fetch skipped or timed out:', e);
+            }
+
             const systemPromptContent = `You are Swift Assistant, the smart AI companion for Swift File Tools. You help users manage, convert, and edit their PDF and image files.
-You have access to client-side application tools. To invoke a tool, output a single JSON block anywhere in your response (do not explain the tool call, just output it):
-1. Switch Tab: {"action": "switch_tab", "tab": "tab-id"}
-   Supported tabs: img-to-pdf, pdf-to-img, merge-pdf, split-pdf, compress-pdf, compress-image, unlock-pdf, protect-pdf, bg-remover, collage-maker, word-to-pdf, scanner, webpage-to-pdf, redact-pdf, watermark-tool.
-2. Web Search: {"action": "web_search", "query": "search query"}
-3. Get Active Files: {"action": "get_active_files"}
+You have access to a client-side Web Search tool to fetch live information when needed. To invoke the tool, output a single JSON block anywhere in your response (do not explain the tool call, just output it):
+{"action": "web_search", "query": "search query"}
+
+User Environment Context:
+${userContextInfo}
 
 CRITICAL RULES FOR INTERNET REQUESTS:
 - If the user asks about current real-time details (e.g., today's news, current weather, stock price, time, calendar events, recent releases), you MUST use the Web Search tool {"action": "web_search", "query": "..."} to fetch the live information.
