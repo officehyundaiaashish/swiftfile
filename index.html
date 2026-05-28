@@ -43,6 +43,7 @@
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -8626,6 +8627,97 @@
             notify('Generation cancelled.', 'info');
         }
 
+        async function performOCR(imageDataUrl) {
+            try {
+                const worker = await Tesseract.createWorker('eng');
+                const ret = await worker.recognize(imageDataUrl);
+                await worker.terminate();
+                return ret.data.text || '';
+            } catch (err) {
+                console.error('OCR failed:', err);
+                return 'OCR failed to extract text from this image.';
+            }
+        }
+
+        async function extractPdfTextWithOCR(pdfDocument) {
+            let extractedText = '';
+            try {
+                for (let i = 1; i <= pdfDocument.numPages; i++) {
+                    const page = await pdfDocument.getPage(i);
+                    const viewport = page.getViewport({ scale: 1.5 });
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    const imgDataUrl = canvas.toDataURL('image/png');
+                    const pageText = await performOCR(imgDataUrl);
+                    extractedText += `--- Page ${i} (OCR) ---\n${pageText}\n\n`;
+                }
+            } catch (err) {
+                console.error('PDF OCR failed:', err);
+            }
+            return extractedText.trim();
+        }
+
+        async function handleAgentTools(responseText) {
+            try {
+                const jsonRegex = /\{[\s\S]*?"action"\s*:\s*"[^"]*"[\s\S]*?\}/g;
+                const match = responseText.match(jsonRegex);
+                if (match) {
+                    const actionObj = JSON.parse(match[0]);
+                    if (actionObj && actionObj.action) {
+                        if (actionObj.action === 'switch_tab') {
+                            const tabId = actionObj.tab;
+                            if (tabId) {
+                                switchTab(tabId);
+                                notify(`Switched to tab: ${tabId}`, 'info');
+                                return {
+                                    success: true,
+                                    action: 'switch_tab',
+                                    param: tabId,
+                                    result: `Successfully switched active tab to ${tabId}.`
+                                };
+                            }
+                        } else if (actionObj.action === 'web_search') {
+                            const query = actionObj.query;
+                            if (query) {
+                                notify(`Searching: ${query}`, 'info');
+                                const searchRes = await searchWeb(query);
+                                return {
+                                    success: true,
+                                    action: 'web_search',
+                                    param: query,
+                                    result: `Web search results for "${query}":\n` + JSON.stringify(searchRes)
+                                };
+                            }
+                        } else if (actionObj.action === 'get_active_files') {
+                            let fileDetails = 'Active File States:\n';
+                            const activeDropZones = document.querySelectorAll('.drop-zone');
+                            activeDropZones.forEach(zone => {
+                                const parent = zone.closest('.tab-content');
+                                if (parent) {
+                                    const files = zone.querySelectorAll('.preview-item');
+                                    if (files.length > 0) {
+                                        fileDetails += `- Tab ${parent.id}: Has ${files.length} loaded files.\n`;
+                                    }
+                                }
+                            });
+                            return {
+                                success: true,
+                                action: 'get_active_files',
+                                result: fileDetails === 'Active File States:\n' ? 'No files are currently loaded in any drop zones.' : fileDetails
+                            };
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Error executing agent tool:', e);
+            }
+            return null;
+        }
+
         if (assistantCloseBtn) {
             assistantCloseBtn.addEventListener('click', () => {
                 document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
@@ -9894,27 +9986,263 @@
             assistantFileInput.click();
         });
 
-        assistantFileInput.addEventListener('change', (e) => {
+        assistantFileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            const isText = file.type === 'text/plain' || file.name.endsWith('.txt') || file.name.endsWith('.csv') || file.name.endsWith('.json') || file.name.endsWith('.xml') || file.name.endsWith('.md');
+            attachedFilesContainer.innerHTML = `
+                <div style="display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; color:var(--text-secondary);">
+                    <i data-lucide="loader-2" class="spin" style="width:14px; height:14px; color:var(--accent-color);"></i>
+                    <span>Processing ${file.name}...</span>
+                </div>
+            `;
+            lucide.createIcons({ root: attachedFilesContainer });
 
-            reader.onload = () => {
+            // Create a gorgeous Claude-style file processing card inside the chat log!
+            const processCard = document.createElement('div');
+            processCard.className = 'assistant-chat-bubble bot system-status';
+            processCard.style.background = 'rgba(37, 99, 235, 0.05)';
+            processCard.style.border = '1px dashed var(--accent-border-alpha)';
+            processCard.style.borderRadius = '12px';
+            processCard.style.padding = '10px 14px';
+            processCard.style.margin = '8px 0';
+            processCard.style.width = 'fit-content';
+            processCard.style.maxWidth = '85%';
+            processCard.style.alignSelf = 'flex-start';
+            processCard.innerHTML = `
+                <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:var(--accent-color);">
+                    <i data-lucide="loader-2" class="spin" style="width:14px; height:14px;"></i>
+                    <span>Loading Document: ${file.name}</span>
+                </div>
+                <p style="font-size:0.75rem; margin:4px 0 0 0; color:var(--text-secondary);">Reading binary buffer...</p>
+            `;
+            assistantChatLog.appendChild(processCard);
+            lucide.createIcons({ root: processCard });
+            scrollChatToBottom();
+
+            try {
+                const isText = file.type === 'text/plain' || file.name.endsWith('.txt') || file.name.endsWith('.csv') || file.name.endsWith('.json') || file.name.endsWith('.xml') || file.name.endsWith('.md');
+                const isPdf = file.name.endsWith('.pdf') || file.type === 'application/pdf';
+                const isDocx = file.name.endsWith('.docx');
+                const isImage = file.type.startsWith('image/');
+
+                let extractedText = '';
+                let fileData = null;
+
+                if (isText) {
+                    processCard.querySelector('p').textContent = 'Reading plain text stream...';
+                    extractedText = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsText(file);
+                    });
+                    fileData = extractedText;
+                    
+                    processCard.style.background = 'rgba(34, 197, 94, 0.05)';
+                    processCard.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+                    processCard.innerHTML = `
+                        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:20px;">
+                            <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:#22c55e;">
+                                <i data-lucide="check-circle" style="width:14px; height:14px;"></i>
+                                <span>Text Loaded</span>
+                            </div>
+                            <span style="font-size:0.65rem; color:var(--text-secondary); opacity:0.6; font-weight:600; text-transform:uppercase;">Local File</span>
+                        </div>
+                        <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary);">Successfully loaded text data from <strong>${file.name}</strong> (${extractedText.length} characters).</p>
+                    `;
+                    lucide.createIcons({ root: processCard });
+                } else if (isPdf) {
+                    processCard.querySelector('p').textContent = 'Extracting pages from PDF container...';
+                    const arrayBuffer = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsArrayBuffer(file);
+                    });
+                    try {
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        let text = '';
+                        let textContentEmpty = true;
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            processCard.querySelector('p').textContent = `Reading text contents (Page ${i} of ${pdf.numPages})...`;
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            const pageText = textContent.items.map(item => item.str).join(' ');
+                            if (pageText.trim().length > 0) textContentEmpty = false;
+                            text += `--- Page ${i} ---\n${pageText}\n\n`;
+                        }
+                        
+                        if (textContentEmpty || text.trim().length < 50) {
+                            processCard.querySelector('p').textContent = 'Scanned PDF detected. Preparing local WebAssembly OCR...';
+                            attachedFilesContainer.innerHTML = `
+                                <div style="display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; color:var(--text-secondary);">
+                                    <i data-lucide="loader-2" class="spin" style="width:14px; height:14px; color:var(--accent-color);"></i>
+                                    <span>Running Local OCR on PDF...</span>
+                                </div>
+                            `;
+                            lucide.createIcons({ root: attachedFilesContainer });
+                            extractedText = await extractPdfTextWithOCR(pdf);
+                        } else {
+                            extractedText = text.trim();
+                        }
+                        
+                        processCard.style.background = 'rgba(34, 197, 94, 0.05)';
+                        processCard.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+                        processCard.innerHTML = `
+                            <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:20px;">
+                                <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:#22c55e;">
+                                    <i data-lucide="check-circle" style="width:14px; height:14px;"></i>
+                                    <span>PDF Parsed</span>
+                                </div>
+                                <span style="font-size:0.65rem; color:var(--text-secondary); opacity:0.6; font-weight:600; text-transform:uppercase;">Local Parser</span>
+                            </div>
+                            <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary);">Extracted text from all <strong>${pdf.numPages}</strong> pages of PDF (${extractedText.length} characters).</p>
+                        `;
+                        lucide.createIcons({ root: processCard });
+                    } catch (pdfErr) {
+                        console.error('PDF parsing error:', pdfErr);
+                        extractedText = 'Error parsing PDF file content.';
+                        processCard.style.background = 'rgba(239, 68, 68, 0.05)';
+                        processCard.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                        processCard.innerHTML = `
+                            <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:#ef4444;">
+                                <i data-lucide="alert-circle" style="width:14px; height:14px;"></i>
+                                <span>PDF Error</span>
+                            </div>
+                            <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary);">Failed to extract text from PDF document.</p>
+                        `;
+                        lucide.createIcons({ root: processCard });
+                    }
+                    fileData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(file);
+                    });
+                } else if (isDocx) {
+                    processCard.querySelector('p').textContent = 'Decompressing Word document stream...';
+                    const arrayBuffer = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsArrayBuffer(file);
+                    });
+                    try {
+                        const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                        extractedText = result.value || 'Empty Word document.';
+                        
+                        processCard.style.background = 'rgba(34, 197, 94, 0.05)';
+                        processCard.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+                        processCard.innerHTML = `
+                            <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:20px;">
+                                <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:#22c55e;">
+                                    <i data-lucide="check-circle" style="width:14px; height:14px;"></i>
+                                    <span>DOCX Parsed</span>
+                                </div>
+                                <span style="font-size:0.65rem; color:var(--text-secondary); opacity:0.6; font-weight:600; text-transform:uppercase;">Local Parser</span>
+                            </div>
+                            <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary);">Extracted document body text from <strong>${file.name}</strong> (${extractedText.length} characters).</p>
+                        `;
+                        lucide.createIcons({ root: processCard });
+                    } catch (docxErr) {
+                        console.error('Word document parsing error:', docxErr);
+                        extractedText = 'Error parsing Word document.';
+                        processCard.style.background = 'rgba(239, 68, 68, 0.05)';
+                        processCard.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                        processCard.innerHTML = `
+                            <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:#ef4444;">
+                                <i data-lucide="alert-circle" style="width:14px; height:14px;"></i>
+                                <span>DOCX Error</span>
+                            </div>
+                            <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary);">Failed to extract text from Word document.</p>
+                        `;
+                        lucide.createIcons({ root: processCard });
+                    }
+                    fileData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(file);
+                    });
+                } else if (isImage) {
+                    processCard.querySelector('p').textContent = 'Reading pixels & running Tesseract OCR...';
+                    fileData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(file);
+                    });
+                    attachedFilesContainer.innerHTML = `
+                        <div style="display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; color:var(--text-secondary);">
+                            <i data-lucide="loader-2" class="spin" style="width:14px; height:14px; color:var(--accent-color);"></i>
+                            <span>Running Local OCR on Image...</span>
+                        </div>
+                    `;
+                    lucide.createIcons({ root: attachedFilesContainer });
+                    try {
+                        extractedText = await performOCR(fileData);
+                        
+                        processCard.style.background = 'rgba(34, 197, 94, 0.05)';
+                        processCard.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+                        processCard.innerHTML = `
+                            <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:20px;">
+                                <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:#22c55e;">
+                                    <i data-lucide="check-circle" style="width:14px; height:14px;"></i>
+                                    <span>OCR Complete</span>
+                                </div>
+                                <span style="font-size:0.65rem; color:var(--text-secondary); opacity:0.6; font-weight:600; text-transform:uppercase;">Local OCR</span>
+                            </div>
+                            <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary);">Extracted text from image pixels using Tesseract engine (${extractedText.length} characters).</p>
+                        `;
+                        lucide.createIcons({ root: processCard });
+                    } catch (ocrErr) {
+                        console.error('OCR error:', ocrErr);
+                        extractedText = '';
+                        processCard.style.background = 'rgba(239, 68, 68, 0.05)';
+                        processCard.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                        processCard.innerHTML = `
+                            <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:#ef4444;">
+                                <i data-lucide="alert-circle" style="width:14px; height:14px;"></i>
+                                <span>OCR Error</span>
+                            </div>
+                            <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary);">Failed to perform optical character recognition on image.</p>
+                        `;
+                        lucide.createIcons({ root: processCard });
+                    }
+                } else {
+                    processCard.querySelector('p').textContent = 'Attaching file stream...';
+                    fileData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(file);
+                    });
+                    
+                    processCard.style.background = 'var(--accent-alpha)';
+                    processCard.style.borderColor = 'var(--accent-border-alpha)';
+                    processCard.innerHTML = `
+                        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:20px;">
+                            <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:var(--accent-color);">
+                                <i data-lucide="paperclip" style="width:14px; height:14px;"></i>
+                                <span>File Attached</span>
+                            </div>
+                            <span style="font-size:0.65rem; color:var(--text-secondary); opacity:0.6; font-weight:600; text-transform:uppercase;">Attached</span>
+                        </div>
+                        <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary);">Attached <strong>${file.name}</strong> as image/media binary payload.</p>
+                    `;
+                    lucide.createIcons({ root: processCard });
+                }
+
                 attachedFile = {
                     name: file.name,
                     type: file.type,
-                    data: reader.result,
-                    isText: isText
+                    data: fileData,
+                    isText: isText || isPdf || isDocx || isImage,
+                    extractedText: extractedText
                 };
                 renderAttachedFile();
-            };
-
-            if (isText) {
-                reader.readAsText(file);
-            } else {
-                reader.readAsDataURL(file);
+            } catch (err) {
+                console.error('File reading failed:', err);
+                notify('Failed to process file.', 'warning');
+                attachedFile = null;
+                renderAttachedFile();
+                if (typeof processCard !== 'undefined' && processCard) {
+                    processCard.remove();
+                }
             }
         });
 
@@ -10094,16 +10422,28 @@
             const model = assistantModel.value.trim() || 'gemini-1.5-flash';
             let endpoint = assistantEndpoint.value.trim();
 
+            const systemPromptContent = `You are Swift Assistant, the smart AI companion for Swift File Tools. You help users manage, convert, and edit their PDF and image files.
+You have access to client-side application tools. To invoke a tool, output a single JSON block anywhere in your response (do not explain the tool call, just output it):
+1. Switch Tab: {"action": "switch_tab", "tab": "tab-id"}
+   Supported tabs: img-to-pdf, pdf-to-img, merge-pdf, split-pdf, compress-pdf, compress-image, unlock-pdf, protect-pdf, bg-remover, collage-maker, word-to-pdf, scanner, webpage-to-pdf, redact-pdf, watermark-tool.
+2. Web Search: {"action": "web_search", "query": "search query"}
+3. Get Active Files: {"action": "get_active_files"}`;
+
+            let loopCount = 0;
+            const maxLoops = 2;
+
             try {
-                let responseText = '';
+                while (loopCount < maxLoops) {
+                    let responseText = '';
 
-                if (provider === 'builtin') {
-                    // Route through Vercel proxy (API key stored securely on server)
-                    const messagesPayload = chatHistory.map((msg, idx) => {
-                        let content = msg.content;
-                        if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
-                            content = `You have access to web search results to answer the user query.
+                    if (provider === 'builtin') {
+                        const messagesPayload = [
+                            { role: 'system', content: systemPromptContent },
+                            ...chatHistory.map((msg, idx) => {
+                                let content = msg.content;
+                                if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
+                                    const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                                    content = `You have access to web search results to answer the user query.
 Search Results:
 ${contextStr}
 
@@ -10113,102 +10453,41 @@ Instructions:
 3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
 
 User Query: ${msg.content}`;
-                        }
-                        if (msg.attachment) {
-                            if (msg.attachment.isText) {
-                                return { role: msg.role, content: (content || '') + `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}` };
-                            }
-                            return { role: msg.role, content: (content || '') + `\n\n[Attached File: ${msg.attachment.name}]` };
-                        }
-                        return { role: msg.role, content: content };
-                    });
-
-                    const res = await fetch(VERCEL_PROXY_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ messages: messagesPayload }),
-                        signal: signal
-                    });
-
-                    if (!res.ok) {
-                        const errData = await res.json().catch(() => ({}));
-                        throw new Error(errData.error || `HTTP ${res.status}`);
-                    }
-                    const data = await res.json();
-                    responseText = data.choices?.[0]?.message?.content || data.response || 'No response generated.';
-
-                } else if (provider === 'gemini') {
-                    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-                    const contentsPayload = chatHistory.map((msg, idx) => {
-                        let msgContent = msg.content;
-                        if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
-                            msgContent = `You have access to web search results to answer the user query.
-Search Results:
-${contextStr}
-
-Instructions:
-1. Synthesize the provided search results to summarize a clear, well-mannered, and accurate response.
-2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
-3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
-
-User Query: ${msg.content}`;
-                        }
-                        const parts = [{ text: msgContent || 'Attached file details below:' }];
-                        if (msg.attachment) {
-                            if (msg.attachment.type.startsWith('image/')) {
-                                try {
-                                    const base64Data = msg.attachment.data.split(',')[1];
-                                    parts.push({
-                                        inlineData: {
-                                            mimeType: msg.attachment.type,
-                                            data: base64Data
-                                        }
-                                    });
-                                } catch (e) {
-                                    console.error('Error parsing attachment base64', e);
                                 }
-                            } else if (msg.attachment.isText) {
-                                parts.push({ text: `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}` });
-                            } else {
-                                parts.push({ text: `\n\n[Attached File Link: ${msg.attachment.name} (${msg.attachment.type})]` });
-                            }
+                                if (msg.attachment) {
+                                    if (msg.attachment.extractedText) {
+                                        return { role: msg.role, content: (content || '') + `\n\n[Content of attached file: ${msg.attachment.name}]\n\n${msg.attachment.extractedText}` };
+                                    } else if (msg.attachment.isText) {
+                                        return { role: msg.role, content: (content || '') + `\n\n[Content of attached file: ${msg.attachment.name}]\n\n${msg.attachment.data}` };
+                                    }
+                                    return { role: msg.role, content: (content || '') + `\n\n[Attached File: ${msg.attachment.name}]` };
+                                }
+                                return { role: msg.role, content: content };
+                            })
+                        ];
+
+                        const res = await fetch(VERCEL_PROXY_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ messages: messagesPayload }),
+                            signal: signal
+                        });
+
+                        if (!res.ok) {
+                            const errData = await res.json().catch(() => ({}));
+                            throw new Error(errData.error || `HTTP ${res.status}`);
                         }
-                        return {
-                            role: msg.role === 'user' ? 'user' : 'model',
-                            parts: parts
-                        };
-                    });
+                        const data = await res.json();
+                        responseText = data.choices?.[0]?.message?.content || data.response || 'No response generated.';
 
-                    const res = await fetch(geminiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: contentsPayload }),
-                        signal: signal
-                    });
+                    } else if (provider === 'gemini') {
+                        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-                    if (!res.ok) {
-                        const errData = await res.json().catch(() => ({}));
-                        throw new Error(errData.error?.message || `HTTP ${res.status}`);
-                    }
-                    const data = await res.json();
-                    responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
-
-                } else if (provider === 'openrouter' || provider === 'groq' || provider === 'custom') {
-                    if (provider === 'openrouter' && !endpoint) {
-                        endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-                    } else if (provider === 'groq' && !endpoint) {
-                        endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-                    }
-
-                    if (!endpoint) throw new Error('API endpoint URL is required.');
-
-                    const messagesPayload = chatHistory.map((msg, idx) => {
-                        let content = msg.content;
-                        if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
-                            content = `You have access to web search results to answer the user query.
+                        const contentsPayload = chatHistory.map((msg, idx) => {
+                            let msgContent = msg.content;
+                            if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
+                                const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                                msgContent = `You have access to web search results to answer the user query.
 Search Results:
 ${contextStr}
 
@@ -10218,61 +10497,138 @@ Instructions:
 3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
 
 User Query: ${msg.content}`;
-                        }
-                        if (msg.attachment) {
-                            if (msg.attachment.type.startsWith('image/')) {
-                                const contentArray = [
-                                    { type: 'text', text: content || 'Image attached below:' },
-                                    { type: 'image_url', image_url: { url: msg.attachment.data } }
-                                ];
-                                return {
-                                    role: msg.role,
-                                    content: contentArray
-                                };
-                            } else if (msg.attachment.isText) {
-                                return {
-                                    role: msg.role,
-                                    content: (content || '') + `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}`
-                                };
-                            } else {
-                                return {
-                                    role: msg.role,
-                                    content: (content || '') + `\n\n[Attached File Link: ${msg.attachment.name}]`
-                                };
                             }
+                            const parts = [{ text: msgContent || 'Attached file details below:' }];
+                            if (msg.attachment) {
+                                if (msg.attachment.type.startsWith('image/')) {
+                                    try {
+                                        const base64Data = msg.attachment.data.split(',')[1];
+                                        parts.push({
+                                            inlineData: {
+                                                mimeType: msg.attachment.type,
+                                                data: base64Data
+                                            }
+                                        });
+                                    } catch (e) {
+                                        console.error('Error parsing attachment base64', e);
+                                    }
+                                } else if (msg.attachment.extractedText) {
+                                    parts.push({ text: `\n\n[Content of attached file: ${msg.attachment.name}]\n\n${msg.attachment.extractedText}` });
+                                } else if (msg.attachment.isText) {
+                                    parts.push({ text: `\n\n[Content of attached file: ${msg.attachment.name}]\n\n${msg.attachment.data}` });
+                                } else {
+                                    parts.push({ text: `\n\n[Attached File Link: ${msg.attachment.name} (${msg.attachment.type})]` });
+                                }
+                            }
+                            return {
+                                role: msg.role === 'user' ? 'user' : 'model',
+                                parts: parts
+                            };
+                        });
+
+                        const res = await fetch(geminiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                contents: contentsPayload,
+                                systemInstruction: { parts: [{ text: systemPromptContent }] }
+                            }),
+                            signal: signal
+                        });
+
+                        if (!res.ok) {
+                            const errData = await res.json().catch(() => ({}));
+                            throw new Error(errData.error?.message || `HTTP ${res.status}`);
                         }
-                        return {
-                            role: msg.role,
-                            content: content
-                        };
-                    });
+                        const data = await res.json();
+                        responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
 
-                    const res = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: model,
-                            messages: messagesPayload
-                        }),
-                        signal: signal
-                    });
+                    } else if (provider === 'openrouter' || provider === 'groq' || provider === 'custom') {
+                        if (provider === 'openrouter' && !endpoint) {
+                            endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+                        } else if (provider === 'groq' && !endpoint) {
+                            endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+                        }
 
-                    if (!res.ok) {
-                        const errData = await res.json().catch(() => ({}));
-                        throw new Error(errData.error?.message || `HTTP ${res.status}`);
-                    }
-                    const data = await res.json();
-                    responseText = data.choices?.[0]?.message?.content || 'No response generated.';
+                        if (!endpoint) throw new Error('API endpoint URL is required.');
 
-                } else if (provider === 'huggingface') {
-                    const hfUrl = `https://api-inference.huggingface.co/models/${model}`;
-                    let hfPrompt = prompt;
-                    if (searchResults && searchResults.length > 0) {
-                        const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
-                        hfPrompt = `You have access to web search results to answer the user query.
+                        const messagesPayload = [
+                            { role: 'system', content: systemPromptContent },
+                            ...chatHistory.map((msg, idx) => {
+                                let content = msg.content;
+                                if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
+                                    const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                                    content = `You have access to web search results to answer the user query.
+Search Results:
+${contextStr}
+
+Instructions:
+1. Synthesize the provided search results to summarize a clear, well-mannered, and accurate response.
+2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
+3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
+
+User Query: ${msg.content}`;
+                                }
+                                if (msg.attachment) {
+                                    if (msg.attachment.type.startsWith('image/')) {
+                                        const contentArray = [
+                                            { type: 'text', text: content || 'Image attached below:' },
+                                            { type: 'image_url', image_url: { url: msg.attachment.data } }
+                                        ];
+                                        return {
+                                            role: msg.role,
+                                            content: contentArray
+                                        };
+                                    } else if (msg.attachment.extractedText) {
+                                        return {
+                                            role: msg.role,
+                                            content: (content || '') + `\n\n[Content of attached file: ${msg.attachment.name}]\n\n${msg.attachment.extractedText}`
+                                        };
+                                    } else if (msg.attachment.isText) {
+                                        return {
+                                            role: msg.role,
+                                            content: (content || '') + `\n\n[Content of attached file: ${msg.attachment.name}]\n\n${msg.attachment.data}`
+                                        };
+                                    } else {
+                                        return {
+                                            role: msg.role,
+                                            content: (content || '') + `\n\n[Attached File Link: ${msg.attachment.name}]`
+                                        };
+                                    }
+                                }
+                                return {
+                                    role: msg.role,
+                                    content: content
+                                };
+                            })
+                        ];
+
+                        const res = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${apiKey}`
+                            },
+                            body: JSON.stringify({
+                                model: model,
+                                messages: messagesPayload
+                            }),
+                            signal: signal
+                        });
+
+                        if (!res.ok) {
+                            const errData = await res.json().catch(() => ({}));
+                            throw new Error(errData.error?.message || `HTTP ${res.status}`);
+                        }
+                        const data = await res.json();
+                        responseText = data.choices?.[0]?.message?.content || 'No response generated.';
+
+                    } else if (provider === 'huggingface') {
+                        const hfUrl = `https://api-inference.huggingface.co/models/${model}`;
+                        let hfPrompt = `System instructions:\n${systemPromptContent}\n\n`;
+                        if (searchResults && searchResults.length > 0) {
+                            const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                            hfPrompt += `You have access to web search results to answer the user query.
 Search Results:
 ${contextStr}
 
@@ -10282,37 +10638,119 @@ Instructions:
 3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
 
 User Query: ${prompt}`;
+                        } else {
+                            hfPrompt += `User Query: ${prompt}`;
+                        }
+
+                        const res = await fetch(hfUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${apiKey}`
+                              },
+                            body: JSON.stringify({ inputs: hfPrompt }),
+                            signal: signal
+                        });
+
+                        if (!res.ok) {
+                            throw new Error(`Inference call failed: HTTP ${res.status}`);
+                        }
+                        const data = await res.json();
+                        responseText = Array.isArray(data) ? (data[0]?.generated_text || JSON.stringify(data)) : (data.generated_text || JSON.stringify(data));
                     }
 
-                    const res = await fetch(hfUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        body: JSON.stringify({ inputs: hfPrompt }),
-                        signal: signal
+                    // Check for agent tool execution
+                    let toolRun = await handleAgentTools(responseText);
+                    if (toolRun && toolRun.success) {
+                        loopCount++;
+                        // Remove thinking bubble
+                        thinkingBubble.remove();
+
+                        // Create a gorgeous inline tool card to display execution in the chat window (Claude-style)
+                        const toolCard = document.createElement('div');
+                        toolCard.className = 'assistant-chat-bubble bot system-status';
+                        toolCard.style.background = 'rgba(37, 99, 235, 0.03)';
+                        toolCard.style.border = '1px solid var(--border-color)';
+                        toolCard.style.borderRadius = '12px';
+                        toolCard.style.padding = '10px 14px';
+                        toolCard.style.margin = '8px 0';
+                        toolCard.style.width = 'fit-content';
+                        toolCard.style.maxWidth = '85%';
+                        toolCard.style.alignSelf = 'flex-start';
+
+                        let iconName = 'play';
+                        let actionLabel = 'Executing Action';
+                        let statusText = 'Completed execution successfully.';
+
+                        if (toolRun.action === 'switch_tab') {
+                            iconName = 'layout';
+                            actionLabel = 'Switched UI Workspace';
+                            statusText = `Navigated user layout to <strong>${toolRun.param}</strong> tab.`;
+                        } else if (toolRun.action === 'web_search') {
+                            iconName = 'globe';
+                            actionLabel = 'Searched Online Knowledge';
+                            statusText = `Queried external web index for: <em>"${toolRun.param}"</em>`;
+                        } else if (toolRun.action === 'get_active_files') {
+                            iconName = 'files';
+                            actionLabel = 'Scanned Active Workspaces';
+                            statusText = `Audited loaded document counts across tool panels.`;
+                        }
+
+                        toolCard.innerHTML = `
+                            <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:20px;">
+                                <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.8rem; color:var(--accent-color);">
+                                    <i data-lucide="${iconName}" style="width:14px; height:14px;"></i>
+                                    <span>${actionLabel}</span>
+                                </div>
+                                <span style="font-size:0.65rem; color:#22c55e; font-weight:600; text-transform:uppercase; display:flex; align-items:center; gap:3px;">
+                                    <i data-lucide="check" style="width:10px; height:10px;"></i> success
+                                </span>
+                            </div>
+                            <p style="font-size:0.8rem; margin:4px 0 0 0; color:var(--text-secondary); line-height: 1.4;">${statusText}</p>
+                        `;
+
+                        assistantChatLog.appendChild(toolCard);
+                        lucide.createIcons({ root: toolCard });
+
+                        // Append assistant tool invocation response
+                        chatHistory.push({
+                            role: 'assistant',
+                            content: responseText
+                        });
+                        chatHistory.push({
+                            role: 'user',
+                            content: `[SYSTEM TOOL EXECUTION RESULT]: ${toolRun.result}\nPlease respond to the user based on this result.`
+                        });
+
+                        // Re-add thinking bubble for next iteration
+                        thinkingBubble.innerHTML = `
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <i data-lucide="loader-2" class="spin" style="width:16px; color:var(--accent-color);"></i>
+                                <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Executing tool & thinking...</span>
+                            </div>
+                        `;
+                        assistantChatLog.appendChild(thinkingBubble);
+                        lucide.createIcons();
+                        scrollChatToBottom();
+
+                        // Loop back to fetch new response from model
+                        continue;
+                    }
+
+                    // Remove thinking bubble
+                    thinkingBubble.remove();
+
+                    // Append assistant final response to history
+                    chatHistory.push({
+                        role: 'assistant',
+                        content: responseText,
+                        searchResults: searchResults,
+                        timestamp: new Date().toISOString()
                     });
-
-                    if (!res.ok) {
-                        throw new Error(`Inference call failed: HTTP ${res.status}`);
-                    }
-                    const data = await res.json();
-                    responseText = Array.isArray(data) ? (data[0]?.generated_text || JSON.stringify(data)) : (data.generated_text || JSON.stringify(data));
+                    saveCurrentConversation();
+                    renderChatHistory();
+                    break;
                 }
-
-                // Remove thinking bubble
-                thinkingBubble.remove();
-
-                // Append assistant response to history
-                chatHistory.push({
-                    role: 'assistant',
-                    content: responseText,
-                    searchResults: searchResults,
-                    timestamp: new Date().toISOString()
-                });
-                saveCurrentConversation();
-                renderChatHistory();
 
             } catch (err) {
                 if (err.name === 'AbortError') {
