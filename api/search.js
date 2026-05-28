@@ -9,16 +9,32 @@ export default async function handler(req, res) {
   }
 
   const query = req.query.q || req.query.query || req.body?.query;
+  const location = req.query.location || req.body?.location;
 
   if (!query) {
     return res.status(400).json({ error: 'Search query parameter (q) is required.' });
+  }
+
+  // Augment search query with location if it has local-intent and location is provided
+  let searchQuery = query;
+  if (location) {
+    const localKeywords = ['weather', 'time', 'news', 'today', 'temp', 'forecast', 'local', 'current', 'hour', 'date'];
+    const queryLower = query.toLowerCase();
+    const isLocal = localKeywords.some(keyword => queryLower.includes(keyword));
+    if (isLocal) {
+      const locationParts = location.split(',').map(p => p.trim().toLowerCase());
+      const alreadyHasLocation = locationParts.some(part => part && queryLower.includes(part));
+      if (!alreadyHasLocation) {
+        searchQuery = `${query} in ${location}`;
+      }
+    }
   }
 
   const results = [];
 
   try {
     // 1. Try Google Search
-    const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
     const googleRes = await fetch(googleUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -54,7 +70,7 @@ export default async function handler(req, res) {
     // 2. Fallback to DuckDuckGo Lite if Google returned nothing
     if (results.length === 0) {
       console.log('Google search returned no hits. Falling back to DuckDuckGo Lite...');
-      const ddgUrl = `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(query)}`;
+      const ddgUrl = `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(searchQuery)}`;
       const ddgRes = await fetch(ddgUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
