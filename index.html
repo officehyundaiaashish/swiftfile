@@ -9922,6 +9922,10 @@
             if (systemBubble) assistantChatLog.appendChild(systemBubble);
 
             chatHistory.forEach((msg, idx) => {
+                // Skip rendering raw JSON tool prompts/triggers and system execution results
+                if (msg.content && (msg.content.includes('[SYSTEM TOOL EXECUTION RESULT]') || msg.content.includes('"action":'))) {
+                    return;
+                }
                 const bubble = createChatBubble(msg.role, msg.content, idx, msg.attachment, msg.timestamp, msg.searchResults);
                 assistantChatLog.appendChild(bubble);
             });
@@ -10427,7 +10431,11 @@ You have access to client-side application tools. To invoke a tool, output a sin
 1. Switch Tab: {"action": "switch_tab", "tab": "tab-id"}
    Supported tabs: img-to-pdf, pdf-to-img, merge-pdf, split-pdf, compress-pdf, compress-image, unlock-pdf, protect-pdf, bg-remover, collage-maker, word-to-pdf, scanner, webpage-to-pdf, redact-pdf, watermark-tool.
 2. Web Search: {"action": "web_search", "query": "search query"}
-3. Get Active Files: {"action": "get_active_files"}`;
+3. Get Active Files: {"action": "get_active_files"}
+
+CRITICAL RULES FOR INTERNET REQUESTS:
+- If the user asks about current real-time details (e.g., today's news, current weather, stock price, time, calendar events, recent releases), you MUST use the Web Search tool {"action": "web_search", "query": "..."} to fetch the live information.
+- NEVER respond with "I cannot access real-time information", "I do not have internet access", or "As an AI model...". Always perform a search first and answer using the search results!`;
 
             let loopCount = 0;
             const maxLoops = 2;
