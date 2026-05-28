@@ -1,4 +1,3550 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#f0f4f8">
+    <title>Swift File Tools - PDF & Image Tools</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="description" content="A modern, minimal, and beautiful PDF to Image and Image to PDF converter.">
+
+    <!-- Anti-Automation Script -->
+    <script>
+        (function () {
+            function blockAutomation() {
+                document.documentElement.innerHTML = '<div style="font-family:sans-serif;text-align:center;padding:50px;color:#1e293b;background:#f0f4f8;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;"><h1>Access Denied</h1><p style="margin-top:10px;color:#475569;">Automated access is not permitted on this tool.</p></div>';
+                try { window.stop(); } catch (e) { }
+            }
+
+            if (navigator.webdriver) { blockAutomation(); }
+
+            var vars = ['_phantom', '__nightmare', '_selenium', 'callPhantom', 'callSelenium', '_Selenium_IDE_Recorder', '__playwright', '__puppeteer', 'webdriver'];
+            for (var i = 0; i < vars.length; i++) { if (window[vars[i]]) { blockAutomation(); } }
+            if (document.__webdriver_evaluate || document.$cdc_asdjflasutopfhvcZLmcfl_) { blockAutomation(); }
+        })();
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://docs.opencv.org/4.5.4/opencv.js" async onload="onOpenCvReady()"></script>
+    <style>
+        :root {
+            /* Color Palette - Light Theme (Innovative Solid) */
+            --bg-color: #f0f4f8;
+            --surface-color: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-shadow: rgba(37, 99, 235, 0.25);
+            --accent-alpha: rgba(37, 99, 235, 0.08);
+            --accent-border-alpha: rgba(37, 99, 235, 0.2);
+            --glass-blur: none;
+            --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --input-bg: #f8fafc;
+
+            /* Animation Constants */
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dark-theme {
+            --bg-color: #0b1120;
+            --surface-color: #1e293b;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-hover: #60a5fa;
+            --accent-shadow: rgba(59, 130, 246, 0.35);
+            --accent-alpha: rgba(59, 130, 246, 0.12);
+            --accent-border-alpha: rgba(59, 130, 246, 0.3);
+            --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            --card-bg: #1e293b;
+            --input-bg: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        input,
+        textarea,
+        [contenteditable="true"] {
+            -webkit-user-select: auto;
+            user-select: auto;
+            cursor: text;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background-color 0.5s ease;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Background Animated Blobs */
+        .background-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent-alpha) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            top: -150px;
+            left: -150px;
+        }
+
+        .blob-2 {
+            bottom: -150px;
+            right: -150px;
+        }
+
+        .blob-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Header */
+        header {
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-img {
+            height: 32px;
+            width: 32px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .dark-theme .logo-img {
+            box-shadow: none;
+        }
+
+        .logo-icon {
+            color: var(--accent-color);
+        }
+
+        .icon-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            backdrop-filter: var(--glass-blur);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+        #theme-toggle,
+        #history-btn {
+            width: 44px;
+            height: 44px;
+            padding: 0 !important;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #theme-toggle i,
+        #history-btn i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.04em;
+            background: linear-gradient(to right, var(--text-primary), var(--accent-color), var(--text-primary));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textShine 4s linear infinite;
+        }
+
+        @keyframes textShine {
+            0% {
+                background-position: 0% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tabs */
+        .converter-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tab-btn {
+            flex: 0 1 auto;
+            min-width: 160px;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            backdrop-filter: var(--glass-blur);
+        }
+
+        .bg-controls-panel {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .bg-option-tabs {
+            display: flex;
+            background: var(--input-bg);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .bg-option-btn {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .bg-option-btn.active {
+            background: white;
+            color: var(--accent-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-theme .bg-option-btn.active {
+            background: var(--surface-color);
+            color: white;
+        }
+
+        .gradient-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .gradient-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .gradient-swatch.active {
+            border-color: var(--accent-color);
+        }
+
+        .secondary-btn {
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-border-alpha);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .secondary-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .preview-tab-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .preview-tab-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px var(--accent-shadow);
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Cropper Overrides */
+        .cropper-view-box,
+        .cropper-face {
+            border-radius: 0;
+        }
+
+        .cropper-line,
+        .cropper-point {
+            background-color: var(--accent-color);
+        }
+
+        .cropper-point.point-se {
+            width: 10px;
+            height: 10px;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 15px var(--accent-shadow);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn:hover:not(.active) {
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+            background: var(--accent-alpha);
+            transform: translateY(-2px);
+        }
+
+        /* Converter Card */
+        .converter-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .large-preview-box {
+            position: relative;
+            background: var(--input-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+            transition: var(--transition);
+        }
+
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--accent-color), transparent);
+            box-shadow: 0 0 15px var(--accent-color);
+            z-index: 10;
+            display: none;
+            animation: scan 2s ease-in-out infinite;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        @keyframes scan {
+            0% {
+                transform: translateY(0) translateZ(0);
+            }
+
+            50% {
+                transform: translateY(500px) translateZ(0);
+            }
+
+            100% {
+                transform: translateY(0) translateZ(0);
+            }
+        }
+
+        .btn-pro-ai {
+            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
+        }
+
+        .btn-pro-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5) !important;
+        }
+
+        .btn-swift-engine {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2dd4bf 100%) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3) !important;
+        }
+
+        .btn-swift-engine:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4) !important;
+        }
+
+        .btn-download-success {
+            background: linear-gradient(135deg, #22c55e 0%, #10b981 100%) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4) !important;
+        }
+
+        .btn-download-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5) !important;
+        }
+
+        .bg-loader-content {
+            z-index: 11;
+            text-align: center;
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 20px;
+            padding: 4rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--input-bg);
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--accent-color);
+            background: var(--accent-alpha);
+            box-shadow: 0 15px 30px -10px var(--accent-shadow);
+            transform: translateY(-2px);
+        }
+
+        .icon-wrapper {
+            width: 64px;
+            height: 64px;
+            background: var(--accent-alpha);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--accent-color);
+            transition: var(--transition);
+        }
+
+        .drop-zone:hover .icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .drop-zone h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .drop-zone p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Preview Area */
+        .preview-container {
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-header span {
+            font-weight: 600;
+        }
+
+        .text-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .text-btn.danger {
+            color: #ef4444;
+        }
+
+        .text-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .text-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .add-more-btn {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-more-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .add-more-btn:active {
+            transform: translateY(0);
+        }
+
+        .preview-scroll,
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: var(--input-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
+        }
+
+        .preview-scroll::-webkit-scrollbar,
+        .preview-grid::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .preview-scroll::-webkit-scrollbar-track,
+        .preview-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .preview-scroll::-webkit-scrollbar-thumb,
+        .preview-grid::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 99px;
+        }
+
+        .preview-scroll::-webkit-scrollbar-thumb:hover,
+        .preview-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
+        @media (max-width: 1000px) {
+
+            .preview-scroll,
+            .preview-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .preview-scroll,
+            .preview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            background: var(--surface-color);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, opacity 0.2s, box-shadow 0.2s;
+            aspect-ratio: 3/4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .preview-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 20px -10px var(--accent-shadow);
+        }
+
+        .preview-item.image-type {
+            aspect-ratio: 1/1;
+        }
+
+        .preview-item:active {
+            cursor: grabbing;
+        }
+
+        .preview-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            border-style: dashed;
+            border-color: var(--accent-color);
+        }
+
+        .preview-item.drag-over {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--accent-shadow);
+        }
+
+        .preview-item canvas,
+        .preview-item img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            pointer-events: none;
+            /* Let the parent handle drag */
+        }
+
+        .placeholder-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .placeholder-loader i {
+            animation: spin 1s linear infinite;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            z-index: 20;
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        .remove-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .rotate-btn {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        .rotate-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .page-badge,
+        .page-count-badge {
+            position: absolute;
+            bottom: 6px;
+            background: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            z-index: 15;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-badge {
+            left: 6px;
+        }
+
+        #redact-pages-container canvas {
+            max-width: 100%;
+            height: auto !important;
+            display: block;
+        }
+
+        .flex-mobile-stack {
+            display: flex;
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .flex-mobile-stack {
+                flex-direction: column;
+            }
+            .flex-mobile-stack button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .page-count-badge {
+            right: 6px;
+            background: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .primary-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 14px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px var(--accent-shadow);
+        }
+
+        .primary-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px var(--accent-shadow);
+        }
+
+        .add-more-btn {
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-border-alpha);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .clear-all-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .add-more-btn:hover {
+            background: var(--accent-border-alpha);
+            transform: translateY(-1px);
+        }
+
+        .clear-all-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface-color);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Notifications */
+        .notification-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+        }
+
+        .notification {
+            background: var(--surface-color);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-primary);
+            min-width: 300px;
+            max-width: 90vw;
+            transform: translateX(120%);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: all;
+            font-weight: 500;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .notification.success .notification-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .notification.error .notification-icon {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .notification.info .notification-icon {
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 600px) {
+            .notification-container {
+                top: auto;
+                bottom: 5rem;
+                right: 1rem;
+                left: 1rem;
+                align-items: center;
+            }
+
+            .notification {
+                min-width: 0;
+                width: 100%;
+                transform: translateY(150%);
+            }
+
+            .notification.show {
+                transform: translateY(0);
+            }
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px var(--accent-alpha);
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .converter-card {
+                padding: 1.5rem;
+                border-radius: 20px;
+            }
+
+            .drop-zone {
+                padding: 3rem 1rem;
+            }
+
+            .hero {
+                padding: 2rem 0;
+            }
+
+            .preview-scroll,
+            .preview-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero {
+                padding: 1rem 0;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+                padding: 0 1rem;
+            }
+
+            /* Mobile Tool Dropdown - Premium Custom Style */
+            .mobile-tool-selector {
+                display: block !important;
+                margin: 0 0 1.5rem 0 !important;
+                position: relative !important;
+                z-index: 1000 !important;
+            }
+
+            .tool-select-btn {
+                width: 100% !important;
+                background: white !important;
+                border: 1px solid rgba(0, 0, 0, 0.05) !important;
+                padding: 1.1rem 1.25rem !important;
+                border-radius: 20px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                color: var(--text-primary) !important;
+                font-weight: 600 !important;
+                font-size: 1rem !important;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04) !important;
+                border-left: 4px solid var(--accent-color) !important;
+            }
+
+            .dark-theme .tool-select-btn {
+                background: rgba(255, 255, 255, 0.04) !important;
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                border-left: 4px solid var(--accent-color) !important;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
+                /* backdrop-filter removed for performance */
+            }
+
+            .tool-dropdown-menu {
+                display: none !important;
+            }
+
+            .tool-option {
+                padding: 0.85rem 1.25rem !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+                color: var(--text-primary) !important;
+                font-weight: 500 !important;
+                font-size: 0.9rem !important;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
+                transition: background 0.2s !important;
+            }
+
+            .dark-theme .tool-option {
+                border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+            }
+
+            .tool-option:last-child {
+                border-bottom: none !important;
+            }
+
+            .tool-option:active {
+                background: var(--accent-alpha) !important;
+            }
+
+            .tool-option i {
+                width: 18px !important;
+                color: var(--accent-color) !important;
+            }
+
+            .converter-tabs {
+                display: flex !important;
+                overflow-x: auto !important;
+                gap: 10px !important;
+                padding: 0.5rem 2px !important;
+                margin-bottom: 1rem !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+            }
+
+            .converter-tabs::-webkit-scrollbar {
+                display: none !important;
+            }
+
+            .tab-btn {
+                flex-shrink: 0 !important;
+                padding: 0.75rem 1.25rem !important;
+                font-size: 0.85rem !important;
+                white-space: nowrap !important;
+            }
+
+            .converter-card {
+                padding: 1.5rem !important;
+                margin-top: 1rem !important;
+                border-radius: 28px !important;
+            }
+
+            .drop-zone {
+                padding: 4.5rem 1.25rem 3rem 1.25rem !important;
+                /* Extra top space */
+                margin: 0 0 2rem 0 !important;
+                min-height: 260px !important;
+            }
+
+            .icon-wrapper {
+                margin-top: 1.5rem !important;
+                /* Shift icon down */
+                margin-bottom: 1.5rem !important;
+            }
+
+            .hero {
+                padding: 2.5rem 0 1.5rem 0 !important;
+            }
+
+            .tab-btn i {
+                width: 16px;
+                height: 16px;
+            }
+
+            .converter-card {
+                padding: 1rem;
+                border-radius: 20px;
+            }
+
+            .drop-zone {
+                height: 160px;
+            }
+
+            .drop-zone h3 {
+                font-size: 1.1rem;
+            }
+
+            .drop-zone p {
+                font-size: 0.85rem;
+            }
+
+            .primary-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 0.875rem 1.5rem;
+                font-size: 0.95rem;
+            }
+
+            .header-content {
+                padding: 0.75rem 0 !important;
+            }
+
+            .logo {
+                font-size: 1.1rem !important;
+            }
+
+            #theme-toggle,
+            #history-btn {
+                padding: 0.5rem !important;
+                border-radius: 10px !important;
+                width: 36px !important;
+                height: 36px !important;
+            }
+
+            #theme-toggle i,
+            #history-btn i {
+                width: 18px !important;
+                height: 18px !important;
+            }
+
+            .preview-scroll,
+            .preview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .compression-settings>div[style*="display: grid"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .preview-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .preview-header div {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        /* Specialized Mobile Optimizations */
+        @media (max-width: 768px) {
+
+            .bg-tool-layout,
+            .collage-tool-layout {
+                grid-template-columns: 1fr !important;
+                gap: 1.5rem !important;
+            }
+
+            .bg-controls-panel {
+                width: 100% !important;
+                padding: 1.25rem !important;
+                background: rgba(255, 255, 255, 0.05) !important;
+                border: 1px solid var(--border-color) !important;
+            }
+
+            .large-preview-box {
+                min-height: 300px !important;
+                padding: 10px !important;
+            }
+
+            #bg-preview-img,
+            #collage-canvas {
+                max-height: 450px !important;
+            }
+
+            .converter-tabs {
+                display: flex !important;
+                overflow-x: auto !important;
+                white-space: nowrap !important;
+                justify-content: flex-start !important;
+                padding: 5px 2px !important;
+                gap: 8px !important;
+                scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .converter-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tab-btn {
+                flex: 0 0 auto !important;
+                padding: 10px 16px !important;
+                font-size: 0.85rem !important;
+                border-radius: 10px !important;
+            }
+
+            #collage-canvas-wrapper {
+                width: 100% !important;
+            }
+
+            /* Adjust grid controls for small screens */
+            .control-group div[style*="grid-template-columns"] {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+
+            .preview-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+            }
+
+            .drop-zone {
+                padding: 3rem 1.5rem !important;
+                border: 2px dashed var(--accent-border-alpha) !important;
+                background: var(--accent-alpha) !important;
+                margin: 0.5rem 0.5rem 2.5rem 0.5rem !important;
+                min-height: 220px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .drop-zone-content h3 {
+                font-size: 1.25rem !important;
+                margin-top: 1rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            .drop-zone-content p {
+                display: none !important;
+            }
+
+            .drop-zone-content .file-info {
+                font-size: 0.85rem !important;
+                color: var(--accent-color) !important;
+                font-weight: 600 !important;
+                display: block !important;
+                margin-top: 1rem !important;
+                padding: 0.5rem !important;
+                border-top: 1px dashed var(--accent-border-alpha) !important;
+            }
+
+            .file-info::before {
+                content: "Tap to browse files";
+            }
+
+            .file-info span,
+            .file-info {
+                visibility: hidden;
+                position: relative;
+            }
+
+            .file-info::after {
+                content: "Tap to browse files";
+                visibility: visible;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                white-space: nowrap;
+            }
+
+            .converter-card {
+                padding: 0.75rem !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                margin-bottom: 3rem !important;
+                /* More space before footer */
+            }
+
+            .tab-content {
+                padding: 0.75rem !important;
+                border-radius: 32px !important;
+            }
+
+            .hero h1 {
+                font-size: 2rem !important;
+            }
+
+            .hero p {
+                font-size: 0.9rem !important;
+                padding: 0 1rem !important;
+            }
+        }
+
+        @media (max-width: 400px) {
+
+            .preview-scroll,
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .converter-card {
+                padding: 1.25rem;
+            }
+        }
+
+        /* Slider Customization */
+        #compression-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        #compression-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            background: var(--accent-hover);
+        }
+
+        /* Word Document Preview Styles */
+        .word-preview-wrapper {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 100%;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+        }
+
+        .light-theme .word-preview-wrapper {
+            background: #f7f9fb;
+        }
+
+        .dark-theme .word-preview-wrapper {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .word-preview-paper {
+            background: white;
+            color: #333333;
+            width: 100%;
+            max-width: 800px;
+            min-height: 1000px;
+            padding: 3rem 4rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            text-align: left;
+            font-family: 'Outfit', 'Inter', 'Calibri', 'Arial', sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+        }
+
+        .word-preview-paper h1,
+        .word-preview-paper h2,
+        .word-preview-paper h3,
+        .word-preview-paper h4 {
+            color: #111111;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .word-preview-paper h1 {
+            font-size: 2rem;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 0.5rem;
+        }
+
+        .word-preview-paper h2 {
+            font-size: 1.5rem;
+        }
+
+        .word-preview-paper h3 {
+            font-size: 1.25rem;
+        }
+
+        .word-preview-paper p {
+            margin-bottom: 1rem;
+        }
+
+        .word-preview-paper table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .word-preview-paper th,
+        .word-preview-paper td {
+            border: 1px solid #dddddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .word-preview-paper th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        #scanner-start-screen {
+            min-height: auto !important;
+            height: auto !important;
+            padding: 2.5rem 1.5rem !important;
+        }
+
+        /* Swift Assistant Chat Bubble Styles */
+        .assistant-chat-bubble {
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            max-width: 85%;
+            position: relative;
+            animation: bubbleFadeIn 0.3s ease-out;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            -webkit-user-select: text;
+            user-select: text;
+            cursor: text;
+        }
+        .assistant-chat-bubble p,
+        .assistant-chat-bubble span,
+        .assistant-chat-bubble li,
+        .assistant-chat-bubble div {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        #assistant-chat-log {
+            -webkit-user-select: text;
+            user-select: text;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
+        }
+        #assistant-chat-log::-webkit-scrollbar {
+            width: 6px;
+        }
+        #assistant-chat-log::-webkit-scrollbar-thumb {
+            background: rgba(128, 128, 128, 0.25);
+            border-radius: 10px;
+        }
+        #assistant-chat-log::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 12px 0;
+        }
+        #assistant-input {
+            -webkit-user-select: auto !important;
+            user-select: auto !important;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
+            overflow-y: hidden !important;
+        }
+        #assistant-input::-webkit-scrollbar {
+            width: 4px;
+            background: transparent;
+        }
+        #assistant-input::-webkit-scrollbar-thumb {
+            background: rgba(128, 128, 128, 0.25);
+            border-radius: 4px;
+        }
+        #assistant-input::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 6px 0;
+        }
+        #search-web-toggle.active-on {
+            background: var(--accent-color) !important;
+            color: white !important;
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 2px 8px var(--accent-shadow) !important;
+        }
+        #assistant-send-btn,
+        #assistant-send-btn:focus,
+        #assistant-send-btn:active,
+        #assistant-send-btn:focus-visible {
+            outline: none !important;
+            border: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+        #search-web-toggle.active-auto {
+            background: var(--accent-alpha) !important;
+            color: var(--accent-color) !important;
+            border-color: var(--accent-border-alpha) !important;
+        }
+
+        @keyframes bubbleFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .assistant-chat-bubble.user {
+            background: var(--accent-alpha);
+            border: 1px solid var(--accent-border-alpha);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .assistant-chat-bubble.bot {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .assistant-chat-bubble.system {
+            background: rgba(128, 128, 128, 0.05);
+            border: 1px solid var(--border-color);
+            align-self: center;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .chat-bubble-action-btn {
+            background: none !important;
+            border: none !important;
+            cursor: pointer;
+            padding: 2px !important;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            width: 14px;
+            height: 14px;
+        }
+        .chat-bubble-action-btn:hover {
+            color: var(--accent-color);
+        }
+        .chat-bubble-action-btn i {
+            width: 8px;
+            height: 8px;
+        }
+
+        .assistant-chat-bubble pre {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            user-select: text;
+        }
+
+        .assistant-chat-bubble code {
+            font-family: monospace;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            user-select: text;
+        }
+
+        /* Custom Context Menu Styles */
+        .custom-context-menu {
+            position: fixed;
+            z-index: 10000;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 140px;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .custom-context-menu.show {
+            display: flex !important;
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .menu-item {
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .menu-item i {
+            width: 16px;
+            height: 16px;
+            color: var(--text-secondary);
+        }
+
+        .menu-item:hover:not(:disabled) {
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+        }
+
+        .menu-item:hover:not(:disabled) i {
+            color: var(--accent-color);
+        }
+
+        .menu-item:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Mobile View styles for Swift Assistant */
+        .mobile-only-btn {
+            display: none !important;
+        }
+        @media (max-width: 768px) {
+            .mobile-only-btn {
+                display: flex !important;
+            }
+            /* ===== Fullscreen Mode ===== */
+            #swift-assistant.mobile-fullscreen {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+                z-index: 9999 !important;
+                background: var(--bg-color) !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            /* Outer wrapper (the card div) */
+            #swift-assistant.mobile-fullscreen > div,
+            #swift-assistant.mobile-fullscreen .assistant-outer-wrap {
+                height: 100% !important;
+                max-height: 100% !important;
+                min-height: 0 !important;
+                border-radius: 0 !important;
+                border: none !important;
+                padding: 10px 10px 18px 10px !important;
+                padding-bottom: calc(env(safe-area-inset-bottom, 12px) + 14px) !important;
+                gap: 0 !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
+                flex: 1 !important;
+                overflow: hidden !important;
+            }
+            /* Inner wrapper (the chat interface container) */
+            #swift-assistant.mobile-fullscreen .assistant-inner-wrap {
+                flex: 1 !important;
+                min-height: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0 !important;
+                overflow: hidden !important;
+            }
+            /* Chat log takes remaining space */
+            #swift-assistant.mobile-fullscreen #assistant-chat-log {
+                flex: 1 !important;
+                height: 0 !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                margin-top: 6px !important;
+                padding: 10px !important;
+                border-radius: 14px !important;
+            }
+            /* Input bar pinned at bottom - NEVER collapse */
+            #swift-assistant.mobile-fullscreen .assistant-input-bar {
+                flex-shrink: 0 !important;
+                padding-top: 8px !important;
+                padding-bottom: 0 !important;
+            }
+            /* ===== Non-fullscreen mobile ===== */
+            #swift-assistant > div {
+                padding: 0.75rem !important;
+                border-radius: 16px !important;
+                gap: 0.75rem !important;
+                min-height: 400px !important;
+            }
+            #assistant-chat-log {
+                padding: 0.75rem !important;
+                max-height: 45vh !important;
+            }
+            /* ===== Input row (shared) ===== */
+            .assistant-input-row {
+                gap: 4px !important;
+                width: 100% !important;
+                display: flex !important;
+                align-items: flex-end !important;
+                flex-wrap: nowrap !important;
+            }
+            .assistant-input-row > div {
+                min-width: 0 !important;
+                flex: 1 !important;
+            }
+            .assistant-input-row button {
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                flex-shrink: 0 !important;
+                padding: 0 !important;
+                border-radius: 50% !important;
+            }
+            .assistant-input-row button i {
+                width: 14px !important;
+                height: 14px !important;
+            }
+            #assistant-input {
+                padding: 8px 10px !important;
+                font-size: 0.85rem !important;
+                border-radius: 12px !important;
+                height: 34px !important;
+                min-height: 34px !important;
+                max-height: 34px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+                scrollbar-width: thin !important;
+                overflow-y: hidden !important;
+            }
+            #assistant-settings-popover, #assistant-history-popover {
+                width: calc(100vw - 24px) !important;
+                max-width: 280px !important;
+                right: 0 !important;
+            }
+        }
+
+        /* History Drawer Styles */
+        .history-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .history-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .history-drawer {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            max-width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background: var(--surface-color);
+            border-left: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            z-index: 10000;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: var(--glass-blur);
+            overscroll-behavior: contain;
+        }
+        .history-drawer.open {
+            right: 0;
+        }
+        .history-drawer-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-drawer-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+        .history-drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overscroll-behavior: contain;
+        }
+        .history-drawer:has(.history-clear-dialog.open) .history-drawer-content {
+            overflow-y: hidden !important;
+        }
+        .history-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--text-secondary);
+            gap: 1rem;
+            padding: 2rem;
+        }
+        .history-empty-state i {
+            width: 48px;
+            height: 48px;
+            opacity: 0.5;
+            color: var(--accent-color);
+        }
+        .history-item {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: var(--transition);
+        }
+        .history-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-border-alpha);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .history-item-top {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .history-thumbnail {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border-color);
+        }
+        .history-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .history-thumbnail i {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-color);
+        }
+        .history-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .history-filename {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+        .history-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 0.25rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.5rem;
+        }
+        .history-action-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .history-action-btn:hover {
+            background: var(--border-color);
+            border-color: var(--text-secondary);
+        }
+        .history-action-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        .history-drawer-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface-color);
+        }
+        
+        /* Custom Clear Warning Dialog inside Panel */
+        .history-clear-dialog {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 10100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .history-clear-dialog.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .history-clear-dialog-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .history-clear-dialog.open .history-clear-dialog-card {
+            transform: scale(1);
+        }
+        .history-clear-dialog-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .history-clear-dialog-icon i {
+            width: 24px;
+            height: 24px;
+        }
+        .history-clear-dialog-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .history-clear-dialog-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+        .history-clear-dialog-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+    </style>
+    <script>
+        let lastActiveTabId = 'swift-assistant';
+        function switchTab(tabId) {
+            if (tabId !== 'swift-assistant') {
+                lastActiveTabId = tabId;
+            }
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === tabId);
+            });
+
+            // Sync Mobile Dropdown Label if needed
+            const toolLabels = {
+                'img-to-pdf': 'Image to PDF',
+                'pdf-to-img': 'PDF to Image',
+                'merge-pdf': 'Merge PDF',
+                'split-pdf': 'Split PDF',
+                'compress-pdf': 'Compress PDF',
+                'compress-image': 'Compress Image',
+                'unlock-pdf': 'Unlock PDF',
+                'protect-pdf': 'Protect PDF',
+                'bg-remover': 'Remove BG',
+                'collage-maker': 'Collage Maker',
+                'word-to-pdf': 'Word to PDF',
+                'scanner': 'Scanner',
+                'webpage-to-pdf': 'Webpage to PDF',
+                'redact-pdf': 'Redact PDF',
+                'watermark-tool': 'Watermark',
+                'swift-assistant': 'Swift Assistant'
+            };
+            const toolIcons = {
+                'img-to-pdf': 'image',
+                'pdf-to-img': 'file-image',
+                'merge-pdf': 'copy',
+                'split-pdf': 'scissors',
+                'compress-pdf': 'shrink',
+                'compress-image': 'image-plus',
+                'unlock-pdf': 'unlock',
+                'protect-pdf': 'lock',
+                'bg-remover': 'eraser',
+                'collage-maker': 'layout',
+                'word-to-pdf': 'file-up',
+                'scanner': 'scan',
+                'webpage-to-pdf': 'globe',
+                'redact-pdf': 'eye-off',
+                'watermark-tool': 'stamp',
+                'swift-assistant': 'message-square'
+            };
+
+            const label = document.getElementById('current-tool-label');
+            const icon = document.getElementById('current-tool-icon');
+            if (label && toolLabels[tabId]) {
+                label.textContent = toolLabels[tabId];
+                if (icon) {
+                    icon.setAttribute('data-lucide', toolIcons[tabId]);
+                }
+            }
+
+            if (tabId === 'swift-assistant') {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('swift-assistant').classList.add('mobile-fullscreen');
+                    if (window.history.state?.panel !== 'assistant') {
+                        window.history.pushState({ panel: 'assistant' }, '');
+                    }
+                }
+                setTimeout(() => {
+                    const inputField = document.getElementById('assistant-input');
+                    if (inputField) {
+                        inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        inputField.focus();
+                    }
+                }, 100);
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Mobile Tool Dropdown Logic removed as requested
+
+        function handleMobileToolSelect(tabId, labelText, iconName) {
+            switchTab(tabId);
+        }
+    </script>
+</head>
+
+<body class="light-theme">
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="logo.png" alt="Swift File" class="logo-img">
+                <span>Swift File</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="history-btn" class="icon-btn" title="View History">
+                    <i data-lucide="history"></i>
+                </button>
+                <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                    <i data-lucide="sun" id="sun-icon" class="hidden"></i>
+                    <i data-lucide="moon" id="moon-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Swift File Tools</h1>
+            <p>Convert your documents and images instantly, securely in your browser.</p>
+        </section>
+
+        <!-- Mobile Tool Selector (Custom Dropdown) -->
+        <div class="mobile-tool-selector hidden" id="mobile-tool-selector">
+            <div class="tool-select-btn">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i id="current-tool-icon" data-lucide="message-square"></i>
+                    <span id="current-tool-label">Swift Assistant</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="converter-tabs">
+            <button class="tab-btn active" data-tab="swift-assistant" onclick="switchTab('swift-assistant')">
+                <i data-lucide="message-square"></i> Swift Assistant
+            </button>
+            <button class="tab-btn" data-tab="img-to-pdf" onclick="switchTab('img-to-pdf')">
+                <i data-lucide="image"></i> Image to PDF
+            </button>
+            <button class="tab-btn" data-tab="pdf-to-img" onclick="switchTab('pdf-to-img')">
+                <i data-lucide="file-text"></i> PDF to Image
+            </button>
+            <button class="tab-btn" data-tab="merge-pdf" onclick="switchTab('merge-pdf')">
+                <i data-lucide="copy"></i> Merge PDF
+            </button>
+            <button class="tab-btn" data-tab="split-pdf" onclick="switchTab('split-pdf')">
+                <i data-lucide="scissors"></i> Split PDF
+            </button>
+            <button class="tab-btn" data-tab="compress-pdf" onclick="switchTab('compress-pdf')">
+                <i data-lucide="minimize-2"></i> Compress PDF
+            </button>
+            <button class="tab-btn" data-tab="compress-image" onclick="switchTab('compress-image')">
+                <i data-lucide="image"></i> Compress Image
+            </button>
+            <button class="tab-btn" data-tab="unlock-pdf" onclick="switchTab('unlock-pdf')">
+                <i data-lucide="unlock"></i> Unlock PDF
+            </button>
+            <button class="tab-btn" data-tab="protect-pdf" onclick="switchTab('protect-pdf')">
+                <i data-lucide="lock"></i> Protect PDF
+            </button>
+            <button class="tab-btn" data-tab="bg-remover" onclick="switchTab('bg-remover')">
+                <i data-lucide="image-minus"></i> Remove BG
+            </button>
+            <button class="tab-btn" data-tab="collage-maker" onclick="switchTab('collage-maker')">
+                <i data-lucide="layout"></i> Collage Maker
+            </button>
+            <button class="tab-btn" data-tab="word-to-pdf" onclick="switchTab('word-to-pdf')">
+                <i data-lucide="file-up"></i> Word to PDF
+            </button>
+            <button class="tab-btn" data-tab="scanner" onclick="switchTab('scanner')">
+                <i data-lucide="scan"></i> Scanner
+            </button>
+            <button class="tab-btn" data-tab="webpage-to-pdf" onclick="switchTab('webpage-to-pdf')">
+                <i data-lucide="globe"></i> Webpage to PDF
+            </button>
+            <button class="tab-btn" data-tab="redact-pdf" onclick="switchTab('redact-pdf')">
+                <i data-lucide="eye-off"></i> Redact PDF
+            </button>
+            <button class="tab-btn" data-tab="watermark-tool" onclick="switchTab('watermark-tool')">
+                <i data-lucide="stamp"></i> Watermark
+            </button>
+        </div>
+
+        <div class="converter-card">
+            <!-- Image to PDF Section -->
+            <div id="img-to-pdf" class="tab-content">
+                <div class="drop-zone" id="img-drop-zone">
+                    <input type="file" id="img-input" accept="image/*" multiple hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="image"></i>
+                        </div>
+                        <h3>Upload Images</h3>
+                        <p>Drag and drop multiple images or click to browse</p>
+                        <span class="file-info">JPG, PNG, WebP, SVG, GIF, BMP, TIFF supported</span>
+                    </div>
+                </div>
+
+                <div id="img-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="img-count">0 images selected</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="add-more-img" class="add-more-btn"><i data-lucide="plus"
+                                    style="width:14px;"></i> Add More</button>
+                            <button id="clear-img" class="text-btn danger">Clear All</button>
+                        </div>
+                    </div>
+                    <div class="preview-grid" id="img-previews"></div>
+                    <div class="action-bar">
+                        <button id="convert-img-btn" class="primary-btn">
+                            <span>Generate PDF</span>
+                            <i data-lucide="file-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF to Image Section -->
+            <div id="pdf-to-img" class="tab-content">
+                <div class="drop-zone" id="pdf-drop-zone">
+                    <input type="file" id="pdf-input" accept="application/pdf" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="upload-cloud"></i>
+                        </div>
+                        <h3>Upload PDF</h3>
+                        <p>Drag and drop or click to browse</p>
+                        <span class="file-info">Maximum file size: 100MB</span>
+                    </div>
+                </div>
+
+                <div id="pdf-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="pdf-filename">Files Ready</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="add-more-pdf" class="add-more-btn"><i data-lucide="plus"
+                                    style="width:14px;"></i> Add More</button>
+                            <button id="clear-pdf" class="text-btn danger">Clear All</button>
+                        </div>
+                    </div>
+                    <div class="preview-scroll" id="pdf-previews"></div>
+                    <div class="action-bar">
+                        <button id="convert-pdf-btn" class="primary-btn">
+                            <span>Convert to Images</span>
+                            <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Merge PDF Section -->
+            <div id="merge-pdf" class="tab-content">
+                <div class="drop-zone" id="merge-drop-zone">
+                    <input type="file" id="merge-input" accept="application/pdf" multiple hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="layers"></i>
+                        </div>
+                        <h3>Upload Multiple PDFs</h3>
+                        <p>Drag and drop several PDFs to merge them into one</p>
+                        <span class="file-info">Combine reports, books, or documents</span>
+                    </div>
+                </div>
+
+                <div id="merge-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="merge-count">0 files selected</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="add-more-merge" class="add-more-btn"><i data-lucide="plus"
+                                    style="width:14px;"></i> Add More</button>
+                            <button id="clear-merge" class="text-btn danger">Clear All</button>
+                        </div>
+                    </div>
+                    <div class="preview-grid" id="merge-previews"></div>
+                    <div class="action-bar">
+                        <button id="convert-merge-btn" class="primary-btn">
+                            <span>Merge & Download</span>
+                            <i data-lucide="merge"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Split PDF Section -->
+            <div id="split-pdf" class="tab-content">
+                <div class="drop-zone" id="split-drop-zone">
+                    <input type="file" id="split-input" accept="application/pdf" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="scissors"></i>
+                        </div>
+                        <h3>Upload PDF to Split</h3>
+                        <p>Drag and drop a PDF to split it into individual pages</p>
+                        <span class="file-info">Perfect for separating combined documents</span>
+                    </div>
+                </div>
+
+                <div id="split-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="split-filename">Files Ready</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="add-more-split" class="add-more-btn"><i data-lucide="plus"
+                                    style="width:14px;"></i> Add More</button>
+                            <button id="clear-split" class="text-btn danger">Clear All</button>
+                        </div>
+                    </div>
+                    <div class="preview-scroll" id="split-previews"></div>
+                    <div class="action-bar">
+                        <button id="convert-split-btn" class="primary-btn">
+                            <span>Split into Individual Pages</span>
+                            <i data-lucide="scissors"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compress PDF Section -->
+            <div id="compress-pdf" class="tab-content">
+                <div class="drop-zone" id="compress-drop-zone">
+                    <input type="file" id="compress-input" accept="application/pdf" multiple hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="minimize-2"></i>
+                        </div>
+                        <h3>Compress PDF</h3>
+                        <p>Reduce file size while maintaining quality</p>
+                        <span class="file-info">Optimize your PDF for email and web</span>
+                    </div>
+                </div>
+
+                <div id="compress-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="compress-filename">Files Ready</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="add-more-compress" class="add-more-btn"><i data-lucide="plus"
+                                    style="width:14px;"></i> Add More</button>
+                            <button id="clear-compress" class="text-btn danger">Clear All</button>
+                        </div>
+                    </div>
+
+                    <div class="compression-settings"
+                        style="margin: 2rem 0; background: var(--input-bg); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border-color);">
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center;">
+                            <span style="font-weight: 600;">Compression Strength</span>
+                            <span id="compression-value"
+                                style="background: var(--accent-color); color:white; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">50%</span>
+                        </div>
+                        <input type="range" id="compression-slider" min="10" max="90" value="50"
+                            style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+                            <div
+                                style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 16px; text-align: center; border: 1px solid var(--border-color);">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">
+                                    Original Size</div>
+                                <div id="original-size-text" style="font-weight: 700; font-size: 1.1rem;">0 KB</div>
+                            </div>
+                            <div
+                                style="background: var(--accent-alpha); padding: 1rem; border-radius: 16px; text-align: center; border: 1px solid var(--accent-border-alpha);">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">
+                                    Estimated Size</div>
+                                <div id="estimated-size-text"
+                                    style="font-weight: 700; font-size: 1.1rem; color: var(--accent-color);">0 KB</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-scroll" id="compress-previews" style="margin-bottom: 2rem;"></div>
+
+                    <div class="action-bar">
+                        <button id="convert-compress-btn" class="primary-btn btn-download-success"
+                            style="width: 100%; justify-content: center;">
+                            <span>Compress & Download</span>
+                            <i data-lucide="download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Background Remover Section -->
+            <div id="bg-remover" class="tab-content">
+                <div class="drop-zone" id="bg-drop-zone">
+                    <input type="file" id="bg-input" accept="image/*" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="image-minus"></i>
+                        </div>
+                        <h3>Remove Background</h3>
+                        <p>Instant & Accurate AI Background Removal</p>
+                        <span class="file-info">JPG, PNG, WebP, SVG, GIF, BMP, TIFF supported</span>
+                    </div>
+                </div>
+
+                <div id="bg-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="bg-filename">Image Ready</span>
+                        <button id="clear-bg" class="text-btn danger">Clear All</button>
+                    </div>
+
+                    <div class="bg-tool-layout"
+                        style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                        <div class="bg-main-preview">
+                            <div class="preview-tabs" style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                                <button class="preview-tab-btn active" data-view="original">Original</button>
+                                <button class="preview-tab-btn" data-view="processed">Processed</button>
+                            </div>
+                            <div class="large-preview-box" id="bg-main-box">
+                                <div class="scanner-line" id="bg-scanner"></div>
+                                <img id="bg-preview-img"
+                                    style="max-width: 100%; max-height: 600px; display: block; transition: var(--transition);">
+                                <div id="bg-loader" class="hidden"
+                                    style="position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
+                                    <div class="bg-loader-content">
+                                        <div class="spin" style="margin-bottom: 1.5rem;">
+                                            <i data-lucide="loader-2"
+                                                style="width: 48px; height: 48px; color: var(--accent-color);"></i>
+                                        </div>
+                                        <h4 style="font-weight: 700; margin-bottom: 8px;">AI is Scanning Subject...</h4>
+                                        <p style="font-size: 0.85rem; opacity: 0.8;">Powered by remove.bg API</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-controls-panel">
+                            <div class="control-group">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Replace
+                                    Background</label>
+
+                                <div class="bg-option-tabs">
+                                    <button class="bg-option-btn active" data-bg-type="transparent">None</button>
+                                    <button class="bg-option-btn" data-bg-type="color">Color</button>
+                                    <button class="bg-option-btn" data-bg-type="gradient">Gradient</button>
+                                    <button class="bg-option-btn" data-bg-type="image">Image</button>
+                                </div>
+
+                                <div id="bg-color-ctrl" class="bg-ctrl-panel hidden">
+                                    <div style="display: flex; gap: 12px; align-items: center;">
+                                        <div
+                                            style="position: relative; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 2px solid var(--border-color);">
+                                            <input type="color" id="bg-color-picker" value="#ffffff"
+                                                style="position: absolute; top: -10px; left: -10px; width: 80px; height: 80px; border: none; cursor: pointer;">
+                                        </div>
+                                        <span style="font-size: 0.85rem; font-weight: 600;">Pick a solid color</span>
+                                    </div>
+                                </div>
+
+                                <div id="bg-gradient-ctrl" class="bg-ctrl-panel hidden">
+                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;"
+                                        id="gradient-list">
+                                        <!-- Gradients will be added by JS -->
+                                    </div>
+                                </div>
+
+                                <div id="bg-image-ctrl" class="bg-ctrl-panel hidden">
+                                    <button id="bg-upload-btn" class="secondary-btn"
+                                        style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 10px;">
+                                        <i data-lucide="image-plus" style="width:16px;"></i> Upload Background
+                                    </button>
+                                    <input type="file" id="bg-img-input" accept="image/*" hidden>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Adjustments</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <button id="bg-rotate-l" class="secondary-btn" style="justify-content: center;"><i
+                                            data-lucide="rotate-ccw" style="width:18px;"></i></button>
+                                    <button id="bg-rotate-r" class="secondary-btn" style="justify-content: center;"><i
+                                            data-lucide="rotate-cw" style="width:18px;"></i></button>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 10px;" id="bg-extend-ctrl">
+                                <button id="bg-extend-btn" class="secondary-btn"
+                                    style="flex: 1; justify-content: center;">
+                                    <i data-lucide="maximize" style="width:18px;"></i> Extend to Preview
+                                </button>
+                                <button id="bg-cancel-extend" class="secondary-btn hidden"
+                                    style="border-color: #ef4444; color: #ef4444;">
+                                    Cancel
+                                </button>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 10px;" id="bg-crop-ctrl">
+                                <button id="bg-crop-btn" class="secondary-btn"
+                                    style="flex: 1; justify-content: center;">
+                                    <i data-lucide="crop" style="width:18px;"></i> Crop
+                                </button>
+                                <button id="bg-cancel-crop" class="secondary-btn hidden"
+                                    style="border-color: #ef4444; color: #ef4444;">
+                                    Cancel
+                                </button>
+                            </div>
+
+                            <div
+                                style="margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;">
+                                <button id="bg-process-btn" class="primary-btn btn-pro-ai"
+                                    style="width: 100%; justify-content: center;">
+                                    <i data-lucide="sparkles"></i> AI Removal
+                                </button>
+                                <button id="bg-rembg-btn" class="primary-btn btn-swift-engine"
+                                    style="width: 100%; justify-content: center;">
+                                    <i data-lucide="zap"></i> Swift Removal
+                                </button>
+                                <button id="bg-download-btn" class="primary-btn btn-download-success hidden"
+                                    style="width: 100%; justify-content: center;">
+                                    <i data-lucide="download"></i> Download Result
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compress Image Section -->
+            <div id="compress-image" class="tab-content">
+                <div class="drop-zone" id="compress-img-drop-zone">
+                    <input type="file" id="compress-img-input" accept="image/*" multiple hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="image"></i>
+                        </div>
+                        <h3>Compress Images</h3>
+                        <p>Reduce image file size while maintaining quality</p>
+                        <span class="file-info">Supports JPG, PNG, WebP, SVG, GIF, BMP, TIFF</span>
+                    </div>
+                </div>
+
+                <div id="compress-img-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="compress-img-count">0 images selected</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="add-more-compress-img" class="add-more-btn"><i data-lucide="plus"
+                                    style="width:14px;"></i> Add More</button>
+                            <button id="clear-compress-img" class="text-btn danger">Clear All</button>
+                        </div>
+                    </div>
+
+                    <div class="compression-settings"
+                        style="margin: 2rem 0; background: var(--input-bg); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border-color);">
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center;">
+                            <span style="font-weight: 600;">Image Quality</span>
+                            <span id="compress-img-quality-value"
+                                style="background: var(--accent-color); color:white; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">80%</span>
+                        </div>
+                        <input type="range" id="compress-img-slider" min="10" max="100" value="80"
+                            style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+                            <div
+                                style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 16px; text-align: center; border: 1px solid var(--border-color);">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">
+                                    Original Size</div>
+                                <div id="compress-img-original-size" style="font-weight: 700; font-size: 1.1rem;">0 KB
+                                </div>
+                            </div>
+                            <div
+                                style="background: var(--accent-alpha); padding: 1rem; border-radius: 16px; text-align: center; border: 1px solid var(--accent-border-alpha);">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">
+                                    Estimated Size</div>
+                                <div id="compress-img-estimated-size"
+                                    style="font-weight: 700; font-size: 1.1rem; color: var(--accent-color);">0 KB</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-grid" id="compress-img-previews"></div>
+
+                    <div class="action-bar">
+                        <button id="compress-img-btn" class="primary-btn btn-download-success"
+                            style="width: 100%; justify-content: center;">
+                            <span>Compress & Download</span>
+                            <i data-lucide="download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Unlock PDF Section -->
+            <div id="unlock-pdf" class="tab-content">
+                <div class="drop-zone" id="unlock-drop-zone">
+                    <input type="file" id="unlock-input" accept="application/pdf" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="unlock"></i>
+                        </div>
+                        <h3>Upload Protected PDF</h3>
+                        <p>Drag and drop a locked PDF or click to browse</p>
+                        <span class="file-info">Remove password protection securely</span>
+                    </div>
+                </div>
+
+                <div id="unlock-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="unlock-filename">File Ready</span>
+                        <button id="clear-unlock" class="text-btn danger">Clear All</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; margin: 1rem 0;">
+                        <div id="unlock-preview-grid" class="preview-grid"
+                            style="grid-template-columns: 1fr; width: 180px;"></div>
+                    </div>
+
+                    <div
+                        style="margin: 1rem 0; background: var(--input-bg); padding: 1.5rem; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
+                        <div class="icon-wrapper"
+                            style="margin-bottom: 1.5rem; background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                            <i data-lucide="lock"></i>
+                        </div>
+                        <h4 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Enter PDF Password</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">To unlock
+                            "<span id="locked-file-name" style="color: var(--text-primary); font-weight: 600;"></span>",
+                            please enter its password below.</p>
+
+                        <input type="password" id="pdf-password" class="password-input" placeholder="Enter password...">
+
+                        <div class="action-bar" style="margin-top: 1rem;">
+                            <button id="unlock-btn" class="primary-btn btn-download-success"
+                                style="width: 100%; justify-content: center;">
+                                <span>Unlock & Download</span>
+                                <i data-lucide="unlock"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Protect PDF Section -->
+            <div id="protect-pdf" class="tab-content">
+                <div class="drop-zone" id="protect-drop-zone">
+                    <input type="file" id="protect-input" accept="application/pdf" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="lock"></i>
+                        </div>
+                        <h3>Protect PDF</h3>
+                        <p>Drag and drop a PDF to encrypt it with a password</p>
+                        <span class="file-info">Keep your documents secure with 128-bit encryption</span>
+                    </div>
+                </div>
+
+                <div id="protect-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="protect-filename">File Ready</span>
+                        <button id="clear-protect" class="text-btn danger">Clear All</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; margin: 1rem 0;">
+                        <div id="protect-preview-grid" class="preview-grid"
+                            style="grid-template-columns: 1fr; width: 180px;"></div>
+                    </div>
+
+                    <div
+                        style="margin: 1rem 0; background: var(--input-bg); padding: 1.5rem; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
+                        <div class="icon-wrapper"
+                            style="margin-bottom: 1.5rem; background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i data-lucide="shield-check"></i>
+                        </div>
+                        <h4 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Set PDF Password</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">Enter a
+                            strong password to protect
+                            "<span id="protect-file-name-display"
+                                style="color: var(--text-primary); font-weight: 600;"></span>".</p>
+
+                        <div id="already-protected-msg" class="hidden"
+                            style="background: rgba(239, 68, 68, 0.05); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; text-align: left;">
+                            <i data-lucide="alert-triangle" style="width: 18px; flex-shrink:0;"></i>
+                            <span>This PDF is already protected. Enter the current password below to set a new
+                                one.</span>
+                        </div>
+
+                        <div id="current-password-group" class="hidden">
+                            <input type="password" id="current-protect-password" class="password-input"
+                                placeholder="Enter current password...">
+                        </div>
+
+                        <input type="password" id="protect-password" class="password-input"
+                            placeholder="Set new password...">
+                        <input type="password" id="protect-confirm-password" class="password-input"
+                            placeholder="Confirm new password...">
+
+                        <div class="action-bar" style="margin-top: 1rem;">
+                            <button id="protect-btn" class="primary-btn btn-download-success"
+                                style="width: 100%; justify-content: center;">
+                                <span>Encrypt & Download</span>
+                                <i data-lucide="shield"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Collage Maker Section -->
+            <div id="collage-maker" class="tab-content">
+                <div class="drop-zone" id="collage-drop-zone">
+                    <input type="file" id="collage-input" accept="image/*" multiple hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="layout"></i>
+                        </div>
+                        <h3>Create Collage</h3>
+                        <p>Combine multiple images into a beautiful layout</p>
+                        <span class="file-info">Drag and drop or click to browse</span>
+                    </div>
+                </div>
+
+                <div id="collage-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="collage-count">0 images selected</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="add-more-collage" class="add-more-btn"><i data-lucide="plus"
+                                    style="width:14px;"></i> Add More</button>
+                            <button id="clear-collage" class="clear-all-btn"><i data-lucide="trash-2"
+                                    style="width:14px;"></i> Clear All</button>
+                        </div>
+                    </div>
+
+                    <div class="collage-tool-layout"
+                        style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                        <div class="collage-main-preview">
+                            <div class="large-preview-box" id="collage-main-box"
+                                style="background: var(--input-bg); min-height: 500px; padding: 20px;">
+                                <div id="collage-canvas-wrapper"
+                                    style="position: relative; display: inline-block; max-width: 100%; max-height: 600px;">
+                                    <canvas id="collage-canvas"
+                                        style="max-width: 100%; max-height: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 4px; display: block;"></canvas>
+                                    <div id="collage-overlay"
+                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 4px; pointer-events: none;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-controls-panel">
+                            <div class="control-group">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Artistic
+                                    Layouts</label>
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;"
+                                    id="collage-layout-btns">
+                                    <button class="bg-option-btn active" data-layout="grid" title="Grid"><i
+                                            data-lucide="grid"></i></button>
+                                    <button class="bg-option-btn" data-layout="hero-l" title="Hero Left"><i
+                                            data-lucide="layout-panel-left"></i></button>
+                                    <button class="bg-option-btn" data-layout="hero-t" title="Hero Top"><i
+                                            data-lucide="layout-panel-top"></i></button>
+                                    <button class="bg-option-btn" data-layout="triptych" title="Triptych"><i
+                                            data-lucide="columns-3"></i></button>
+                                    <button class="bg-option-btn" data-layout="cinema" title="Cinema"><i
+                                            data-lucide="rows-3"></i></button>
+                                    <button class="bg-option-btn" data-layout="mosaic" title="Mosaic"><i
+                                            data-lucide="layout-grid"></i></button>
+                                    <button class="bg-option-btn" data-layout="magazine" title="Magazine"><i
+                                            data-lucide="newspaper"></i></button>
+                                    <button class="bg-option-btn" data-layout="stack" title="Stack"><i
+                                            data-lucide="layers"></i></button>
+                                    <button class="bg-option-btn" data-layout="split" title="Modern Split"><i
+                                            data-lucide="split"></i></button>
+                                    <button class="bg-option-btn" data-layout="feature" title="Featured Item"><i
+                                            data-lucide="star"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Canvas
+                                    Size</label>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                    <button class="bg-option-btn active" data-ratio="1:1">1:1 Square</button>
+                                    <button class="bg-option-btn" data-ratio="4:5">4:5 Insta</button>
+                                    <button class="bg-option-btn" data-ratio="16:9">16:9 HD</button>
+                                    <button class="bg-option-btn" data-ratio="9:16">9:16 Story</button>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <label
+                                        style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Spacing</label>
+                                    <span id="collage-spacing-val"
+                                        style="font-size: 0.8rem; font-weight: 600;">10px</span>
+                                </div>
+                                <input type="range" id="collage-spacing" min="0" max="100" value="10"
+                                    style="width: 100%;">
+                            </div>
+
+                            <div class="control-group">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <label
+                                        style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Roundness</label>
+                                    <span id="collage-radius-val"
+                                        style="font-size: 0.8rem; font-weight: 600;">8px</span>
+                                </div>
+                                <input type="range" id="collage-radius" min="0" max="100" value="8"
+                                    style="width: 100%;">
+                            </div>
+
+                            <div class="control-group">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Background</label>
+                                <div
+                                    style="display: flex; gap: 12px; align-items: center; background: var(--input-bg); padding: 8px; border-radius: 12px;">
+                                    <div
+                                        style="position: relative; width: 32px; height: 32px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color);">
+                                        <input type="color" id="collage-bg-color" value="#ffffff"
+                                            style="position: absolute; top: -5px; left: -5px; width: 50px; height: 50px; cursor: pointer; border: none;">
+                                    </div>
+                                    <span style="font-size: 0.85rem; font-weight: 600;">Canvas Color</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color);">
+                                <button id="collage-download-btn" class="primary-btn btn-download-success"
+                                    style="width: 100%; justify-content: center;">
+                                    <i data-lucide="download"></i> Download Collage
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <label
+                            style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Manage
+                            Images (Drag to Reorder)</label>
+                        <div class="preview-grid" id="collage-previews" style="min-height: 100px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Word to PDF Section -->
+            <div id="word-to-pdf" class="tab-content">
+                <div class="drop-zone" id="word-to-pdf-drop-zone">
+                    <input type="file" id="word-to-pdf-input" accept=".docx" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="file-up"></i>
+                        </div>
+                        <h3>Upload Word Document</h3>
+                        <p>Drag and drop a Word document (.docx) or click to browse</p>
+                        <span class="file-info">Only .docx files are supported for offline conversion</span>
+                    </div>
+                </div>
+
+                <div id="word-to-pdf-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="word-to-pdf-filename">Document Ready</span>
+                        <button id="clear-word-to-pdf" class="text-btn danger">Clear All</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; margin: 1rem 0; width: 100%;">
+                        <div id="word-to-pdf-preview-wrapper" class="word-preview-wrapper">
+                            <div id="word-to-pdf-preview" class="word-preview-paper"></div>
+                        </div>
+                    </div>
+
+                    <div class="action-bar">
+                        <button id="convert-word-to-pdf-btn" class="primary-btn btn-download-success"
+                            style="width: 100%; justify-content: center;">
+                            <span>Convert & Download PDF</span>
+                            <i data-lucide="download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scanner Section -->
+            <div id="scanner" class="tab-content">
+                <!-- Start Screen: Grant permission / select camera -->
+                <div id="scanner-start-screen" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper">
+                            <i data-lucide="scan"></i>
+                        </div>
+                        <h3>Document Scanner</h3>
+                        <p>Use your camera to scan, autocrop, and enhance documents in real-time</p>
+                        <div
+                            style="display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 1.5rem auto 0 auto; align-items: center;">
+                            <select id="scanner-camera-select" class="password-input"
+                                style="margin-bottom: 0; padding: 0.75rem; font-size: 0.9rem; text-align-last: center;"></select>
+                            <button id="scanner-start-btn" class="primary-btn"
+                                style="width: 100%; justify-content: center;">
+                                <i data-lucide="camera"></i> Start Camera
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Streaming State -->
+                <div id="scanner-active-screen" class="hidden">
+                    <div class="preview-header">
+                        <span id="scanner-status-text">Detecting edges...</span>
+                        <button id="scanner-stop-btn" class="text-btn danger">Close Camera</button>
+                    </div>
+                    <div class="large-preview-box" id="scanner-video-container"
+                        style="background: #000; min-height: 450px; position: relative;">
+                        <video id="scanner-video" autoplay playsinline
+                            style="width: 100%; height: 100%; object-fit: contain; transform: scaleX(1);"></video>
+                        <canvas id="scanner-overlay-canvas"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;"></canvas>
+                        <div class="scanner-line" id="scanner-line-active" style="display: block;"></div>
+                    </div>
+                    <div class="action-bar" style="margin-top: 1.5rem;">
+                        <button id="scanner-capture-btn" class="primary-btn btn-pro-ai"
+                            style="padding: 1.25rem 2.5rem; border-radius: 50px;">
+                            <i data-lucide="camera" style="width: 24px; height: 24px;"></i>
+                            <span style="font-size: 1.1rem; font-weight: 700;">CAPTURE DOCUMENT</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Capture Edit / Preview State -->
+                <div id="scanner-preview-screen" class="hidden">
+                    <div class="preview-header">
+                        <span>Scan Result</span>
+                        <button id="scanner-retake-btn" class="text-btn"><i data-lucide="rotate-ccw"></i>
+                            Retake</button>
+                    </div>
+
+                    <div class="bg-tool-layout"
+                        style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                        <div class="bg-main-preview">
+                            <div class="large-preview-box" id="scanner-preview-box" style="padding: 10px;">
+                                <img id="scanner-result-img"
+                                    style="max-width: 100%; max-height: 600px; display: block; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: 4px;">
+                            </div>
+                        </div>
+
+                        <div class="bg-controls-panel">
+                            <div class="control-group">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Enhancement
+                                    Filters</label>
+                                <div class="bg-option-tabs" style="margin-bottom: 1.5rem;">
+                                    <button class="bg-option-btn active" id="filter-orig">Original</button>
+                                    <button class="bg-option-btn" id="filter-magic">Magic Color</button>
+                                    <button class="bg-option-btn" id="filter-bw">B&W</button>
+                                </div>
+                            </div>
+
+                            <div class="control-group" style="margin-top: 1rem;">
+                                <button id="scanner-recrop-btn" class="secondary-btn"
+                                    style="width: 100%; justify-content: center;">
+                                    <i data-lucide="crop" style="width:18px;"></i> Adjust Borders (Recrop)
+                                </button>
+                            </div>
+
+                            <div class="control-group" style="margin-top: 1rem; background: var(--input-bg); padding: 1rem; border-radius: 16px; border: 1px solid var(--border-color);">
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); cursor: pointer; user-select: none;">
+                                    <input type="checkbox" id="scanner-watermark-toggle" style="cursor: pointer; width: 16px; height: 16px;"> Add Watermark
+                                </label>
+                                <input type="text" id="scanner-watermark-text" value="Scanned with Swift File" placeholder="Watermark text..." class="password-input" style="margin-top: 8px; margin-bottom: 0; padding: 8px 12px; font-size: 0.85rem; display: none;">
+                            </div>
+
+                            <div
+                                style="margin-top: 2rem; pt: 1rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;">
+                                <button id="scanner-save-jpg-btn" class="primary-btn btn-swift-engine"
+                                    style="width: 100%; justify-content: center;">
+                                    <i data-lucide="image"></i> Save as JPG
+                                </button>
+                                <button id="scanner-save-pdf-btn" class="primary-btn btn-pro-ai"
+                                    style="width: 100%; justify-content: center;">
+                                    <i data-lucide="file-text"></i> Save as PDF
+                                </button>
+                                <button id="scanner-send-to-pdf-btn" class="secondary-btn"
+                                    style="width: 100%; justify-content: center;">
+                                    <i data-lucide="plus"></i> Add to Image-to-PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="webpage-to-pdf" class="tab-content">
+                <div style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Enter Webpage URL / Link</label>
+                        <div class="flex-mobile-stack">
+                            <input type="url" id="webpage-url-input" class="password-input" placeholder="https://en.wikipedia.org/wiki/PDF" style="margin-bottom: 0; flex: 1;">
+                            <button id="webpage-fetch-btn" class="primary-btn" style="padding: 0.75rem 1.5rem;">
+                                <span>Fetch Page</span>
+                                <i data-lucide="globe"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; color: var(--text-secondary); position: relative; margin: 0.5rem 0;">
+                        <span style="background: var(--input-bg); padding: 0 10px; position: relative; z-index: 2; font-weight: 600; font-size: 0.85rem;">OR PASTE HTML DIRECTLY</span>
+                        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border-color); z-index: 1;"></div>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">HTML Source Code</label>
+                        <textarea id="webpage-html-input" class="password-input" rows="8" placeholder="<h1>Hello World</h1><p>Type or paste your HTML here...</p>" style="font-family: monospace; font-size: 0.9rem; resize: vertical; margin-bottom: 0;"></textarea>
+                    </div>
+
+                    <!-- Webpage Preview Comes Underneath -->
+                    <div id="webpage-preview-container" class="preview-container hidden">
+                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Page Preview (Standard A4 Size)</label>
+                        <div class="word-preview-wrapper" style="max-height: 600px; padding: 1.5rem; display: flex; justify-content: center; background: rgba(0,0,0,0.03); border-radius: 16px; overflow-x: auto;">
+                            <iframe id="webpage-preview-iframe" style="width: 794px; height: 1123px; border: 1px solid var(--border-color); background: white; pointer-events: none; box-shadow: var(--shadow); border-radius: 8px;"></iframe>
+                        </div>
+
+                        <!-- PDF Page Setup Controls -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--input-bg); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); margin-top: 1.5rem;">
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Page Size</label>
+                                <select id="webpage-pdf-size" class="password-input" style="padding: 8px 12px; height: 38px; margin-bottom: 0; width: 100%;">
+                                    <option value="a4">A4 (Standard)</option>
+                                    <option value="letter">Letter</option>
+                                    <option value="a3">A3 (Large)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Orientation</label>
+                                <select id="webpage-pdf-orient" class="password-input" style="padding: 8px 12px; height: 38px; margin-bottom: 0; width: 100%;">
+                                    <option value="auto">Auto-Detect</option>
+                                    <option value="p">Portrait</option>
+                                    <option value="l">Landscape</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="action-bar" style="margin-top: 1.5rem; margin-bottom: 1rem;">
+                            <button id="webpage-convert-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                                <span>Convert Webpage to PDF</span>
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Redact PDF Section -->
+            <div id="redact-pdf" class="tab-content">
+                <div class="drop-zone" id="redact-drop-zone">
+                    <input type="file" id="redact-input" accept="application/pdf" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                            <i data-lucide="eye-off"></i>
+                        </div>
+                        <h3>Upload PDF to Redact</h3>
+                        <p>Drag and drop or click to browse</p>
+                        <span class="file-info">Draw boxes to black out and securely remove sensitive content</span>
+                    </div>
+                </div>
+
+                <div id="redact-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="redact-filename">File Ready</span>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <button id="clear-redact" class="text-btn danger">Clear All</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 280px; gap: 2rem; margin-top: 1rem;">
+                        <div class="collage-main-preview">
+                            <div class="large-preview-box" style="padding: 1rem; overflow-y: auto; flex-direction: column; gap: 2rem; max-height: 650px; min-height: 500px; justify-content: flex-start;" id="redact-pages-container">
+                                <!-- Canvases with redaction shapes will be appended here -->
+                            </div>
+                        </div>
+
+                        <div class="bg-controls-panel">
+                            <div class="control-group">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Redaction Style</label>
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <span style="font-size: 0.85rem; font-weight: 600;">Mask Color</span>
+                                        <div style="position: relative; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 2px solid var(--border-color);">
+                                            <input type="color" id="redact-color-picker" value="#000000" style="position: absolute; top: -10px; left: -10px; width: 80px; height: 80px; border: none; cursor: pointer;">
+                                        </div>
+                                    </div>
+                                    <button id="redact-clear-shapes-btn" class="secondary-btn" style="width: 100%; justify-content: center; font-size: 0.85rem;">
+                                        <i data-lucide="trash-2" style="width:16px;"></i> Clear Drawn Boxes
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="control-group" style="background: var(--input-bg); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-secondary);">
+                                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">💡 How to Redact:</p>
+                                <ul style="padding-left: 14px; display: flex; flex-direction: column; gap: 4px;">
+                                    <li>Click and drag directly over the text/images on the document to draw a box.</li>
+                                    <li>Multiple boxes can be drawn across pages.</li>
+                                    <li>On download, these areas will be permanently removed and masked.</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color);">
+                                <button id="redact-apply-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                                    <i data-lucide="shield-alert"></i> Redact & Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Watermark Tool Section -->
+            <div id="watermark-tool" class="tab-content">
+                <div class="drop-zone" id="watermark-drop-zone">
+                    <input type="file" id="watermark-input" accept="application/pdf,image/*" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-wrapper" style="background: var(--accent-alpha); color: var(--accent-color);">
+                            <i data-lucide="stamp"></i>
+                        </div>
+                        <h3>Upload PDF or Image</h3>
+                        <p>Drag and drop or click to browse</p>
+                        <span class="file-info">Supports PDF documents and JPG, PNG, WebP images</span>
+                    </div>
+                </div>
+
+                <div id="watermark-preview-container" class="preview-container hidden">
+                    <div class="preview-header">
+                        <span id="watermark-filename">File Ready</span>
+                        <button id="clear-watermark" class="text-btn danger">Clear All</button>
+                    </div>
+
+                    <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                        <div class="collage-main-preview">
+                            <div class="large-preview-box" id="watermark-preview-box">
+                                <canvas id="watermark-preview-canvas" style="max-width: 100%; max-height: 600px; box-shadow: var(--shadow); border-radius: 8px; display: block;"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-controls-panel">
+                            <div class="control-group">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Watermark Type</label>
+                                <div class="bg-option-tabs">
+                                    <button class="bg-option-btn active" id="wm-type-text-btn">Text</button>
+                                    <button class="bg-option-btn" id="wm-type-image-btn">Image</button>
+                                </div>
+
+                                <!-- Text Options -->
+                                <div id="wm-text-options">
+                                    <input type="text" id="wm-text-input" class="password-input" value="CONFIDENTIAL" placeholder="Enter watermark text..." style="margin-top: 12px; margin-bottom: 12px;">
+                                    
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                                        <div>
+                                            <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Color</label>
+                                            <input type="color" id="wm-text-color" value="#ff0000" class="password-input" style="padding: 4px; height: 38px; cursor: pointer;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Font</label>
+                                            <select id="wm-text-font" class="password-input" style="padding: 8px 12px; height: 38px;">
+                                                <option value="Helvetica">Helvetica</option>
+                                                <option value="Courier">Courier</option>
+                                                <option value="Times-Roman">Times New Roman</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Image Options -->
+                                <div id="wm-image-options" class="hidden" style="margin-top: 12px;">
+                                    <button id="wm-upload-btn" class="secondary-btn" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 10px; margin-bottom: 12px;">
+                                        <i data-lucide="image-plus" style="width:16px;"></i> Upload Logo / Image
+                                    </button>
+                                    <input type="file" id="wm-img-file-input" accept="image/*" hidden>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Placement</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                    <button class="bg-option-btn active" data-wm-pos="center">Center</button>
+                                    <button class="bg-option-btn" data-wm-pos="bottom-right">Bottom Right</button>
+                                    <button class="bg-option-btn" data-wm-pos="top-left">Top Left</button>
+                                    <button class="bg-option-btn" data-wm-pos="tiled">Tiled Pattern</button>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Opacity</label>
+                                    <span id="wm-opacity-val" style="font-size: 0.8rem; font-weight: 600;">30%</span>
+                                </div>
+                                <input type="range" id="wm-opacity-slider" min="10" max="100" value="30" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none; margin-bottom: 12px;">
+
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Scale / Size</label>
+                                    <span id="wm-size-val" style="font-size: 0.8rem; font-weight: 600;">100%</span>
+                                </div>
+                                <input type="range" id="wm-size-slider" min="10" max="300" value="100" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none; margin-bottom: 12px;">
+
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Rotation</label>
+                                    <span id="wm-rotation-val" style="font-size: 0.8rem; font-weight: 600;">45&deg;</span>
+                                </div>
+                                <input type="range" id="wm-rotation-slider" min="-180" max="180" value="45" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+                            </div>
+
+                            <div style="margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color);">
+                                <button id="wm-apply-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                                    <i data-lucide="download"></i> Apply & Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Swift Assistant Section -->
+            <div id="swift-assistant" class="tab-content active">
+                <div class="assistant-outer-wrap" style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem; min-height: 550px;">
+                    
+                    <!-- Chat Interface Container -->
+                    <div class="assistant-inner-wrap" style="display: flex; flex-direction: column; flex: 1; position: relative; min-height: 0;">
+                        <!-- Dedicated Chat Header Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; flex-shrink: 0;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button id="assistant-close-btn" class="chat-bubble-action-btn mobile-only-btn" title="Minimize" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: none; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 4px;">
+                                    <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                                </button>
+                                <img src="logo.png" style="width: 20px; height: 20px; object-fit: cover; border-radius: 4px; display: inline-block;">
+                                <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Swift Assistant</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+                                <span id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444;"></span>
+                                <button id="assistant-history-toggle-btn" class="chat-bubble-action-btn" title="Previous Conversations" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                    <i data-lucide="history" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <button id="assistant-settings-toggle-btn" class="chat-bubble-action-btn" title="Model & API Settings" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                    <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
+                                </button>
+
+                                <!-- Floating History Popover Panel -->
+                                <div id="assistant-history-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;">
+                                    <div style="font-weight: 700; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Conversations</span>
+                                        <button id="new-chat-btn" class="secondary-btn" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 6px; height: 24px; margin-bottom: 0;">New Chat</button>
+                                    </div>
+                                    <div id="conversations-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                        <!-- Will be loaded via JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Floating Popover Dropdown Panel -->
+                                <div id="assistant-settings-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Provider</label>
+                                        <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
+                                            <option value="builtin" selected>Swift Assistant (Official)</option>
+                                            <option value="gemini">Google Gemini</option>
+                                            <option value="openrouter">OpenRouter</option>
+                                            <option value="groq">Groq Cloud</option>
+                                            <option value="huggingface">Hugging Face</option>
+                                            <option value="custom">Custom API</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Name</label>
+                                        <input type="text" id="assistant-model" class="password-input" value="gemini-1.5-flash" placeholder="Model name..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div id="assistant-endpoint-container" class="hidden">
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Endpoint URL</label>
+                                        <input type="url" id="assistant-endpoint" class="password-input" placeholder="https://api..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Key</label>
+                                        <input type="password" id="assistant-api-key" class="password-input" placeholder="Paste API key..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                    </div>
+
+                                    <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px;">
+                                        <span id="status-text" style="font-size: 0.75rem; font-weight: 600; color: #ef4444;">Disconnected</span>
+                                        <button id="assistant-connect-btn" class="secondary-btn" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; height: 28px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 0;">
+                                            <i data-lucide="radio" style="width: 12px; height: 12px;"></i> Connect
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Log -->
+                        <div id="assistant-chat-log" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; min-height: 200px; max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03); flex: 1;">
+                            <!-- Default Welcome Message -->
+                            <div class="assistant-chat-bubble system" style="background: rgba(128,128,128,0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; align-self: center; width: 100%;">
+                                <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am your Swift AI Assistant. I can write HTML/CSS code, explain concepts, edit drafts, or answer questions. Configure your API key to get started.</p>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input bar -->
+                        <div class="assistant-input-bar" style="display: flex; flex-direction: column; width: 100%; flex-shrink: 0; padding-top: 8px;">
+                            <!-- Chat settings/toggles row -->
+                            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; padding: 0 4px;">
+                                <button id="search-web-toggle" class="secondary-btn" title="Cycle Web Search: Off / Auto / On" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 20px; height: 28px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0; cursor: pointer; transition: var(--transition);">
+                                    <i data-lucide="globe" style="width: 14px; height: 14px;"></i>
+                                    <span id="search-web-label">Search: Auto</span>
+                                </button>
+                                <span id="search-status-label" style="font-size: 0.75rem; color: var(--text-secondary); opacity: 0.8; display: none; align-items: center; gap: 4px;">
+                                    <i data-lucide="loader-2" class="spin" style="width: 12px; height: 12px;"></i>
+                                    Searching the web...
+                                </span>
+                            </div>
+
+                            <!-- Attached files preview container -->
+                            <div id="attached-files-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; padding: 0 4px;"></div>
+                            
+                            <div class="assistant-input-row" style="display: flex; gap: 8px; align-items: flex-end; width: 100%;">
+                                <!-- Left Attachment Button -->
+                                <button id="assistant-attach-btn" class="secondary-btn" title="Attach File" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                    <i data-lucide="paperclip" style="width: 18px; height: 18px;"></i>
+                                    <input type="file" id="assistant-file-input" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.json" style="display: none;">
+                                </button>
+
+                                <!-- Textarea Input Box -->
+                                <div style="flex: 1; min-width: 0;">
+                                    <textarea id="assistant-input" class="password-input" placeholder="Ask anything..." rows="1" style="resize: none; margin-bottom: 0; padding: 10px 14px; font-size: 0.95rem; border-radius: 18px; width: 100%; box-sizing: border-box;"></textarea>
+                                </div>
+
+                                <!-- Right Control Buttons -->
+                                <button id="assistant-voice-btn" class="secondary-btn" title="Voice Input" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                    <i data-lucide="mic" style="width: 18px; height: 18px;"></i>
+                                </button>
+                                <button id="assistant-new-chat-btn" class="secondary-btn" title="New Chat" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0; border-color: rgba(255,255,255,0.1);">
+                                    <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+                                </button>
+                                <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                    <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="status-toast" class="toast hidden">
+            <div class="toast-content">
+                <i data-lucide="loader-2" class="spin"></i>
+                <span id="status-message">Processing...</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom Context Menu for URL/HTML Input fields -->
+    <div id="custom-context-menu" class="custom-context-menu hidden">
+        <button id="menu-cut" class="menu-item"><i data-lucide="scissors"></i> Cut</button>
+        <button id="menu-copy" class="menu-item"><i data-lucide="copy"></i> Copy</button>
+        <button id="menu-paste" class="menu-item"><i data-lucide="clipboard"></i> Paste</button>
+    </div>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Swift File Tools. Privacy first. All processing happens locally. Aashish Giri H.</p>
+        </div>
+    </footer>
+
+    <script>
         // Global Helpers
         function formatBytes(bytes) {
             if (bytes === 0) return '0 Bytes';
@@ -4833,11 +8379,13 @@
         let chatHistory = []; // stores {role: 'user'|'assistant', content: '...', timestamp: '...'}
         let currentConversationId = null;
 
-        // Close/minimize button event
         if (assistantCloseBtn) {
             assistantCloseBtn.addEventListener('click', () => {
                 document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
                 switchTab(lastActiveTabId);
+                if (window.history.state?.panel === 'assistant') {
+                    window.history.back();
+                }
             });
         }
 
@@ -5621,7 +9169,7 @@
             senderLabel.style.color = role === 'user' ? 'var(--accent-color)' : 'var(--text-secondary)';
             senderLabel.innerHTML = role === 'user' 
                 ? '<i data-lucide="user" style="width:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> You' 
-                : '<i data-lucide="sparkles" style="width:12px;display:inline-block;vertical-align:middle;margin-right:4px;color:var(--accent-color);"></i> Swift Assistant';
+                : '<img src="logo.png" style="width:14px;height:14px;object-fit:cover;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:4px;"> Swift Assistant';
 
             header.appendChild(senderLabel);
 
@@ -6516,34 +10064,131 @@ User Query: ${prompt}`;
         // ==========================================
         // HISTORY UI DRAWER & EVENT HANDLERS
         // ==========================================
-        const historyBtn = document.getElementById('history-btn');
-        const historyDrawer = document.getElementById('history-drawer');
-        const historyOverlay = document.getElementById('history-overlay');
-        const closeHistoryBtn = document.getElementById('close-history-btn');
-        const clearAllHistoryBtn = document.getElementById('clear-all-history-btn');
-        const historyDrawerContent = document.getElementById('history-drawer-content');
-        const historyCount = document.getElementById('history-count');
+        let historyBtn, historyDrawer, historyOverlay, closeHistoryBtn, clearAllHistoryBtn, historyDrawerContent, historyCount;
+        let itemToDeleteId = null;
+
+        function openDeleteItemDialog(id, name) {
+            itemToDeleteId = id;
+            const deleteDialog = document.getElementById('history-delete-dialog');
+            const desc = document.getElementById('delete-dialog-desc');
+            if (desc) {
+                desc.textContent = `Are you sure you want to delete "${name}"? This action cannot be undone.`;
+            }
+            if (deleteDialog) {
+                deleteDialog.classList.add('open');
+            }
+        }
+
+        function initHistoryUI() {
+            historyBtn = document.getElementById('history-btn');
+            historyDrawer = document.getElementById('history-drawer');
+            historyOverlay = document.getElementById('history-overlay');
+            closeHistoryBtn = document.getElementById('close-history-btn');
+            clearAllHistoryBtn = document.getElementById('clear-all-history-btn');
+            historyDrawerContent = document.getElementById('history-drawer-content');
+            historyCount = document.getElementById('history-count');
+
+            if (historyBtn) {
+                historyBtn.addEventListener('click', openHistoryDrawer);
+            }
+            if (closeHistoryBtn) closeHistoryBtn.addEventListener('click', closeHistoryDrawer);
+            if (historyOverlay) historyOverlay.addEventListener('click', closeHistoryDrawer);
+
+            if (clearAllHistoryBtn) {
+                clearAllHistoryBtn.addEventListener('click', () => {
+                    const clearDialog = document.getElementById('history-clear-dialog');
+                    if (clearDialog) clearDialog.classList.add('open');
+                });
+            }
+
+            const confirmClearBtn = document.getElementById('confirm-clear-btn');
+            const cancelClearBtn = document.getElementById('cancel-clear-btn');
+            if (confirmClearBtn) {
+                confirmClearBtn.addEventListener('click', async () => {
+                    await clearHistory();
+                    renderHistoryList();
+                    const clearDialog = document.getElementById('history-clear-dialog');
+                    if (clearDialog) clearDialog.classList.remove('open');
+                    notify("History cleared successfully.", "success");
+                });
+            }
+            if (cancelClearBtn) {
+                cancelClearBtn.addEventListener('click', () => {
+                    const clearDialog = document.getElementById('history-clear-dialog');
+                    if (clearDialog) clearDialog.classList.remove('open');
+                });
+            }
+
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', async () => {
+                    if (itemToDeleteId !== null) {
+                        await deleteHistoryItem(itemToDeleteId);
+                        renderHistoryList();
+                        const deleteDialog = document.getElementById('history-delete-dialog');
+                        if (deleteDialog) deleteDialog.classList.remove('open');
+                        itemToDeleteId = null;
+                        notify("File deleted from history.", "success");
+                    }
+                });
+            }
+            if (cancelDeleteBtn) {
+                cancelDeleteBtn.addEventListener('click', () => {
+                    const deleteDialog = document.getElementById('history-delete-dialog');
+                    if (deleteDialog) deleteDialog.classList.remove('open');
+                    itemToDeleteId = null;
+                });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', initHistoryUI);
 
         function openHistoryDrawer() {
-            historyDrawer.classList.add('open');
-            historyOverlay.classList.add('open');
-            renderHistoryList();
+            if (historyDrawer && historyOverlay) {
+                historyDrawer.classList.add('open');
+                historyOverlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; // Lock background scrolling
+                if (window.history.state?.panel !== 'history') {
+                    window.history.pushState({ panel: 'history' }, '');
+                }
+                renderHistoryList();
+            }
         }
 
         function closeHistoryDrawer() {
-            historyDrawer.classList.remove('open');
-            historyOverlay.classList.remove('open');
+            if (historyDrawer && historyOverlay) {
+                historyDrawer.classList.remove('open');
+                historyOverlay.classList.remove('open');
+                const clearDialog = document.getElementById('history-clear-dialog');
+                if (clearDialog) clearDialog.classList.remove('open');
+                const deleteDialog = document.getElementById('history-delete-dialog');
+                if (deleteDialog) deleteDialog.classList.remove('open');
+                document.body.style.overflow = ''; // Unlock background scrolling
+                if (window.history.state?.panel === 'history') {
+                    window.history.back();
+                }
+            }
         }
 
-        historyBtn.addEventListener('click', openHistoryDrawer);
-        closeHistoryBtn.addEventListener('click', closeHistoryDrawer);
-        historyOverlay.addEventListener('click', closeHistoryDrawer);
+        // Handle physical/gestural back button navigation for Android/iOS
+        window.addEventListener('popstate', (e) => {
+            const hDrawer = document.getElementById('history-drawer');
+            if (hDrawer && hDrawer.classList.contains('open')) {
+                hDrawer.classList.remove('open');
+                const clearDialog = document.getElementById('history-clear-dialog');
+                if (clearDialog) clearDialog.classList.remove('open');
+                const deleteDialog = document.getElementById('history-delete-dialog');
+                if (deleteDialog) deleteDialog.classList.remove('open');
+                document.body.style.overflow = ''; // Unlock background scrolling
+                const hOverlay = document.getElementById('history-overlay');
+                if (hOverlay) hOverlay.classList.remove('open');
+            }
 
-        clearAllHistoryBtn.addEventListener('click', async () => {
-            if (confirm("Are you sure you want to clear all conversion history? This will permanently delete local logs and cached files.")) {
-                await clearHistory();
-                renderHistoryList();
-                notify("History cleared successfully.", "success");
+            const assistant = document.getElementById('swift-assistant');
+            if (assistant && assistant.classList.contains('mobile-fullscreen')) {
+                assistant.classList.remove('mobile-fullscreen');
+                switchTab('img-to-pdf'); // minimize it to webhome page
             }
         });
 
@@ -6582,14 +10227,23 @@ User Query: ${prompt}`;
 
                 // Setup preview thumbnail
                 let thumbnailHtml = '';
+                let typeLabel = 'File';
+                
                 if (item.thumbnail) {
                     thumbnailHtml = `<img src="${item.thumbnail}" alt="${item.name}">`;
-                } else if (item.type === 'application/pdf') {
-                    thumbnailHtml = `<i data-lucide="file-text"></i>`;
+                }
+                
+                if (item.type === 'application/pdf') {
+                    if (!thumbnailHtml) thumbnailHtml = `<i data-lucide="file-text"></i>`;
+                    typeLabel = 'PDF';
                 } else if (item.type.startsWith('image/')) {
-                    thumbnailHtml = `<i data-lucide="image"></i>`;
+                    if (!thumbnailHtml) thumbnailHtml = `<i data-lucide="image"></i>`;
+                    typeLabel = 'Image';
+                } else if (item.name.endsWith('.docx') || item.name.endsWith('.doc')) {
+                    if (!thumbnailHtml) thumbnailHtml = `<i data-lucide="file-text"></i>`;
+                    typeLabel = 'Word';
                 } else {
-                    thumbnailHtml = `<i data-lucide="file"></i>`;
+                    if (!thumbnailHtml) thumbnailHtml = `<i data-lucide="file"></i>`;
                 }
 
                 const formattedTime = new Date(item.timestamp).toLocaleString();
@@ -6603,6 +10257,7 @@ User Query: ${prompt}`;
                         <div class="history-details">
                             <div class="history-filename" title="${item.name}">${item.name}</div>
                             <div class="history-meta">
+                                <span style="background: var(--accent-alpha); color: var(--accent-color); padding: 1px 6px; border-radius: 4px; font-weight: 600; font-size: 0.7rem;">${typeLabel}</span>
                                 <span>${sizeStr}</span>
                                 <span>•</span>
                                 <span>${formattedTime}</span>
@@ -6670,10 +10325,8 @@ User Query: ${prompt}`;
                     getReq.onerror = () => { db.close(); notify("Failed to share file.", "error"); };
                 });
 
-                itemDiv.querySelector('.delete-file-btn').addEventListener('click', async () => {
-                    await deleteHistoryItem(item.id);
-                    renderHistoryList();
-                    notify("File deleted from history.", "success");
+                itemDiv.querySelector('.delete-file-btn').addEventListener('click', () => {
+                    openDeleteItemDialog(item.id, item.name);
                 });
 
                 historyDrawerContent.appendChild(itemDiv);
@@ -6806,4 +10459,57 @@ User Query: ${prompt}`;
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(handleReceivedShare, 500);
         });
+    </script>
     
+    <!-- History Drawer -->
+    <div class="history-overlay" id="history-overlay"></div>
+    <div class="history-drawer" id="history-drawer">
+        <div class="history-drawer-header">
+            <h2><i data-lucide="history"></i> Conversion History</h2>
+            <button id="close-history-btn" class="icon-btn" title="Close">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="history-drawer-content" id="history-drawer-content">
+            <!-- History items go here -->
+        </div>
+        <div class="history-drawer-footer">
+            <span id="history-count" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">0 items</span>
+            <button id="clear-all-history-btn" class="history-action-btn danger">
+                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear All
+            </button>
+        </div>
+        
+        <!-- Custom Clear Confirmation Dialog inside panel -->
+        <div class="history-clear-dialog" id="history-clear-dialog">
+            <div class="history-clear-dialog-card">
+                <div class="history-clear-dialog-icon">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <h3>Clear all history?</h3>
+                <p>This action will permanently delete all conversion logs and cached files. You cannot undo this.</p>
+                <div class="history-clear-dialog-actions">
+                    <button id="confirm-clear-btn" class="history-action-btn danger" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Yes, Clear</button>
+                    <button id="cancel-clear-btn" class="history-action-btn" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Delete Item Confirmation Dialog inside panel -->
+        <div class="history-clear-dialog" id="history-delete-dialog">
+            <div class="history-clear-dialog-card">
+                <div class="history-clear-dialog-icon">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <h3>Delete file?</h3>
+                <p id="delete-dialog-desc">Are you sure you want to delete this file? This action cannot be undone.</p>
+                <div class="history-clear-dialog-actions">
+                    <button id="confirm-delete-btn" class="history-action-btn danger" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Yes, Delete</button>
+                    <button id="cancel-delete-btn" class="history-action-btn" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
