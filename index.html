@@ -2190,6 +2190,134 @@
             gap: 12px;
             justify-content: center;
         }
+
+        /* ===== NEW FEATURES CSS ===== */
+
+        /* Code Block Copy Button */
+        .code-block-wrapper {
+            position: relative;
+            margin: 8px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .code-block-wrapper pre {
+            margin: 0;
+        }
+        .code-copy-btn {
+            align-self: flex-end;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(4px);
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            padding: 5px 10px;
+            border-radius: 0 0 6px 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 5;
+            margin-top: -1px;
+        }
+        .code-copy-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        .code-copy-btn.copied {
+            background: #22c55e;
+            color: white;
+        }
+
+        /* Stop Generation Button */
+        .stop-gen-btn {
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+            padding: 0 !important;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            margin-bottom: 0;
+            cursor: pointer;
+            transition: var(--transition);
+            outline: none !important;
+        }
+        .stop-gen-btn:hover {
+            background: #ef4444 !important;
+            color: white !important;
+            transform: translateY(-1px);
+        }
+        .stop-gen-btn.active {
+            display: flex;
+        }
+
+        /* Regenerate Button */
+        .regenerate-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .assistant-chat-bubble:hover .regenerate-btn {
+            opacity: 1;
+        }
+
+        /* Conversation Rename */
+        .conv-title-input {
+            background: var(--input-bg);
+            border: 1px solid var(--accent-color);
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            width: 100%;
+            outline: none;
+            font-family: inherit;
+        }
+        .conv-rename-btn {
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .conv-item-wrap:hover .conv-rename-btn {
+            opacity: 1;
+        }
+
+        /* Improved Timestamps */
+        .msg-timestamp {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            cursor: default;
+        }
+        .assistant-chat-bubble:hover .msg-timestamp {
+            opacity: 0.7;
+        }
+        .msg-timestamp:hover {
+            opacity: 1 !important;
+        }
+
+        /* Streaming cursor */
+        @keyframes blink-cursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .streaming-cursor::after {
+            content: '';
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: var(--accent-color);
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: blink-cursor 0.8s ease-in-out infinite;
+        }
     </style>
     <script>
         let lastActiveTabId = 'swift-assistant';
@@ -3513,6 +3641,9 @@
                                 </button>
                                 <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                                </button>
+                                <button id="assistant-stop-btn" class="stop-gen-btn" title="Stop generating">
+                                    <i data-lucide="square" style="width: 16px; height: 16px;"></i>
                                 </button>
                             </div>
                         </div>
@@ -8855,10 +8986,12 @@
         function formatMessage(text) {
             let formatted = escapeHtml(text);
             
-            // Format code blocks: ```code```
+            // Format code blocks: ```code``` with copy button
             const codeBlockRegex = /```([\s\S]*?)```/g;
+            let codeBlockId = 0;
             formatted = formatted.replace(codeBlockRegex, (match, code) => {
-                return `<pre><code>${code.trim()}</code></pre>`;
+                const id = 'codeblock-' + Date.now() + '-' + (codeBlockId++);
+                return `<div class="code-block-wrapper"><pre><code id="${id}">${code.trim()}</code></pre><button class="code-copy-btn" onclick="copyCodeBlock(this)" title="Copy code"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button></div>`;
             });
 
             // Format inline code: `code`
@@ -8869,6 +9002,25 @@
             formatted = formatted.split('\n').join('<br>');
             
             return formatted;
+        }
+
+        function copyCodeBlock(btn) {
+            const wrapper = btn.closest('.code-block-wrapper');
+            const codeEl = wrapper.querySelector('code');
+            const text = codeEl.textContent || codeEl.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                btn.title = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                    btn.title = 'Copy code';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                notify('Failed to copy code.', 'error');
+            });
         }
 
         function formatMessageTime(isoString) {
@@ -9044,6 +9196,7 @@
                 }
                 
                 const item = document.createElement('div');
+                item.className = 'conv-item-wrap';
                 item.style.display = 'flex';
                 item.style.justifyContent = 'space-between';
                 item.style.alignItems = 'center';
@@ -9087,6 +9240,79 @@
                     renderChatHistory();
                     assistantHistoryPopover.classList.add('hidden');
                 });
+
+                // Action buttons container (rename + delete)
+                const actionsDiv = document.createElement('div');
+                actionsDiv.style.display = 'flex';
+                actionsDiv.style.gap = '4px';
+                actionsDiv.style.alignItems = 'center';
+                actionsDiv.style.flexShrink = '0';
+
+                // Rename button
+                const renameBtn = document.createElement('button');
+                renameBtn.className = 'conv-rename-btn chat-bubble-action-btn';
+                renameBtn.title = 'Rename chat';
+                renameBtn.style.background = 'none';
+                renameBtn.style.border = 'none';
+                renameBtn.style.cursor = 'pointer';
+                renameBtn.style.color = 'var(--text-secondary)';
+                renameBtn.style.padding = '4px';
+                renameBtn.style.display = 'flex';
+                renameBtn.style.alignItems = 'center';
+                renameBtn.style.justifyContent = 'center';
+                renameBtn.innerHTML = '<i data-lucide="pencil" style="width:12px; height:12px;"></i>';
+                renameBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const currentTitle = titleSpan.textContent;
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'conv-title-input';
+                    input.value = currentTitle;
+                    input.maxLength = 50;
+                    
+                    titleSpan.replaceWith(input);
+                    input.focus();
+                    input.select();
+
+                    const saveRename = () => {
+                        const newTitle = input.value.trim() || 'Untitled Chat';
+                        const newTitleSpan = document.createElement('span');
+                        newTitleSpan.style.fontSize = '0.8rem';
+                        newTitleSpan.style.fontWeight = '600';
+                        newTitleSpan.style.whiteSpace = 'nowrap';
+                        newTitleSpan.style.overflow = 'hidden';
+                        newTitleSpan.style.textOverflow = 'ellipsis';
+                        newTitleSpan.textContent = newTitle;
+                        newTitleSpan.dataset.convId = conv.id;
+                        input.replaceWith(newTitleSpan);
+                        
+                        let convList = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
+                        const convIndex = convList.findIndex(c => c.id === conv.id);
+                        if (convIndex !== -1) {
+                            convList[convIndex].title = newTitle;
+                            localStorage.setItem('assistant-conversations', JSON.stringify(convList));
+                        }
+                        
+                        notify('Chat renamed.', 'success');
+                    };
+
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') { e.preventDefault(); saveRename(); }
+                        if (e.key === 'Escape') { 
+                            const restored = document.createElement('span');
+                            restored.style.fontSize = '0.8rem';
+                            restored.style.fontWeight = '600';
+                            restored.style.whiteSpace = 'nowrap';
+                            restored.style.overflow = 'hidden';
+                            restored.style.textOverflow = 'ellipsis';
+                            restored.textContent = currentTitle;
+                            restored.dataset.convId = conv.id;
+                            input.replaceWith(restored);
+                        }
+                    });
+                    input.addEventListener('blur', saveRename);
+                });
+                actionsDiv.appendChild(renameBtn);
                 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.style.background = 'none';
@@ -9103,9 +9329,10 @@
                     e.stopPropagation();
                     deleteConversation(conv.id);
                 });
+                actionsDiv.appendChild(deleteBtn);
                 
                 item.appendChild(infoDiv);
-                item.appendChild(deleteBtn);
+                item.appendChild(actionsDiv);
                 conversationsList.appendChild(item);
             });
             
@@ -9331,10 +9558,10 @@
             footer.style.marginTop = '6px';
 
             const timeSpan = document.createElement('span');
-            timeSpan.style.fontSize = '0.65rem';
-            timeSpan.style.color = 'var(--text-secondary)';
-            timeSpan.style.opacity = '0.6';
-            timeSpan.textContent = formatMessageTime(timestamp || new Date().toISOString());
+            timeSpan.className = 'msg-timestamp';
+            const tsDate = timestamp ? new Date(timestamp) : new Date();
+            timeSpan.textContent = formatMessageTime(tsDate.toISOString());
+            timeSpan.title = tsDate.toLocaleString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
             footer.appendChild(timeSpan);
 
             // Mail Compose Button if email draft detected
@@ -9356,6 +9583,16 @@
                     }
                 });
                 footer.appendChild(mailBtn);
+            }
+
+            // Regenerate button on bot responses
+            if (role !== 'user') {
+                const regenerateBtn = document.createElement('button');
+                regenerateBtn.className = 'chat-bubble-action-btn regenerate-btn';
+                regenerateBtn.title = 'Regenerate response';
+                regenerateBtn.innerHTML = '<i data-lucide="refresh-cw"></i>';
+                regenerateBtn.addEventListener('click', () => regenerateResponse(index));
+                footer.appendChild(regenerateBtn);
             }
 
             const bottomCopyBtn = document.createElement('button');
@@ -9525,6 +9762,140 @@
             });
         }
 
+        // --- Generation State & Controls ---
+        let abortController = null;
+        let isGenerating = false;
+        const assistantStopBtn = document.getElementById('assistant-stop-btn');
+
+        function setGeneratingState(active) {
+            isGenerating = active;
+            if (active) {
+                assistantSendBtn.style.display = 'none';
+                assistantStopBtn.classList.add('active');
+                assistantInput.disabled = true;
+                assistantInput.placeholder = 'Generating...';
+            } else {
+                assistantSendBtn.style.display = '';
+                assistantStopBtn.classList.remove('active');
+                assistantInput.disabled = false;
+                assistantInput.placeholder = 'Ask anything...';
+            }
+        }
+
+        assistantStopBtn.addEventListener('click', () => {
+            if (abortController) {
+                abortController.abort();
+                abortController = null;
+            }
+            setGeneratingState(false);
+        });
+
+        // Regenerate last assistant response
+        async function regenerateResponse(index) {
+            if (isGenerating) return;
+            // Find the user message that preceded this bot response
+            let userMsgIndex = index - 1;
+            while (userMsgIndex >= 0 && chatHistory[userMsgIndex].role !== 'user') {
+                userMsgIndex--;
+            }
+            if (userMsgIndex < 0) {
+                notify('No user message found to regenerate from.', 'error');
+                return;
+            }
+            // Truncate history from this bot response onward (keep the user message)
+            chatHistory = chatHistory.slice(0, index);
+            saveCurrentConversation();
+            renderChatHistory();
+            // Clear input so sendAssistantMessage won't push a duplicate user message
+            assistantInput.value = '';
+            attachedFile = null;
+            renderAttachedFile();
+            // Manually send the API request using existing chatHistory (user msg already in history)
+            await sendAssistantMessage(true);
+        }
+
+        // Streaming helper for OpenAI-compatible APIs
+        async function streamOpenAIResponse(response, bubbleTextEl) {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+            let buffer = '';
+
+            bubbleTextEl.classList.add('streaming-cursor');
+
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+                        const data = trimmed.slice(6);
+                        if (data === '[DONE]') break;
+                        try {
+                            const json = JSON.parse(data);
+                            const delta = json.choices?.[0]?.delta?.content || '';
+                            if (delta) {
+                                fullText += delta;
+                                bubbleTextEl.innerHTML = formatMessage(fullText);
+                                lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+                                scrollChatToBottom();
+                            }
+                        } catch (e) { /* skip malformed chunks */ }
+                    }
+                }
+            } finally {
+                bubbleTextEl.classList.remove('streaming-cursor');
+            }
+
+            return fullText;
+        }
+
+        // Streaming helper for Gemini API
+        async function streamGeminiResponse(response, bubbleTextEl) {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+            let buffer = '';
+
+            bubbleTextEl.classList.add('streaming-cursor');
+
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || trimmed === '[DONE]') continue;
+                        try {
+                            const json = JSON.parse(trimmed);
+                            const text = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                            if (text) {
+                                fullText = text;
+                                bubbleTextEl.innerHTML = formatMessage(fullText);
+                                lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+                                scrollChatToBottom();
+                            }
+                        } catch (e) { /* skip */ }
+                    }
+                }
+            } finally {
+                bubbleTextEl.classList.remove('streaming-cursor');
+            }
+
+            return fullText;
+        }
+
         // Voice to Text (Speech Recognition)
         let recognition = null;
         let isListening = false;
@@ -9587,9 +9958,9 @@
             });
         }
 
-        async function sendAssistantMessage() {
+        async function sendAssistantMessage(skipUserPush = false) {
             const prompt = assistantInput.value.trim();
-            if (!prompt && !attachedFile) return;
+            if (!prompt && !attachedFile && !skipUserPush) return;
 
             const isBuiltinProvider = assistantProvider.value === 'builtin';
             const apiKey = assistantApiKey.value.trim();
@@ -9601,12 +9972,14 @@
 
             // Check if search should be performed
             let shouldSearch = false;
-            if (webSearchState === 'on') {
-                shouldSearch = true;
-            } else if (webSearchState === 'auto') {
-                const searchKeywords = ['weather', 'stock', 'news', 'current', 'latest', 'today', 'who is', 'price of', 'recent', 'google', 'search', 'time in'];
-                const promptLower = prompt.toLowerCase();
-                shouldSearch = searchKeywords.some(keyword => promptLower.includes(keyword));
+            if (!skipUserPush) {
+                if (webSearchState === 'on') {
+                    shouldSearch = true;
+                } else if (webSearchState === 'auto') {
+                    const searchKeywords = ['weather', 'stock', 'news', 'current', 'latest', 'today', 'who is', 'price of', 'recent', 'google', 'search', 'time in'];
+                    const promptLower = prompt.toLowerCase();
+                    shouldSearch = searchKeywords.some(keyword => promptLower.includes(keyword));
+                }
             }
 
             let searchResults = [];
@@ -9616,26 +9989,28 @@
                 if (searchStatusLabel) searchStatusLabel.style.display = 'none';
             }
 
-            // Append user prompt with attachment to history and render
-            const currentAttachment = attachedFile ? { ...attachedFile } : null;
-            
-            // Reset attachment inputs
-            attachedFile = null;
-            assistantFileInput.value = '';
-            renderAttachedFile();
+            // Append user prompt with attachment to history and render (skip on regenerate)
+            if (!skipUserPush) {
+                const currentAttachment = attachedFile ? { ...attachedFile } : null;
+                
+                // Reset attachment inputs
+                attachedFile = null;
+                assistantFileInput.value = '';
+                renderAttachedFile();
 
-            chatHistory.push({ 
-                role: 'user', 
-                content: prompt,
-                attachment: currentAttachment,
-                timestamp: new Date().toISOString()
-            });
-            saveCurrentConversation();
-            renderChatHistory();
-            
-            // Clear input box
-            assistantInput.value = '';
-            assistantInput.style.height = 'auto'; // Reset height
+                chatHistory.push({ 
+                    role: 'user', 
+                    content: prompt,
+                    attachment: currentAttachment,
+                    timestamp: new Date().toISOString()
+                });
+                saveCurrentConversation();
+                renderChatHistory();
+                
+                // Clear input box
+                assistantInput.value = '';
+                assistantInput.style.height = 'auto'; // Reset height
+            }
 
             // Add bot thinking state bubble
             const thinkingBubble = document.createElement('div');
@@ -9649,6 +10024,9 @@
             assistantChatLog.appendChild(thinkingBubble);
             lucide.createIcons();
             scrollChatToBottom();
+
+            abortController = new AbortController();
+            setGeneratingState(true);
 
             const provider = assistantProvider.value;
             const model = assistantModel.value.trim() || 'gemini-1.5-flash';
@@ -9686,7 +10064,8 @@ User Query: ${msg.content}`;
                     const res = await fetch(VERCEL_PROXY_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ messages: messagesPayload })
+                        body: JSON.stringify({ messages: messagesPayload }),
+                        signal: abortController.signal
                     });
 
                     if (!res.ok) {
@@ -9743,15 +10122,40 @@ User Query: ${msg.content}`;
                     const res = await fetch(geminiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: contentsPayload })
+                        body: JSON.stringify({ contents: contentsPayload, generationConfig: { maxOutputTokens: 8192 } }),
+                        signal: abortController.signal
                     });
 
                     if (!res.ok) {
                         const errData = await res.json().catch(() => ({}));
                         throw new Error(errData.error?.message || `HTTP ${res.status}`);
                     }
-                    const data = await res.json();
-                    responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
+
+                    // Use streaming for Gemini
+                    thinkingBubble.remove();
+                    const geminiStreamBubble = document.createElement('div');
+                    geminiStreamBubble.className = 'assistant-chat-bubble bot';
+                    geminiStreamBubble.dataset.index = chatHistory.length;
+                    const geminiStreamHeader = document.createElement('div');
+                    geminiStreamHeader.style.display = 'flex';
+                    geminiStreamHeader.style.justifyContent = 'space-between';
+                    geminiStreamHeader.style.alignItems = 'center';
+                    geminiStreamHeader.style.marginBottom = '6px';
+                    const geminiStreamSender = document.createElement('span');
+                    geminiStreamSender.style.fontWeight = '700';
+                    geminiStreamSender.style.fontSize = '0.8rem';
+                    geminiStreamSender.style.color = 'var(--text-secondary)';
+                    geminiStreamSender.innerHTML = '<img src="logo.png" style="width:14px;height:14px;object-fit:cover;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:4px;"> Swift Assistant';
+                    geminiStreamHeader.appendChild(geminiStreamSender);
+                    const geminiStreamTextEl = document.createElement('div');
+                    geminiStreamTextEl.style.fontSize = '0.9rem';
+                    geminiStreamBubble.appendChild(geminiStreamHeader);
+                    geminiStreamBubble.appendChild(geminiStreamTextEl);
+                    assistantChatLog.appendChild(geminiStreamBubble);
+                    lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+                    scrollChatToBottom();
+
+                    responseText = await streamGeminiResponse(res, geminiStreamTextEl);
 
                 } else if (provider === 'openrouter' || provider === 'groq' || provider === 'custom') {
                     if (provider === 'openrouter' && !endpoint) {
@@ -9813,16 +10217,42 @@ User Query: ${msg.content}`;
                         },
                         body: JSON.stringify({
                             model: model,
-                            messages: messagesPayload
-                        })
+                            messages: messagesPayload,
+                            stream: true
+                        }),
+                        signal: abortController.signal
                     });
 
                     if (!res.ok) {
                         const errData = await res.json().catch(() => ({}));
                         throw new Error(errData.error?.message || `HTTP ${res.status}`);
                     }
-                    const data = await res.json();
-                    responseText = data.choices?.[0]?.message?.content || 'No response generated.';
+
+                    // Use streaming for OpenAI-compatible APIs
+                    thinkingBubble.remove();
+                    const oaiStreamBubble = document.createElement('div');
+                    oaiStreamBubble.className = 'assistant-chat-bubble bot';
+                    oaiStreamBubble.dataset.index = chatHistory.length;
+                    const oaiStreamHeader = document.createElement('div');
+                    oaiStreamHeader.style.display = 'flex';
+                    oaiStreamHeader.style.justifyContent = 'space-between';
+                    oaiStreamHeader.style.alignItems = 'center';
+                    oaiStreamHeader.style.marginBottom = '6px';
+                    const oaiStreamSender = document.createElement('span');
+                    oaiStreamSender.style.fontWeight = '700';
+                    oaiStreamSender.style.fontSize = '0.8rem';
+                    oaiStreamSender.style.color = 'var(--text-secondary)';
+                    oaiStreamSender.innerHTML = '<img src="logo.png" style="width:14px;height:14px;object-fit:cover;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:4px;"> Swift Assistant';
+                    oaiStreamHeader.appendChild(oaiStreamSender);
+                    const oaiStreamTextEl = document.createElement('div');
+                    oaiStreamTextEl.style.fontSize = '0.9rem';
+                    oaiStreamBubble.appendChild(oaiStreamHeader);
+                    oaiStreamBubble.appendChild(oaiStreamTextEl);
+                    assistantChatLog.appendChild(oaiStreamBubble);
+                    lucide.createIcons({ attrs: { class: 'lucide-icon' } });
+                    scrollChatToBottom();
+
+                    responseText = await streamOpenAIResponse(res, oaiStreamTextEl);
 
                 } else if (provider === 'huggingface') {
                     const hfUrl = `https://api-inference.huggingface.co/models/${model}`;
@@ -9847,7 +10277,8 @@ User Query: ${prompt}`;
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${apiKey}`
                         },
-                        body: JSON.stringify({ inputs: hfPrompt })
+                        body: JSON.stringify({ inputs: hfPrompt }),
+                        signal: abortController.signal
                     });
 
                     if (!res.ok) {
@@ -9857,8 +10288,8 @@ User Query: ${prompt}`;
                     responseText = Array.isArray(data) ? (data[0]?.generated_text || JSON.stringify(data)) : (data.generated_text || JSON.stringify(data));
                 }
 
-                // Remove thinking bubble
-                thinkingBubble.remove();
+                // Remove thinking bubble if still present (non-streaming providers)
+                if (thinkingBubble.parentNode) thinkingBubble.remove();
 
                 // Append assistant response to history
                 chatHistory.push({ 
@@ -9872,8 +10303,23 @@ User Query: ${prompt}`;
 
             } catch (err) {
                 console.error(err);
-                thinkingBubble.remove();
-                
+                if (thinkingBubble.parentNode) thinkingBubble.remove();
+                if (err.name === 'AbortError') {
+                    // Save partial response if any text was streamed
+                    if (responseText) {
+                        chatHistory.push({ 
+                            role: 'assistant', 
+                            content: responseText + '\n\n_[Generation stopped]_',
+                            searchResults: searchResults,
+                            timestamp: new Date().toISOString()
+                        });
+                        saveCurrentConversation();
+                        renderChatHistory();
+                        notify('Generation stopped.', 'info');
+                    } else {
+                        notify('Generation stopped.', 'info');
+                    }
+                } else {
                 const errorBubble = document.createElement('div');
                 errorBubble.className = 'assistant-chat-bubble bot';
                 errorBubble.style.borderColor = 'rgba(239, 68, 68, 0.3)';
@@ -9884,6 +10330,10 @@ User Query: ${prompt}`;
                 `;
                 assistantChatLog.appendChild(errorBubble);
                 scrollChatToBottom();
+                }
+            } finally {
+                setGeneratingState(false);
+                abortController = null;
             }
         }
 
