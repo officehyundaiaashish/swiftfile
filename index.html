@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#f0f4f8">
     <title>Swift File Tools - PDF & Image Tools</title>
     <link rel="icon" type="image/png" href="logo.png">
+    <link rel="manifest" href="manifest.json">
     <meta name="description" content="A modern, minimal, and beautiful PDF to Image and Image to PDF converter.">
 
     <!-- Anti-Automation Script -->
@@ -87,8 +88,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            cursor: default;
-            user-select: none;
         }
 
         input,
@@ -1922,6 +1921,184 @@
                 right: 0 !important;
             }
         }
+
+        /* History Drawer Styles */
+        .history-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .history-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .history-drawer {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            max-width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background: var(--surface-color);
+            border-left: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            z-index: 10000;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: var(--glass-blur);
+        }
+        .history-drawer.open {
+            right: 0;
+        }
+        .history-drawer-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-drawer-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+        .history-drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .history-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--text-secondary);
+            gap: 1rem;
+            padding: 2rem;
+        }
+        .history-empty-state i {
+            width: 48px;
+            height: 48px;
+            opacity: 0.5;
+            color: var(--accent-color);
+        }
+        .history-item {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: var(--transition);
+        }
+        .history-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-border-alpha);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .history-item-top {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .history-thumbnail {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border-color);
+        }
+        .history-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .history-thumbnail i {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-color);
+        }
+        .history-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .history-filename {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+        .history-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 0.25rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.5rem;
+        }
+        .history-action-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .history-action-btn:hover {
+            background: var(--border-color);
+            border-color: var(--text-secondary);
+        }
+        .history-action-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        .history-drawer-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface-color);
+        }
     </style>
     <script>
         let lastActiveTabId = 'img-to-pdf';
@@ -2001,40 +2178,6 @@
         }
 
         // Mobile Tool Dropdown Logic removed as requested
-        document.addEventListener('DOMContentLoaded', () => {
-            // Block View Source, DevTools, and Right Click
-            document.addEventListener('contextmenu', e => e.preventDefault());
-            document.addEventListener('keydown', e => {
-                // Prevent F12
-                if (e.key === 'F12' || e.keyCode === 123) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Prevent Ctrl+U (View Source)
-                if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Prevent Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C (DevTools)
-                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73 ||
-                    e.key === 'J' || e.key === 'j' || e.keyCode === 74 ||
-                    e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Prevent Mac Cmd+Opt+I / Cmd+Opt+J / Cmd+Opt+C and Cmd+U
-                if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73 ||
-                    e.key === 'J' || e.key === 'j' || e.keyCode === 74 ||
-                    e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
-                    e.preventDefault();
-                    return false;
-                }
-                if (e.metaKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-        });
 
         function handleMobileToolSelect(tabId, labelText, iconName) {
             switchTab(tabId);
@@ -2055,6 +2198,9 @@
                 <img src="logo.png" alt="Swift File" class="logo-img">
                 <span>Swift File</span>
             </div>
+            <button id="history-btn" class="icon-btn" title="View History" style="margin-right: 0.5rem;">
+                <i data-lucide="history"></i>
+            </button>
             <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
                 <i data-lucide="sun" id="sun-icon" class="hidden"></i>
                 <i data-lucide="moon" id="moon-icon"></i>
@@ -8148,29 +8294,72 @@
         // Web search helper
         async function searchWeb(query) {
             try {
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://html.duckduckgo.com/html/?q=' + encodeURIComponent(query))}`;
+                // Try Google Search via allorigins proxy
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://www.google.com/search?q=' + encodeURIComponent(query))}`;
                 const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('Search failed');
+                if (!response.ok) throw new Error('Google search request failed');
                 const html = await response.text();
                 
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const results = [];
-                const resultElements = doc.querySelectorAll('.result');
                 
-                for (let i = 0; i < Math.min(resultElements.length, 5); i++) {
-                    const el = resultElements[i];
-                    const titleEl = el.querySelector('.result__snippet');
-                    const linkEl = el.querySelector('.result__url');
-                    if (titleEl) {
-                        results.push({
-                            title: el.querySelector('.result__title')?.textContent?.trim() || '',
-                            snippet: titleEl.textContent?.trim() || '',
-                            url: linkEl?.textContent?.trim() || ''
-                        });
+                // Google search results container selector
+                const resultContainers = doc.querySelectorAll('.g, .MjjYad');
+                
+                if (resultContainers && resultContainers.length > 0) {
+                    for (let i = 0; i < Math.min(resultContainers.length, 5); i++) {
+                        const container = resultContainers[i];
+                        const titleEl = container.querySelector('h3');
+                        const linkEl = container.querySelector('a');
+                        const snippetEl = container.querySelector('.VwiC3b, .yD755d, .MUFPAc, .s3C59');
+                        
+                        if (titleEl && linkEl) {
+                            let url = linkEl.getAttribute('href') || '';
+                            if (url.startsWith('/url?q=')) {
+                                url = url.substring(7).split('&')[0];
+                            }
+                            results.push({
+                                title: titleEl.textContent?.trim() || 'No Title',
+                                snippet: snippetEl ? snippetEl.textContent?.trim() : 'Click link to view details',
+                                url: url
+                            });
+                        }
                     }
                 }
-                return results;
+                
+                // Fallback to DuckDuckGo Lite if Google returned nothing
+                if (results.length === 0) {
+                    console.log('Google search returned no results, falling back to DuckDuckGo...');
+                    const ddgProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://lite.duckduckgo.com/lite/?q=' + encodeURIComponent(query))}`;
+                    const ddgResponse = await fetch(ddgProxyUrl);
+                    if (ddgResponse.ok) {
+                        const ddgHtml = await ddgResponse.text();
+                        const ddgDoc = parser.parseFromString(ddgHtml, 'text/html');
+                        
+                        const rows = ddgDoc.querySelectorAll('table tr');
+                        let currentResult = null;
+                        
+                        rows.forEach((row) => {
+                            const link = row.querySelector('a.result-link');
+                            const snippet = row.querySelector('.result-snippet');
+                            
+                            if (link) {
+                                if (currentResult) results.push(currentResult);
+                                currentResult = {
+                                    title: link.textContent?.trim() || '',
+                                    url: link.getAttribute('href') || '',
+                                    snippet: ''
+                                };
+                            } else if (snippet && currentResult) {
+                                currentResult.snippet = snippet.textContent?.trim() || '';
+                            }
+                        });
+                        if (currentResult) results.push(currentResult);
+                    }
+                }
+                
+                return results.slice(0, 5);
             } catch (err) {
                 console.error('Search error:', err);
                 return [];
@@ -9571,7 +9760,523 @@ User Query: ${prompt}`;
         }
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // ==========================================
+        // PWA SERVICE WORKER REGISTRATION
+        // ==========================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW Registered', reg))
+                    .catch(err => console.error('SW Registration failed', err));
+            });
+        }
+
+        // ==========================================
+        // INDEXEDDB WRAPPERS
+        // ==========================================
+        function initHistoryDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('SwiftFileHistoryDB', 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('conversions')) {
+                        db.createObjectStore('conversions', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                req.onsuccess = (e) => resolve(e.target.result);
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function addHistoryItem(item) {
+            const db = await initHistoryDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('conversions', 'readwrite');
+                const store = tx.objectStore('conversions');
+                const addReq = store.add(item);
+                addReq.onsuccess = () => {
+                    db.close();
+                    resolve();
+                };
+                addReq.onerror = () => {
+                    db.close();
+                    reject(addReq.error);
+                };
+            });
+        }
+
+        async function getHistoryItems() {
+            const db = await initHistoryDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('conversions', 'readonly');
+                const store = tx.objectStore('conversions');
+                const getReq = store.getAll();
+                getReq.onsuccess = () => {
+                    db.close();
+                    resolve(getReq.result || []);
+                };
+                getReq.onerror = () => {
+                    db.close();
+                    reject(getReq.error);
+                };
+            });
+        }
+
+        async function deleteHistoryItem(id) {
+            const db = await initHistoryDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('conversions', 'readwrite');
+                const store = tx.objectStore('conversions');
+                const delReq = store.delete(id);
+                delReq.onsuccess = () => {
+                    db.close();
+                    resolve();
+                };
+                delReq.onerror = () => {
+                    db.close();
+                    reject(delReq.error);
+                };
+            });
+        }
+
+        async function clearHistory() {
+            const db = await initHistoryDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('conversions', 'readwrite');
+                const store = tx.objectStore('conversions');
+                const clearReq = store.clear();
+                clearReq.onsuccess = () => {
+                    db.close();
+                    resolve();
+                };
+                clearReq.onerror = () => {
+                    db.close();
+                    reject(clearReq.error);
+                };
+            });
+        }
+
+        // ==========================================
+        // THUMBNAIL GENERATOR HELPERS
+        // ==========================================
+        async function getPdfThumbnail(blob) {
+            try {
+                const arrayBuffer = await blob.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({ scale: 0.15 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+                return canvas.toDataURL('image/jpeg', 0.7);
+            } catch (e) {
+                console.error("PDF thumbnail generation failed:", e);
+                return null;
+            }
+        }
+
+        function getImageThumbnail(blob) {
+            return new Promise((resolve) => {
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = () => {
+                    URL.revokeObjectURL(url);
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxDim = 80;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > h) {
+                        if (w > maxDim) {
+                            h = h * (maxDim / w);
+                            w = maxDim;
+                        }
+                    } else {
+                        if (h > maxDim) {
+                            w = w * (maxDim / h);
+                            h = maxDim;
+                        }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    resolve(null);
+                };
+                img.src = url;
+            });
+        }
+
+        // ==========================================
+        // CONVERSION TRACKER
+        // ==========================================
+        async function recordConversion(filename, blob) {
+            try {
+                let thumbnail = null;
+                if (blob.type.startsWith('image/')) {
+                    thumbnail = await getImageThumbnail(blob);
+                } else if (blob.type === 'application/pdf') {
+                    thumbnail = await getPdfThumbnail(blob);
+                }
+
+                const item = {
+                    name: filename,
+                    type: blob.type || 'application/octet-stream',
+                    size: blob.size,
+                    timestamp: new Date().toISOString(),
+                    thumbnail: thumbnail,
+                    blob: blob
+                };
+
+                await addHistoryItem(item);
+                if (document.getElementById('history-drawer').classList.contains('open')) {
+                    renderHistoryList();
+                }
+            } catch (err) {
+                console.error('Failed to record conversion:', err);
+            }
+        }
+
+        // ==========================================
+        // DOWNLOAD INTERCEPTOR (MONKEYPATCH)
+        // ==========================================
+        const originalClick = HTMLAnchorElement.prototype.click;
+        HTMLAnchorElement.prototype.click = function () {
+            if (this.download && this.href) {
+                const filename = this.download;
+                const href = this.href;
+                if (href.startsWith('blob:') || href.startsWith('data:')) {
+                    fetch(href)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            recordConversion(filename, blob);
+                        })
+                        .catch(err => console.error("Interception error:", err));
+                }
+            }
+            return originalClick.apply(this, arguments);
+        };
+
+        // ==========================================
+        // HISTORY UI DRAWER & EVENT HANDLERS
+        // ==========================================
+        const historyBtn = document.getElementById('history-btn');
+        const historyDrawer = document.getElementById('history-drawer');
+        const historyOverlay = document.getElementById('history-overlay');
+        const closeHistoryBtn = document.getElementById('close-history-btn');
+        const clearAllHistoryBtn = document.getElementById('clear-all-history-btn');
+        const historyDrawerContent = document.getElementById('history-drawer-content');
+        const historyCount = document.getElementById('history-count');
+
+        function openHistoryDrawer() {
+            historyDrawer.classList.add('open');
+            historyOverlay.classList.add('open');
+            renderHistoryList();
+        }
+
+        function closeHistoryDrawer() {
+            historyDrawer.classList.remove('open');
+            historyOverlay.classList.remove('open');
+        }
+
+        historyBtn.addEventListener('click', openHistoryDrawer);
+        closeHistoryBtn.addEventListener('click', closeHistoryDrawer);
+        historyOverlay.addEventListener('click', closeHistoryDrawer);
+
+        clearAllHistoryBtn.addEventListener('click', async () => {
+            if (confirm("Are you sure you want to clear all conversion history? This will permanently delete local logs and cached files.")) {
+                await clearHistory();
+                renderHistoryList();
+                notify("History cleared successfully.", "success");
+            }
+        });
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        async function renderHistoryList() {
+            historyDrawerContent.innerHTML = '';
+            const items = await getHistoryItems();
+            
+            // Sort descending by timestamp
+            items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            historyCount.textContent = `${items.length} item${items.length === 1 ? '' : 's'}`;
+
+            if (items.length === 0) {
+                historyDrawerContent.innerHTML = `
+                    <div class="history-empty-state">
+                        <i data-lucide="history"></i>
+                        <h3 style="font-weight: 700;">No history yet</h3>
+                        <p style="font-size: 0.85rem; max-width: 250px;">Conversions you make on this device will appear here with previews and easy access.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'history-item';
+
+                // Setup preview thumbnail
+                let thumbnailHtml = '';
+                if (item.thumbnail) {
+                    thumbnailHtml = `<img src="${item.thumbnail}" alt="${item.name}">`;
+                } else if (item.type === 'application/pdf') {
+                    thumbnailHtml = `<i data-lucide="file-text"></i>`;
+                } else if (item.type.startsWith('image/')) {
+                    thumbnailHtml = `<i data-lucide="image"></i>`;
+                } else {
+                    thumbnailHtml = `<i data-lucide="file"></i>`;
+                }
+
+                const formattedTime = new Date(item.timestamp).toLocaleString();
+                const sizeStr = formatBytes(item.size);
+
+                itemDiv.innerHTML = `
+                    <div class="history-item-top">
+                        <div class="history-thumbnail">
+                            ${thumbnailHtml}
+                        </div>
+                        <div class="history-details">
+                            <div class="history-filename" title="${item.name}">${item.name}</div>
+                            <div class="history-meta">
+                                <span>${sizeStr}</span>
+                                <span>•</span>
+                                <span>${formattedTime}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-item-actions">
+                        <button class="history-action-btn open-file-btn" data-id="${item.id}">
+                            <i data-lucide="external-link" style="width:12px; height:12px;"></i> Open
+                        </button>
+                        <button class="history-action-btn share-file-btn" data-id="${item.id}">
+                            <i data-lucide="share-2" style="width:12px; height:12px;"></i> Share
+                        </button>
+                        <button class="history-action-btn danger delete-file-btn" data-id="${item.id}">
+                            <i data-lucide="trash-2" style="width:12px; height:12px;"></i> Delete
+                        </button>
+                    </div>
+                `;
+
+                // Bind Action buttons
+                itemDiv.querySelector('.open-file-btn').addEventListener('click', async () => {
+                    const db = await initHistoryDB();
+                    const tx = db.transaction('conversions', 'readonly');
+                    const getReq = tx.objectStore('conversions').get(item.id);
+                    getReq.onsuccess = () => {
+                        db.close();
+                        const record = getReq.result;
+                        if (record && record.blob) {
+                            const url = URL.createObjectURL(record.blob);
+                            window.open(url, '_blank');
+                        } else {
+                            notify("File not found or corrupted.", "error");
+                        }
+                    };
+                    getReq.onerror = () => { db.close(); notify("Failed to open file.", "error"); };
+                });
+
+                itemDiv.querySelector('.share-file-btn').addEventListener('click', async () => {
+                    const db = await initHistoryDB();
+                    const tx = db.transaction('conversions', 'readonly');
+                    const getReq = tx.objectStore('conversions').get(item.id);
+                    getReq.onsuccess = () => {
+                        db.close();
+                        const record = getReq.result;
+                        if (record && record.blob) {
+                            const shareFile = new File([record.blob], record.name, { type: record.blob.type });
+                            if (navigator.canShare && navigator.canShare({ files: [shareFile] })) {
+                                navigator.share({
+                                    files: [shareFile],
+                                    title: record.name,
+                                    text: 'Shared from Swift File'
+                                }).catch(err => console.log('Error sharing:', err));
+                            } else {
+                                // Fallback download
+                                const url = URL.createObjectURL(record.blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = record.name;
+                                a.click();
+                            }
+                        } else {
+                            notify("File not found.", "error");
+                        }
+                    };
+                    getReq.onerror = () => { db.close(); notify("Failed to share file.", "error"); };
+                });
+
+                itemDiv.querySelector('.delete-file-btn').addEventListener('click', async () => {
+                    await deleteHistoryItem(item.id);
+                    renderHistoryList();
+                    notify("File deleted from history.", "success");
+                });
+
+                historyDrawerContent.appendChild(itemDiv);
+            });
+
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // WEB SHARE TARGET RECEIVER
+        // ==========================================
+        async function getSharedFiles() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('SwiftFileShareDB', 1);
+                req.onsuccess = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('shared-files')) {
+                        resolve([]);
+                        return;
+                    }
+                    const tx = db.transaction('shared-files', 'readonly');
+                    const store = tx.objectStore('shared-files');
+                    const getReq = store.getAll();
+                    getReq.onsuccess = () => {
+                        db.close();
+                        resolve(getReq.result || []);
+                    };
+                    getReq.onerror = () => {
+                        db.close();
+                        reject(getReq.error);
+                    };
+                };
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function clearSharedFiles() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('SwiftFileShareDB', 1);
+                req.onsuccess = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('shared-files')) {
+                        resolve();
+                        return;
+                    }
+                    const tx = db.transaction('shared-files', 'readwrite');
+                    const store = tx.objectStore('shared-files');
+                    const clearReq = store.clear();
+                    clearReq.onsuccess = () => {
+                        db.close();
+                        resolve();
+                    };
+                    clearReq.onerror = () => {
+                        db.close();
+                        reject(clearReq.error);
+                    };
+                };
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function handleReceivedShare() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('shared') === '1') {
+                try {
+                    const sharedItems = await getSharedFiles();
+                    if (sharedItems && sharedItems.length > 0) {
+                        // Clear the database immediately so we don't process again on refresh
+                        await clearSharedFiles();
+
+                        // Route files based on types
+                        for (const item of sharedItems) {
+                            const blob = new Blob([item.data], { type: item.type });
+                            const file = new File([blob], item.name, { type: item.type });
+
+                            if (file.type === 'application/pdf') {
+                                switchTab('pdf-to-img');
+                                const dt = new DataTransfer();
+                                dt.items.add(file);
+                                document.getElementById('pdf-input').files = dt.files;
+                                handlePdfSelect();
+                                notify(`Loaded ${file.name} for PDF to Image conversion.`, 'success');
+                            } else if (file.type.startsWith('image/')) {
+                                switchTab('img-to-pdf');
+                                const dt = new DataTransfer();
+                                dt.items.add(file);
+                                document.getElementById('img-input').files = dt.files;
+                                handleImgSelect();
+                                notify(`Loaded ${file.name} for Image to PDF conversion.`, 'success');
+                            } else if (file.name.endsWith('.docx')) {
+                                switchTab('word-to-pdf');
+                                const dt = new DataTransfer();
+                                dt.items.add(file);
+                                document.getElementById('word-to-pdf-input').files = dt.files;
+                                handleWordSelect();
+                                notify(`Loaded ${file.name} for Word to PDF conversion.`, 'success');
+                            } else {
+                                // Default to assistant attachment
+                                switchTab('swift-assistant');
+                                const isText = file.type === 'text/plain' || file.name.endsWith('.txt') || file.name.endsWith('.csv') || file.name.endsWith('.json') || file.name.endsWith('.xml') || file.name.endsWith('.md');
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                    attachedFile = {
+                                        name: file.name,
+                                        type: file.type,
+                                        data: reader.result,
+                                        isText: isText
+                                    };
+                                    renderAttachedFile();
+                                    notify(`Attached ${file.name} to Swift Assistant.`, 'success');
+                                };
+                                if (isText) {
+                                    reader.readAsText(file);
+                                } else {
+                                    reader.readAsDataURL(file);
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error reading shared data:", e);
+                } finally {
+                    // Clean up URL parameters
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        }
+
+        // Check for shared items on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(handleReceivedShare, 500);
+        });
     </script>
+    
+    <!-- History Drawer -->
+    <div class="history-overlay" id="history-overlay"></div>
+    <div class="history-drawer" id="history-drawer">
+        <div class="history-drawer-header">
+            <h2><i data-lucide="history"></i> Conversion History</h2>
+            <button id="close-history-btn" class="icon-btn" title="Close">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="history-drawer-content" id="history-drawer-content">
+            <!-- History items go here -->
+        </div>
+        <div class="history-drawer-footer">
+            <span id="history-count" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">0 items</span>
+            <button id="clear-all-history-btn" class="history-action-btn danger">
+                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear All
+            </button>
+        </div>
+    </div>
 </body>
 
 </html>
