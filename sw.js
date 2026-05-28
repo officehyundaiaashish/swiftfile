@@ -1,4 +1,4 @@
-const CACHE_NAME = 'swiftfile-v1';
+const CACHE_NAME = 'swiftfile-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -14,6 +14,18 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('Deleting old cache:', cache);
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
   self.clients.claim();
 });
 
@@ -92,8 +104,24 @@ self.addEventListener('fetch', (e) => {
 
   // Normal fetch
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
+    (async () => {
+      // Network-First for index.html & the root directory
+      if (url.pathname === '/' || url.pathname.endsWith('index.html') || url.pathname === '/index.html') {
+        try {
+          const networkResponse = await fetch(e.request);
+          if (networkResponse && networkResponse.status === 200) {
+            const cache = await caches.open(CACHE_NAME);
+            cache.put(e.request, networkResponse.clone());
+            return networkResponse;
+          }
+        } catch (err) {
+          // Network failed, fall back to cached version
+        }
+      }
+
+      // Default to Cache-First for static assets
+      const cachedResponse = await caches.match(e.request);
       return cachedResponse || fetch(e.request);
-    })
+    })()
   );
 });
