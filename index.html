@@ -1935,7 +1935,7 @@
                 flex-wrap: nowrap !important;
             }
 
-            .assistant-input-row>div {
+            .assistant-input-row>div:not(.assistant-send-wrapper) {
                 min-width: 0 !important;
                 flex: 1 !important;
             }
@@ -1970,6 +1970,7 @@
                 width: 34px !important;
                 height: 34px !important;
                 min-width: 34px !important;
+                flex: 0 0 34px !important;
             }
 
             .assistant-send-wrapper button {
@@ -10264,7 +10265,7 @@
                 if (provider === 'builtin') {
                     // Route through Vercel proxy (API key stored securely on server)
                     const messagesPayload = chatHistory.map((msg, idx) => {
-                        let content = msg.content;
+                        let content = (msg.content && msg.content.trim()) || '...';
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
                             const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                             content = `You have access to web search results to answer the user query.
@@ -10305,7 +10306,7 @@ User Query: ${msg.content}`;
                     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
                     const contentsPayload = chatHistory.map((msg, idx) => {
-                        let msgContent = msg.content;
+                        let msgContent = (msg.content && msg.content.trim()) || '...';
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
                             const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                             msgContent = `You have access to web search results to answer the user query.
@@ -10319,7 +10320,7 @@ Instructions:
 
 User Query: ${msg.content}`;
                         }
-                        const parts = [{ text: msgContent || 'Attached file details below:' }];
+                        const parts = [{ text: msgContent }];
                         if (msg.attachment) {
                             if (msg.attachment.type.startsWith('image/')) {
                                 try {
@@ -10393,7 +10394,7 @@ User Query: ${msg.content}`;
                     if (!endpoint) throw new Error('API endpoint URL is required.');
 
                     const messagesPayload = chatHistory.map((msg, idx) => {
-                        let content = msg.content;
+                        let content = (msg.content && msg.content.trim()) || '...';
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
                             const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                             content = `You have access to web search results to answer the user query.
