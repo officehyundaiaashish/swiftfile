@@ -889,6 +889,7 @@
             .flex-mobile-stack {
                 flex-direction: column;
             }
+
             .flex-mobile-stack button {
                 width: 100%;
                 justify-content: center;
@@ -1617,6 +1618,7 @@
             user-select: text;
             cursor: text;
         }
+
         .assistant-chat-bubble p,
         .assistant-chat-bubble span,
         .assistant-chat-bubble li,
@@ -1624,23 +1626,28 @@
             -webkit-user-select: text;
             user-select: text;
         }
+
         #assistant-chat-log {
             -webkit-user-select: text;
             user-select: text;
             scrollbar-width: thin;
             scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
         }
+
         #assistant-chat-log::-webkit-scrollbar {
             width: 6px;
         }
+
         #assistant-chat-log::-webkit-scrollbar-thumb {
             background: rgba(128, 128, 128, 0.25);
             border-radius: 10px;
         }
+
         #assistant-chat-log::-webkit-scrollbar-track {
             background: transparent;
             margin: 12px 0;
         }
+
         #assistant-input {
             -webkit-user-select: auto !important;
             user-select: auto !important;
@@ -1648,24 +1655,29 @@
             scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
             overflow-y: hidden !important;
         }
+
         #assistant-input::-webkit-scrollbar {
             width: 4px;
             background: transparent;
         }
+
         #assistant-input::-webkit-scrollbar-thumb {
             background: rgba(128, 128, 128, 0.25);
             border-radius: 4px;
         }
+
         #assistant-input::-webkit-scrollbar-track {
             background: transparent;
             margin: 6px 0;
         }
+
         #search-web-toggle.active-on {
             background: var(--accent-color) !important;
             color: white !important;
             border-color: var(--accent-color) !important;
             box-shadow: 0 2px 8px var(--accent-shadow) !important;
         }
+
         #assistant-send-btn,
         #assistant-send-btn:focus,
         #assistant-send-btn:active,
@@ -1674,6 +1686,7 @@
             border: none !important;
             -webkit-tap-highlight-color: transparent !important;
         }
+
         #search-web-toggle.active-auto {
             background: var(--accent-alpha) !important;
             color: var(--accent-color) !important;
@@ -1681,8 +1694,15 @@
         }
 
         @keyframes bubbleFadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .assistant-chat-bubble.user {
@@ -1720,9 +1740,11 @@
             width: 14px;
             height: 14px;
         }
+
         .chat-bubble-action-btn:hover {
             color: var(--accent-color);
         }
+
         .chat-bubble-action-btn i {
             width: 8px;
             height: 8px;
@@ -1742,7 +1764,7 @@
 
         .assistant-chat-bubble code {
             font-family: monospace;
-            background: rgba(0,0,0,0.05);
+            background: rgba(0, 0, 0, 0.05);
             padding: 2px 4px;
             border-radius: 4px;
             font-size: 0.85rem;
@@ -1818,10 +1840,12 @@
         .mobile-only-btn {
             display: none !important;
         }
+
         @media (max-width: 768px) {
             .mobile-only-btn {
                 display: flex !important;
             }
+
             /* ===== Fullscreen Mode ===== */
             #swift-assistant.mobile-fullscreen {
                 position: fixed !important;
@@ -1840,8 +1864,9 @@
                 display: flex !important;
                 flex-direction: column !important;
             }
+
             /* Outer wrapper (the card div) */
-            #swift-assistant.mobile-fullscreen > div,
+            #swift-assistant.mobile-fullscreen>div,
             #swift-assistant.mobile-fullscreen .assistant-outer-wrap {
                 height: 100% !important;
                 max-height: 100% !important;
@@ -1857,6 +1882,7 @@
                 flex: 1 !important;
                 overflow: hidden !important;
             }
+
             /* Inner wrapper (the chat interface container) */
             #swift-assistant.mobile-fullscreen .assistant-inner-wrap {
                 flex: 1 !important;
@@ -1866,6 +1892,7 @@
                 gap: 0 !important;
                 overflow: hidden !important;
             }
+
             /* Chat log takes remaining space */
             #swift-assistant.mobile-fullscreen #assistant-chat-log {
                 flex: 1 !important;
@@ -1878,23 +1905,27 @@
                 padding: 10px !important;
                 border-radius: 14px !important;
             }
+
             /* Input bar pinned at bottom - NEVER collapse */
             #swift-assistant.mobile-fullscreen .assistant-input-bar {
                 flex-shrink: 0 !important;
                 padding-top: 8px !important;
                 padding-bottom: 0 !important;
             }
+
             /* ===== Non-fullscreen mobile ===== */
-            #swift-assistant > div {
+            #swift-assistant>div {
                 padding: 0.75rem !important;
                 border-radius: 16px !important;
                 gap: 0.75rem !important;
                 min-height: 400px !important;
             }
+
             #assistant-chat-log {
                 padding: 0.75rem !important;
                 max-height: 45vh !important;
             }
+
             /* ===== Input row (shared) ===== */
             .assistant-input-row {
                 gap: 4px !important;
@@ -1903,10 +1934,12 @@
                 align-items: flex-end !important;
                 flex-wrap: nowrap !important;
             }
-            .assistant-input-row > div {
+
+            .assistant-input-row>div {
                 min-width: 0 !important;
                 flex: 1 !important;
             }
+
             .assistant-input-row button {
                 width: 34px !important;
                 height: 34px !important;
@@ -1918,21 +1951,25 @@
                 padding: 0 !important;
                 border-radius: 50% !important;
             }
+
             .assistant-input-row button i {
                 width: 14px !important;
                 height: 14px !important;
             }
+
             /* Send/Stop button wrapper - shrinks on mobile */
-            .assistant-input-row > div[style*="position: relative"],
-            .assistant-input-row > div:has(#assistant-send-btn) {
+            .assistant-input-row>div[style*="position: relative"],
+            .assistant-input-row>div:has(#assistant-send-btn) {
                 width: 34px !important;
                 height: 34px !important;
                 min-width: 34px !important;
             }
-            .assistant-input-row > div:has(#assistant-send-btn) button {
+
+            .assistant-input-row>div:has(#assistant-send-btn) button {
                 width: 34px !important;
                 height: 34px !important;
             }
+
             #assistant-input {
                 padding: 8px 10px !important;
                 font-size: 0.85rem !important;
@@ -1945,7 +1982,9 @@
                 scrollbar-width: thin !important;
                 overflow-y: hidden !important;
             }
-            #assistant-settings-popover, #assistant-history-popover {
+
+            #assistant-settings-popover,
+            #assistant-history-popover {
                 width: calc(100vw - 24px) !important;
                 max-width: 280px !important;
                 right: 0 !important;
@@ -1963,10 +2002,12 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
+
         .history-overlay.open {
             opacity: 1;
             pointer-events: auto;
         }
+
         .history-drawer {
             position: fixed;
             top: 0;
@@ -1985,9 +2026,11 @@
             backdrop-filter: var(--glass-blur);
             overscroll-behavior: contain;
         }
+
         .history-drawer.open {
             right: 0;
         }
+
         .history-drawer-header {
             padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
@@ -1995,6 +2038,7 @@
             justify-content: space-between;
             align-items: center;
         }
+
         .history-drawer-header h2 {
             font-size: 1.25rem;
             font-weight: 700;
@@ -2003,6 +2047,7 @@
             gap: 0.5rem;
             color: var(--text-primary);
         }
+
         .history-drawer-content {
             flex: 1;
             overflow-y: auto;
@@ -2012,9 +2057,11 @@
             gap: 1rem;
             overscroll-behavior: contain;
         }
+
         .history-drawer:has(.history-clear-dialog.open) .history-drawer-content {
             overflow-y: hidden !important;
         }
+
         .history-empty-state {
             display: flex;
             flex-direction: column;
@@ -2026,12 +2073,14 @@
             gap: 1rem;
             padding: 2rem;
         }
+
         .history-empty-state i {
             width: 48px;
             height: 48px;
             opacity: 0.5;
             color: var(--accent-color);
         }
+
         .history-item {
             background: var(--input-bg);
             border: 1px solid var(--border-color);
@@ -2042,16 +2091,19 @@
             gap: 0.75rem;
             transition: var(--transition);
         }
+
         .history-item:hover {
             transform: translateY(-2px);
             border-color: var(--accent-border-alpha);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
+
         .history-item-top {
             display: flex;
             gap: 1rem;
             align-items: center;
         }
+
         .history-thumbnail {
             width: 56px;
             height: 56px;
@@ -2064,20 +2116,24 @@
             flex-shrink: 0;
             border: 1px solid var(--border-color);
         }
+
         .history-thumbnail img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+
         .history-thumbnail i {
             width: 24px;
             height: 24px;
             color: var(--accent-color);
         }
+
         .history-details {
             flex: 1;
             min-width: 0;
         }
+
         .history-filename {
             font-weight: 600;
             font-size: 0.85rem;
@@ -2087,6 +2143,7 @@
             text-overflow: ellipsis;
             margin-bottom: 4px;
         }
+
         .history-meta {
             font-size: 0.75rem;
             color: var(--text-secondary);
@@ -2094,6 +2151,7 @@
             flex-wrap: wrap;
             gap: 8px;
         }
+
         .history-item-actions {
             display: flex;
             gap: 8px;
@@ -2102,6 +2160,7 @@
             border-top: 1px solid var(--border-color);
             padding-top: 0.5rem;
         }
+
         .history-action-btn {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -2117,15 +2176,18 @@
             font-size: 0.75rem;
             font-weight: 600;
         }
+
         .history-action-btn:hover {
             background: var(--border-color);
             border-color: var(--text-secondary);
         }
+
         .history-action-btn.danger:hover {
             background: rgba(239, 68, 68, 0.1);
             border-color: rgba(239, 68, 68, 0.3);
             color: #ef4444;
         }
+
         .history-drawer-footer {
             padding: 1rem;
             border-top: 1px solid var(--border-color);
@@ -2134,7 +2196,7 @@
             align-items: center;
             background: var(--surface-color);
         }
-        
+
         /* Custom Clear Warning Dialog inside Panel */
         .history-clear-dialog {
             position: absolute;
@@ -2150,10 +2212,12 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
+
         .history-clear-dialog.open {
             opacity: 1;
             pointer-events: auto;
         }
+
         .history-clear-dialog-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -2166,9 +2230,11 @@
             transform: scale(0.9);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         .history-clear-dialog.open .history-clear-dialog-card {
             transform: scale(1);
         }
+
         .history-clear-dialog-icon {
             width: 48px;
             height: 48px;
@@ -2180,22 +2246,26 @@
             justify-content: center;
             margin: 0 auto 1rem;
         }
+
         .history-clear-dialog-icon i {
             width: 24px;
             height: 24px;
         }
+
         .history-clear-dialog-card h3 {
             font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
             color: var(--text-primary);
         }
+
         .history-clear-dialog-card p {
             font-size: 0.85rem;
             color: var(--text-secondary);
             margin-bottom: 1.25rem;
             line-height: 1.5;
         }
+
         .history-clear-dialog-actions {
             display: flex;
             gap: 12px;
@@ -2213,9 +2283,11 @@
             display: flex;
             flex-direction: column;
         }
+
         .code-block-wrapper pre {
             margin: 0;
         }
+
         .code-copy-btn {
             align-self: flex-end;
             background: rgba(0, 0, 0, 0.35);
@@ -2233,10 +2305,12 @@
             z-index: 5;
             margin-top: -1px;
         }
+
         .code-copy-btn:hover {
             background: var(--accent-color);
             color: white;
         }
+
         .code-copy-btn.copied {
             background: #22c55e;
             color: white;
@@ -2259,11 +2333,13 @@
             outline: none !important;
             z-index: 2;
         }
+
         .stop-gen-btn:hover {
             background: #ef4444 !important;
             color: white !important;
             transform: translateY(-1px);
         }
+
         .stop-gen-btn.active {
             display: flex;
         }
@@ -2273,6 +2349,7 @@
             opacity: 0;
             transition: opacity 0.2s ease;
         }
+
         .assistant-chat-bubble:hover .regenerate-btn {
             opacity: 1;
         }
@@ -2290,10 +2367,12 @@
             outline: none;
             font-family: inherit;
         }
+
         .conv-rename-btn {
             opacity: 0;
             transition: opacity 0.15s ease;
         }
+
         .conv-item-wrap:hover .conv-rename-btn {
             opacity: 1;
         }
@@ -2306,18 +2385,28 @@
             transition: opacity 0.2s ease;
             cursor: default;
         }
+
         .assistant-chat-bubble:hover .msg-timestamp {
             opacity: 0.7;
         }
+
         .msg-timestamp:hover {
             opacity: 1 !important;
         }
 
         /* Streaming cursor */
         @keyframes blink-cursor {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
         }
+
         .streaming-cursor::after {
             content: '';
             display: inline-block;
@@ -3275,11 +3364,16 @@
                                 </button>
                             </div>
 
-                            <div class="control-group" style="margin-top: 1rem; background: var(--input-bg); padding: 1rem; border-radius: 16px; border: 1px solid var(--border-color);">
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); cursor: pointer; user-select: none;">
-                                    <input type="checkbox" id="scanner-watermark-toggle" style="cursor: pointer; width: 16px; height: 16px;"> Add Watermark
+                            <div class="control-group"
+                                style="margin-top: 1rem; background: var(--input-bg); padding: 1rem; border-radius: 16px; border: 1px solid var(--border-color);">
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); cursor: pointer; user-select: none;">
+                                    <input type="checkbox" id="scanner-watermark-toggle"
+                                        style="cursor: pointer; width: 16px; height: 16px;"> Add Watermark
                                 </label>
-                                <input type="text" id="scanner-watermark-text" value="Scanned with Swift File" placeholder="Watermark text..." class="password-input" style="margin-top: 8px; margin-bottom: 0; padding: 8px 12px; font-size: 0.85rem; display: none;">
+                                <input type="text" id="scanner-watermark-text" value="Scanned with Swift File"
+                                    placeholder="Watermark text..." class="password-input"
+                                    style="margin-top: 8px; margin-bottom: 0; padding: 8px 12px; font-size: 0.85rem; display: none;">
                             </div>
 
                             <div
@@ -3303,11 +3397,15 @@
             </div>
 
             <div id="webpage-to-pdf" class="tab-content">
-                <div style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem;">
+                <div
+                    style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem;">
                     <div>
-                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Enter Webpage URL / Link</label>
+                        <label
+                            style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Enter
+                            Webpage URL / Link</label>
                         <div class="flex-mobile-stack">
-                            <input type="url" id="webpage-url-input" class="password-input" placeholder="https://en.wikipedia.org/wiki/PDF" style="margin-bottom: 0; flex: 1;">
+                            <input type="url" id="webpage-url-input" class="password-input"
+                                placeholder="https://en.wikipedia.org/wiki/PDF" style="margin-bottom: 0; flex: 1;">
                             <button id="webpage-fetch-btn" class="primary-btn" style="padding: 0.75rem 1.5rem;">
                                 <span>Fetch Page</span>
                                 <i data-lucide="globe"></i>
@@ -3315,36 +3413,55 @@
                         </div>
                     </div>
 
-                    <div style="text-align: center; color: var(--text-secondary); position: relative; margin: 0.5rem 0;">
-                        <span style="background: var(--input-bg); padding: 0 10px; position: relative; z-index: 2; font-weight: 600; font-size: 0.85rem;">OR PASTE HTML DIRECTLY</span>
-                        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border-color); z-index: 1;"></div>
+                    <div
+                        style="text-align: center; color: var(--text-secondary); position: relative; margin: 0.5rem 0;">
+                        <span
+                            style="background: var(--input-bg); padding: 0 10px; position: relative; z-index: 2; font-weight: 600; font-size: 0.85rem;">OR
+                            PASTE HTML DIRECTLY</span>
+                        <div
+                            style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border-color); z-index: 1;">
+                        </div>
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">HTML Source Code</label>
-                        <textarea id="webpage-html-input" class="password-input" rows="8" placeholder="<h1>Hello World</h1><p>Type or paste your HTML here...</p>" style="font-family: monospace; font-size: 0.9rem; resize: vertical; margin-bottom: 0;"></textarea>
+                        <label
+                            style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">HTML
+                            Source Code</label>
+                        <textarea id="webpage-html-input" class="password-input" rows="8"
+                            placeholder="<h1>Hello World</h1><p>Type or paste your HTML here...</p>"
+                            style="font-family: monospace; font-size: 0.9rem; resize: vertical; margin-bottom: 0;"></textarea>
                     </div>
 
                     <!-- Webpage Preview Comes Underneath -->
                     <div id="webpage-preview-container" class="preview-container hidden">
-                        <label style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Page Preview (Standard A4 Size)</label>
-                        <div class="word-preview-wrapper" style="max-height: 600px; padding: 1.5rem; display: flex; justify-content: center; background: rgba(0,0,0,0.03); border-radius: 16px; overflow-x: auto;">
-                            <iframe id="webpage-preview-iframe" style="width: 794px; height: 1123px; border: 1px solid var(--border-color); background: white; pointer-events: none; box-shadow: var(--shadow); border-radius: 8px;"></iframe>
+                        <label
+                            style="display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Page
+                            Preview (Standard A4 Size)</label>
+                        <div class="word-preview-wrapper"
+                            style="max-height: 600px; padding: 1.5rem; display: flex; justify-content: center; background: rgba(0,0,0,0.03); border-radius: 16px; overflow-x: auto;">
+                            <iframe id="webpage-preview-iframe"
+                                style="width: 794px; height: 1123px; border: 1px solid var(--border-color); background: white; pointer-events: none; box-shadow: var(--shadow); border-radius: 8px;"></iframe>
                         </div>
 
                         <!-- PDF Page Setup Controls -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--input-bg); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); margin-top: 1.5rem;">
+                        <div
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--input-bg); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); margin-top: 1.5rem;">
                             <div>
-                                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Page Size</label>
-                                <select id="webpage-pdf-size" class="password-input" style="padding: 8px 12px; height: 38px; margin-bottom: 0; width: 100%;">
+                                <label
+                                    style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Page
+                                    Size</label>
+                                <select id="webpage-pdf-size" class="password-input"
+                                    style="padding: 8px 12px; height: 38px; margin-bottom: 0; width: 100%;">
                                     <option value="a4">A4 (Standard)</option>
                                     <option value="letter">Letter</option>
                                     <option value="a3">A3 (Large)</option>
                                 </select>
                             </div>
                             <div>
-                                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Orientation</label>
-                                <select id="webpage-pdf-orient" class="password-input" style="padding: 8px 12px; height: 38px; margin-bottom: 0; width: 100%;">
+                                <label
+                                    style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Orientation</label>
+                                <select id="webpage-pdf-orient" class="password-input"
+                                    style="padding: 8px 12px; height: 38px; margin-bottom: 0; width: 100%;">
                                     <option value="auto">Auto-Detect</option>
                                     <option value="p">Portrait</option>
                                     <option value="l">Landscape</option>
@@ -3353,7 +3470,8 @@
                         </div>
 
                         <div class="action-bar" style="margin-top: 1.5rem; margin-bottom: 1rem;">
-                            <button id="webpage-convert-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                            <button id="webpage-convert-btn" class="primary-btn btn-download-success"
+                                style="width: 100%; justify-content: center;">
                                 <span>Convert Webpage to PDF</span>
                                 <i data-lucide="download"></i>
                             </button>
@@ -3384,31 +3502,41 @@
                         </div>
                     </div>
 
-                    <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 280px; gap: 2rem; margin-top: 1rem;">
+                    <div class="bg-tool-layout"
+                        style="display: grid; grid-template-columns: 1fr 280px; gap: 2rem; margin-top: 1rem;">
                         <div class="collage-main-preview">
-                            <div class="large-preview-box" style="padding: 1rem; overflow-y: auto; flex-direction: column; gap: 2rem; max-height: 650px; min-height: 500px; justify-content: flex-start;" id="redact-pages-container">
+                            <div class="large-preview-box"
+                                style="padding: 1rem; overflow-y: auto; flex-direction: column; gap: 2rem; max-height: 650px; min-height: 500px; justify-content: flex-start;"
+                                id="redact-pages-container">
                                 <!-- Canvases with redaction shapes will be appended here -->
                             </div>
                         </div>
 
                         <div class="bg-controls-panel">
                             <div class="control-group">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Redaction Style</label>
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Redaction
+                                    Style</label>
                                 <div style="display: flex; flex-direction: column; gap: 10px;">
                                     <div style="display: flex; align-items: center; justify-content: space-between;">
                                         <span style="font-size: 0.85rem; font-weight: 600;">Mask Color</span>
-                                        <div style="position: relative; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 2px solid var(--border-color);">
-                                            <input type="color" id="redact-color-picker" value="#000000" style="position: absolute; top: -10px; left: -10px; width: 80px; height: 80px; border: none; cursor: pointer;">
+                                        <div
+                                            style="position: relative; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 2px solid var(--border-color);">
+                                            <input type="color" id="redact-color-picker" value="#000000"
+                                                style="position: absolute; top: -10px; left: -10px; width: 80px; height: 80px; border: none; cursor: pointer;">
                                         </div>
                                     </div>
-                                    <button id="redact-clear-shapes-btn" class="secondary-btn" style="width: 100%; justify-content: center; font-size: 0.85rem;">
+                                    <button id="redact-clear-shapes-btn" class="secondary-btn"
+                                        style="width: 100%; justify-content: center; font-size: 0.85rem;">
                                         <i data-lucide="trash-2" style="width:16px;"></i> Clear Drawn Boxes
                                     </button>
                                 </div>
                             </div>
-                            
-                            <div class="control-group" style="background: var(--input-bg); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-secondary);">
-                                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">💡 How to Redact:</p>
+
+                            <div class="control-group"
+                                style="background: var(--input-bg); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-secondary);">
+                                <p style="font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">💡 How to
+                                    Redact:</p>
                                 <ul style="padding-left: 14px; display: flex; flex-direction: column; gap: 4px;">
                                     <li>Click and drag directly over the text/images on the document to draw a box.</li>
                                     <li>Multiple boxes can be drawn across pages.</li>
@@ -3417,7 +3545,8 @@
                             </div>
 
                             <div style="margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color);">
-                                <button id="redact-apply-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                                <button id="redact-apply-btn" class="primary-btn btn-download-success"
+                                    style="width: 100%; justify-content: center;">
                                     <i data-lucide="shield-alert"></i> Redact & Download
                                 </button>
                             </div>
@@ -3446,16 +3575,20 @@
                         <button id="clear-watermark" class="text-btn danger">Clear All</button>
                     </div>
 
-                    <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                    <div class="bg-tool-layout"
+                        style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
                         <div class="collage-main-preview">
                             <div class="large-preview-box" id="watermark-preview-box">
-                                <canvas id="watermark-preview-canvas" style="max-width: 100%; max-height: 600px; box-shadow: var(--shadow); border-radius: 8px; display: block;"></canvas>
+                                <canvas id="watermark-preview-canvas"
+                                    style="max-width: 100%; max-height: 600px; box-shadow: var(--shadow); border-radius: 8px; display: block;"></canvas>
                             </div>
                         </div>
 
                         <div class="bg-controls-panel">
                             <div class="control-group">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Watermark Type</label>
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Watermark
+                                    Type</label>
                                 <div class="bg-option-tabs">
                                     <button class="bg-option-btn active" id="wm-type-text-btn">Text</button>
                                     <button class="bg-option-btn" id="wm-type-image-btn">Image</button>
@@ -3463,16 +3596,24 @@
 
                                 <!-- Text Options -->
                                 <div id="wm-text-options">
-                                    <input type="text" id="wm-text-input" class="password-input" value="CONFIDENTIAL" placeholder="Enter watermark text..." style="margin-top: 12px; margin-bottom: 12px;">
-                                    
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                                    <input type="text" id="wm-text-input" class="password-input" value="CONFIDENTIAL"
+                                        placeholder="Enter watermark text..."
+                                        style="margin-top: 12px; margin-bottom: 12px;">
+
+                                    <div
+                                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
                                         <div>
-                                            <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Color</label>
-                                            <input type="color" id="wm-text-color" value="#ff0000" class="password-input" style="padding: 4px; height: 38px; cursor: pointer;">
+                                            <label
+                                                style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Color</label>
+                                            <input type="color" id="wm-text-color" value="#ff0000"
+                                                class="password-input"
+                                                style="padding: 4px; height: 38px; cursor: pointer;">
                                         </div>
                                         <div>
-                                            <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Font</label>
-                                            <select id="wm-text-font" class="password-input" style="padding: 8px 12px; height: 38px;">
+                                            <label
+                                                style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">Font</label>
+                                            <select id="wm-text-font" class="password-input"
+                                                style="padding: 8px 12px; height: 38px;">
                                                 <option value="Helvetica">Helvetica</option>
                                                 <option value="Courier">Courier</option>
                                                 <option value="Times-Roman">Times New Roman</option>
@@ -3483,7 +3624,8 @@
 
                                 <!-- Image Options -->
                                 <div id="wm-image-options" class="hidden" style="margin-top: 12px;">
-                                    <button id="wm-upload-btn" class="secondary-btn" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 10px; margin-bottom: 12px;">
+                                    <button id="wm-upload-btn" class="secondary-btn"
+                                        style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 10px; margin-bottom: 12px;">
                                         <i data-lucide="image-plus" style="width:16px;"></i> Upload Logo / Image
                                     </button>
                                     <input type="file" id="wm-img-file-input" accept="image/*" hidden>
@@ -3491,7 +3633,8 @@
                             </div>
 
                             <div class="control-group">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Placement</label>
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Placement</label>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                                     <button class="bg-option-btn active" data-wm-pos="center">Center</button>
                                     <button class="bg-option-btn" data-wm-pos="bottom-right">Bottom Right</button>
@@ -3502,26 +3645,35 @@
 
                             <div class="control-group">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Opacity</label>
+                                    <label
+                                        style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Opacity</label>
                                     <span id="wm-opacity-val" style="font-size: 0.8rem; font-weight: 600;">30%</span>
                                 </div>
-                                <input type="range" id="wm-opacity-slider" min="10" max="100" value="30" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none; margin-bottom: 12px;">
+                                <input type="range" id="wm-opacity-slider" min="10" max="100" value="30"
+                                    style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none; margin-bottom: 12px;">
 
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Scale / Size</label>
+                                    <label
+                                        style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Scale
+                                        / Size</label>
                                     <span id="wm-size-val" style="font-size: 0.8rem; font-weight: 600;">100%</span>
                                 </div>
-                                <input type="range" id="wm-size-slider" min="10" max="300" value="100" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none; margin-bottom: 12px;">
+                                <input type="range" id="wm-size-slider" min="10" max="300" value="100"
+                                    style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none; margin-bottom: 12px;">
 
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Rotation</label>
-                                    <span id="wm-rotation-val" style="font-size: 0.8rem; font-weight: 600;">45&deg;</span>
+                                    <label
+                                        style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Rotation</label>
+                                    <span id="wm-rotation-val"
+                                        style="font-size: 0.8rem; font-weight: 600;">45&deg;</span>
                                 </div>
-                                <input type="range" id="wm-rotation-slider" min="-180" max="180" value="45" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+                                <input type="range" id="wm-rotation-slider" min="-180" max="180" value="45"
+                                    style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
                             </div>
 
                             <div style="margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color);">
-                                <button id="wm-apply-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center;">
+                                <button id="wm-apply-btn" class="primary-btn btn-download-success"
+                                    style="width: 100%; justify-content: center;">
                                     <i data-lucide="download"></i> Apply & Download
                                 </button>
                             </div>
@@ -3532,45 +3684,66 @@
 
             <!-- Swift Assistant Section -->
             <div id="swift-assistant" class="tab-content active">
-                <div class="assistant-outer-wrap" style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem; min-height: 550px;">
-                    
+                <div class="assistant-outer-wrap"
+                    style="background: var(--input-bg); padding: 2rem; border-radius: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.5rem; min-height: 550px;">
+
                     <!-- Chat Interface Container -->
-                    <div class="assistant-inner-wrap" style="display: flex; flex-direction: column; flex: 1; position: relative; min-height: 0;">
+                    <div class="assistant-inner-wrap"
+                        style="display: flex; flex-direction: column; flex: 1; position: relative; min-height: 0;">
                         <!-- Dedicated Chat Header Row -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; flex-shrink: 0;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; flex-shrink: 0;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <button id="assistant-close-btn" class="chat-bubble-action-btn mobile-only-btn" title="Minimize" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: none; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 4px;">
+                                <button id="assistant-close-btn" class="chat-bubble-action-btn mobile-only-btn"
+                                    title="Minimize"
+                                    style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: none; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 4px;">
                                     <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
                                 </button>
-                                <img src="logo.png" style="width: 20px; height: 20px; object-fit: cover; border-radius: 4px; display: inline-block;">
-                                <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Swift Assistant</span>
+                                <img src="logo.png"
+                                    style="width: 20px; height: 20px; object-fit: cover; border-radius: 4px; display: inline-block;">
+                                <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Swift
+                                    Assistant</span>
                             </div>
-                            
+
                             <div style="display: flex; align-items: center; gap: 8px; position: relative;">
-                                <span id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444;"></span>
-                                <button id="assistant-history-toggle-btn" class="chat-bubble-action-btn" title="Previous Conversations" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                <span id="status-dot"
+                                    style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444;"></span>
+                                <button id="assistant-history-toggle-btn" class="chat-bubble-action-btn"
+                                    title="Previous Conversations"
+                                    style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
                                     <i data-lucide="history" style="width: 14px; height: 14px;"></i>
                                 </button>
-                                <button id="assistant-settings-toggle-btn" class="chat-bubble-action-btn" title="Model & API Settings" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
+                                <button id="assistant-settings-toggle-btn" class="chat-bubble-action-btn"
+                                    title="Model & API Settings"
+                                    style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
                                     <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
                                 </button>
 
                                 <!-- Floating History Popover Panel -->
-                                <div id="assistant-history-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;">
-                                    <div style="font-weight: 700; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <div id="assistant-history-popover" class="hidden"
+                                    style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;">
+                                    <div
+                                        style="font-weight: 700; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                                         <span>Conversations</span>
-                                        <button id="new-chat-btn" class="secondary-btn" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 6px; height: 24px; margin-bottom: 0;">New Chat</button>
+                                        <button id="new-chat-btn" class="secondary-btn"
+                                            style="padding: 2px 8px; font-size: 0.75rem; border-radius: 6px; height: 24px; margin-bottom: 0;">New
+                                            Chat</button>
                                     </div>
-                                    <div id="conversations-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <div id="conversations-list"
+                                        style="display: flex; flex-direction: column; gap: 8px;">
                                         <!-- Will be loaded via JS -->
                                     </div>
                                 </div>
 
                                 <!-- Floating Popover Dropdown Panel -->
-                                <div id="assistant-settings-popover" class="hidden" style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
+                                <div id="assistant-settings-popover" class="hidden"
+                                    style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
                                     <div>
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Provider</label>
-                                        <select id="assistant-provider" class="password-input" style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
+                                        <label
+                                            style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model
+                                            Provider</label>
+                                        <select id="assistant-provider" class="password-input"
+                                            style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
                                             <option value="builtin" selected>Swift Assistant (Official)</option>
                                             <option value="gemini">Google Gemini</option>
                                             <option value="openrouter">OpenRouter</option>
@@ -3579,25 +3752,40 @@
                                             <option value="custom">Custom API</option>
                                         </select>
                                     </div>
-                                    
+
                                     <div>
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Name</label>
-                                        <input type="text" id="assistant-model" class="password-input" value="gemini-1.5-flash" placeholder="Model name..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                        <label
+                                            style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model
+                                            Name</label>
+                                        <input type="text" id="assistant-model" class="password-input"
+                                            value="gemini-1.5-flash" placeholder="Model name..."
+                                            style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
                                     </div>
 
                                     <div id="assistant-endpoint-container" class="hidden">
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Endpoint URL</label>
-                                        <input type="url" id="assistant-endpoint" class="password-input" placeholder="https://api..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                        <label
+                                            style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Endpoint
+                                            URL</label>
+                                        <input type="url" id="assistant-endpoint" class="password-input"
+                                            placeholder="https://api..."
+                                            style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
                                     </div>
 
                                     <div>
-                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API Key</label>
-                                        <input type="password" id="assistant-api-key" class="password-input" placeholder="Paste API key..." style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
+                                        <label
+                                            style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">API
+                                            Key</label>
+                                        <input type="password" id="assistant-api-key" class="password-input"
+                                            placeholder="Paste API key..."
+                                            style="margin-bottom: 0; padding: 6px 10px; height: 32px; font-size: 0.8rem; width: 100%;">
                                     </div>
 
-                                    <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px;">
-                                        <span id="status-text" style="font-size: 0.75rem; font-weight: 600; color: #ef4444;">Disconnected</span>
-                                        <button id="assistant-connect-btn" class="secondary-btn" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; height: 28px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 0;">
+                                    <div
+                                        style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px;">
+                                        <span id="status-text"
+                                            style="font-size: 0.75rem; font-weight: 600; color: #ef4444;">Disconnected</span>
+                                        <button id="assistant-connect-btn" class="secondary-btn"
+                                            style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px; height: 28px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 0;">
                                             <i data-lucide="radio" style="width: 12px; height: 12px;"></i> Connect
                                         </button>
                                     </div>
@@ -3606,54 +3794,74 @@
                         </div>
 
                         <!-- Chat Messages Log -->
-                        <div id="assistant-chat-log" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; min-height: 200px; max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03); flex: 1;">
+                        <div id="assistant-chat-log"
+                            style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; min-height: 200px; max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03); flex: 1;">
                             <!-- Default Welcome Message -->
-                            <div class="assistant-chat-bubble system" style="background: rgba(128,128,128,0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; align-self: center; width: 100%;">
-                                <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am your Swift AI Assistant. I can write HTML/CSS code, explain concepts, edit drafts, or answer questions. Configure your API key to get started.</p>
+                            <div class="assistant-chat-bubble system"
+                                style="background: rgba(128,128,128,0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; align-self: center; width: 100%;">
+                                <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am your
+                                    Swift AI Assistant. I can write HTML/CSS code, explain concepts, edit drafts, or
+                                    answer questions. Configure your API key to get started.</p>
                             </div>
                         </div>
 
                         <!-- Chat Input bar -->
-                        <div class="assistant-input-bar" style="display: flex; flex-direction: column; width: 100%; flex-shrink: 0; padding-top: 8px;">
+                        <div class="assistant-input-bar"
+                            style="display: flex; flex-direction: column; width: 100%; flex-shrink: 0; padding-top: 8px;">
                             <!-- Chat settings/toggles row -->
-                            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; padding: 0 4px;">
-                                <button id="search-web-toggle" class="secondary-btn" title="Cycle Web Search: Off / Auto / On" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 20px; height: 28px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0; cursor: pointer; transition: var(--transition);">
+                            <div
+                                style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; padding: 0 4px;">
+                                <button id="search-web-toggle" class="secondary-btn"
+                                    title="Cycle Web Search: Off / Auto / On"
+                                    style="padding: 4px 10px; font-size: 0.75rem; border-radius: 20px; height: 28px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0; cursor: pointer; transition: var(--transition);">
                                     <i data-lucide="globe" style="width: 14px; height: 14px;"></i>
                                     <span id="search-web-label">Search: Auto</span>
                                 </button>
-                                <span id="search-status-label" style="font-size: 0.75rem; color: var(--text-secondary); opacity: 0.8; display: none; align-items: center; gap: 4px;">
+                                <span id="search-status-label"
+                                    style="font-size: 0.75rem; color: var(--text-secondary); opacity: 0.8; display: none; align-items: center; gap: 4px;">
                                     <i data-lucide="loader-2" class="spin" style="width: 12px; height: 12px;"></i>
                                     Searching the web...
                                 </span>
                             </div>
 
                             <!-- Attached files preview container -->
-                            <div id="attached-files-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; padding: 0 4px;"></div>
-                            
-                            <div class="assistant-input-row" style="display: flex; gap: 8px; align-items: flex-end; width: 100%;">
+                            <div id="attached-files-container"
+                                style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; padding: 0 4px;">
+                            </div>
+
+                            <div class="assistant-input-row"
+                                style="display: flex; gap: 8px; align-items: flex-end; width: 100%;">
                                 <!-- Left Attachment Button -->
-                                <button id="assistant-attach-btn" class="secondary-btn" title="Attach File" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                <button id="assistant-attach-btn" class="secondary-btn" title="Attach File"
+                                    style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="paperclip" style="width: 18px; height: 18px;"></i>
-                                    <input type="file" id="assistant-file-input" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.json" style="display: none;">
+                                    <input type="file" id="assistant-file-input"
+                                        accept="image/*,.pdf,.doc,.docx,.txt,.csv,.json" style="display: none;">
                                 </button>
 
                                 <!-- Textarea Input Box -->
                                 <div style="flex: 1; min-width: 0;">
-                                    <textarea id="assistant-input" class="password-input" placeholder="Ask anything..." rows="1" style="resize: none; margin-bottom: 0; padding: 10px 14px; font-size: 0.95rem; border-radius: 18px; width: 100%; box-sizing: border-box;"></textarea>
+                                    <textarea id="assistant-input" class="password-input" placeholder="Ask anything..."
+                                        rows="1"
+                                        style="resize: none; margin-bottom: 0; padding: 10px 14px; font-size: 0.95rem; border-radius: 18px; width: 100%; box-sizing: border-box;"></textarea>
                                 </div>
 
                                 <!-- Right Control Buttons -->
-                                <button id="assistant-voice-btn" class="secondary-btn" title="Voice Input" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
+                                <button id="assistant-voice-btn" class="secondary-btn" title="Voice Input"
+                                    style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                     <i data-lucide="mic" style="width: 18px; height: 18px;"></i>
                                 </button>
-                                <button id="assistant-new-chat-btn" class="secondary-btn" title="New Chat" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0; border-color: rgba(255,255,255,0.1);">
+                                <button id="assistant-new-chat-btn" class="secondary-btn" title="New Chat"
+                                    style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0; border-color: rgba(255,255,255,0.1);">
                                     <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
                                 </button>
                                 <div style="position: relative; flex-shrink: 0; width: 42px; height: 42px;">
-                                    <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; position: absolute; top: 0; left: 0;">
+                                    <button id="assistant-send-btn" class="primary-btn btn-pro-ai"
+                                        style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; position: absolute; top: 0; left: 0;">
                                         <i data-lucide="send" style="width: 18px; height: 18px;"></i>
                                     </button>
-                                    <button id="assistant-stop-btn" class="stop-gen-btn" title="Stop generating" style="position: absolute; top: 0; left: 0; width: 42px; height: 42px;">
+                                    <button id="assistant-stop-btn" class="stop-gen-btn" title="Stop generating"
+                                        style="position: absolute; top: 0; left: 0; width: 42px; height: 42px;">
                                         <i data-lucide="square" style="width: 16px; height: 16px;"></i>
                                     </button>
                                 </div>
@@ -6814,11 +7022,11 @@
             for (let y = 1; y < ph - 1; y++) {
                 for (let x = 1; x < pw - 1; x++) {
                     const idx = y * pw + x;
-                    const gx = 
+                    const gx =
                         -gray[idx - pw - 1] + gray[idx - pw + 1] +
                         -2 * gray[idx - 1] + 2 * gray[idx + 1] +
                         -gray[idx + pw - 1] + gray[idx + pw + 1];
-                    const gy = 
+                    const gy =
                         -gray[idx - pw - 1] - 2 * gray[idx - pw] - gray[idx - pw + 1] +
                         gray[idx + pw - 1] + 2 * gray[idx + pw] + gray[idx + pw + 1];
                     const mag = Math.sqrt(gx * gx + gy * gy);
@@ -6990,7 +7198,7 @@
                         if (area > (vw * vh * scale * scale * 0.03)) { // min area 3% of view
                             const perimeter = cv.arcLength(contour, true);
                             const tempApprox = new cv.Mat();
-                            
+
                             // Iterate epsilon to locate a 4-point polygon
                             let foundQuad = false;
                             for (let epsilonFactor = 0.01; epsilonFactor <= 0.05; epsilonFactor += 0.01) {
@@ -7356,14 +7564,14 @@
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'bottom';
-                
+
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
                 ctx.lineWidth = Math.max(2, Math.round(fontSize * 0.15));
-                
+
                 const margin = Math.max(12, Math.round(filteredCanvas.width * 0.02));
                 const x = filteredCanvas.width - margin;
                 const y = filteredCanvas.height - margin;
-                
+
                 ctx.strokeText(text, x, y);
                 ctx.fillText(text, x, y);
             }
@@ -7372,7 +7580,7 @@
         }
 
         // Watermark Controls Listeners
-        document.getElementById('scanner-watermark-toggle').addEventListener('change', function() {
+        document.getElementById('scanner-watermark-toggle').addEventListener('change', function () {
             const textInput = document.getElementById('scanner-watermark-text');
             if (this.checked) {
                 textInput.style.display = 'block';
@@ -7493,7 +7701,7 @@
             if (!webpagePreviewIframe) return;
             const doc = webpagePreviewIframe.contentDocument || webpagePreviewIframe.contentWindow.document;
             doc.open();
-            
+
             const baseTemplate = `
                 <!DOCTYPE html>
                 <html lang="en">
@@ -7600,7 +7808,7 @@
                     try {
                         const host = new URL(webpageUrlInput.value.trim()).hostname;
                         name = `${host.replace(/www\./g, '')}_Webpage.pdf`;
-                    } catch (e) {}
+                    } catch (e) { }
                 }
                 const docBody = webpagePreviewIframe.contentWindow.document.body;
                 const pageSizeVal = webpagePdfSize.value;
@@ -7620,7 +7828,7 @@
             if (!webpagePreviewIframe) return;
             const size = webpagePdfSize.value;
             const orient = webpagePdfOrient.value;
-            
+
             let isLandscape = false;
             if (orient === 'l') {
                 isLandscape = true;
@@ -7653,7 +7861,7 @@
             syncIframeDimensions();
             updateIframeContent(webpageHtmlInput.value);
         });
-        
+
         webpagePdfOrient.addEventListener('change', () => {
             syncIframeDimensions();
             updateIframeContent(webpageHtmlInput.value);
@@ -7679,7 +7887,7 @@
             contextMenu.style.left = `${e.clientX}px`;
             contextMenu.style.top = `${e.clientY}px`;
             contextMenu.classList.remove('hidden');
-            
+
             // Allow transition to trigger
             setTimeout(() => {
                 contextMenu.classList.add('show');
@@ -7794,11 +8002,11 @@
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 redactDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                
+
                 for (let i = 1; i <= redactDoc.numPages; i++) {
                     const page = await redactDoc.getPage(i);
                     const id = Math.random().toString(36).substr(2, 9);
-                    
+
                     // Create page element wrapper
                     const wrapper = document.createElement('div');
                     wrapper.style.position = 'relative';
@@ -7888,16 +8096,16 @@
                 if (!isRedactingDrawing) return;
                 e.preventDefault();
                 const currentPos = getMousePos(e);
-                
+
                 const x = Math.min(redactStartPoint.x, currentPos.x);
                 const y = Math.min(redactStartPoint.y, currentPos.y);
                 const w = Math.abs(redactStartPoint.x - currentPos.x);
                 const h = Math.abs(redactStartPoint.y - currentPos.y);
 
                 redactCurrentRect = { x, y, w, h };
-                
+
                 drawAllRects();
-                
+
                 // Draw current active rectangle (translucent red guide)
                 ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
                 ctx.strokeStyle = '#ef4444';
@@ -7978,10 +8186,10 @@
                     const page = pages[pState.pageNum - 1];
                     const pdfWidth = page.getWidth();
                     const pdfHeight = page.getHeight();
-                    
+
                     const canvasWidth = pState.canvas.width;
                     const canvasHeight = pState.canvas.height;
-                    
+
                     const scaleX = pdfWidth / canvasWidth;
                     const scaleY = pdfHeight / canvasHeight;
 
@@ -8033,7 +8241,7 @@
         const wmImageOptions = document.getElementById('wm-image-options');
         const wmUploadBtn = document.getElementById('wm-upload-btn');
         const wmImgFileInput = document.getElementById('wm-img-file-input');
-        
+
         const wmTextInput = document.getElementById('wm-text-input');
         const wmTextColor = document.getElementById('wm-text-color');
         const wmTextFont = document.getElementById('wm-text-font');
@@ -8542,7 +8750,7 @@
         const assistantConnectBtn = document.getElementById('assistant-connect-btn');
         const statusDot = document.getElementById('status-dot');
         const statusText = document.getElementById('status-text');
-        
+
         const assistantChatLog = document.getElementById('assistant-chat-log');
         const assistantInput = document.getElementById('assistant-input');
         const assistantSendBtn = document.getElementById('assistant-send-btn');
@@ -8570,21 +8778,21 @@
                 const response = await fetch(proxyUrl);
                 if (!response.ok) throw new Error('Google search request failed');
                 const html = await response.text();
-                
+
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const results = [];
-                
+
                 // Google search results container selector
                 const resultContainers = doc.querySelectorAll('.g, .MjjYad');
-                
+
                 if (resultContainers && resultContainers.length > 0) {
                     for (let i = 0; i < Math.min(resultContainers.length, 5); i++) {
                         const container = resultContainers[i];
                         const titleEl = container.querySelector('h3');
                         const linkEl = container.querySelector('a');
                         const snippetEl = container.querySelector('.VwiC3b, .yD755d, .MUFPAc, .s3C59');
-                        
+
                         if (titleEl && linkEl) {
                             let url = linkEl.getAttribute('href') || '';
                             if (url.startsWith('/url?q=')) {
@@ -8598,7 +8806,7 @@
                         }
                     }
                 }
-                
+
                 // Fallback to DuckDuckGo Lite if Google returned nothing
                 if (results.length === 0) {
                     console.log('Google search returned no results, falling back to DuckDuckGo...');
@@ -8607,14 +8815,14 @@
                     if (ddgResponse.ok) {
                         const ddgHtml = await ddgResponse.text();
                         const ddgDoc = parser.parseFromString(ddgHtml, 'text/html');
-                        
+
                         const rows = ddgDoc.querySelectorAll('table tr');
                         let currentResult = null;
-                        
+
                         rows.forEach((row) => {
                             const link = row.querySelector('a.result-link');
                             const snippet = row.querySelector('.result-snippet');
-                            
+
                             if (link) {
                                 if (currentResult) results.push(currentResult);
                                 currentResult = {
@@ -8629,7 +8837,7 @@
                         if (currentResult) results.push(currentResult);
                     }
                 }
-                
+
                 return results.slice(0, 5);
             } catch (err) {
                 console.error('Search error:', err);
@@ -8727,8 +8935,8 @@
         // Vercel proxy URL - dynamically uses the current domain if hosted on Vercel,
         // or falls back to your Vercel deployment URL if hosted on GitHub Pages.
         // UPDATE the URL below with your actual Vercel app URL (e.g. https://swiftfile.vercel.app/api/chat).
-        const VERCEL_PROXY_URL = window.location.hostname.includes('vercel.app') 
-            ? '/api/chat' 
+        const VERCEL_PROXY_URL = window.location.hostname.includes('vercel.app')
+            ? '/api/chat'
             : 'https://swiftfile.vercel.app/api/chat';
 
         // Toggle settings visibility based on provider
@@ -8750,7 +8958,7 @@
             const prov = assistantProvider.value;
             let defaultModel = 'gemini-1.5-flash';
             let defaultEndpoint = '';
-            
+
             if (prov === 'builtin') {
                 defaultModel = 'llama-3.3-70b-versatile';
             } else if (prov === 'openrouter') {
@@ -8760,11 +8968,11 @@
             } else if (prov === 'huggingface') {
                 defaultModel = 'Qwen/Qwen2.5-Coder-7B-Instruct';
             }
-            
+
             assistantModel.value = localStorage.getItem(`assistant-model-${prov}`) || localStorage.getItem('assistant-model') || defaultModel;
             assistantEndpoint.value = localStorage.getItem(`assistant-endpoint-${prov}`) || localStorage.getItem('assistant-endpoint') || defaultEndpoint;
             assistantApiKey.value = localStorage.getItem(`assistant-api-key-${prov}`) || localStorage.getItem('assistant-api-key') || '';
-            
+
             // Clean legacy model keys
             let modelVal = assistantModel.value;
             if (prov === 'groq' && (modelVal.includes('llama3-8b') || modelVal.includes('llama3-70b') || modelVal === 'llama3-8b-8192' || modelVal === 'llama3-70b-8192')) {
@@ -8939,7 +9147,7 @@
         assistantProvider.addEventListener('change', () => {
             const prov = assistantProvider.value;
             checkEndpointVisibility();
-            
+
             // Only set default if no custom value is saved yet
             if (!localStorage.getItem(`assistant-model-${prov}`)) {
                 if (prov === 'gemini') {
@@ -8957,19 +9165,19 @@
             } else {
                 loadProviderSettings();
             }
-            
+
             saveAssistantSettings();
         });
 
         function saveAssistantSettings() {
             const prov = assistantProvider.value;
             localStorage.setItem('assistant-provider', prov);
-            
+
             // Save global values (compatibility)
             localStorage.setItem('assistant-model', assistantModel.value);
             localStorage.setItem('assistant-endpoint', assistantEndpoint.value);
             localStorage.setItem('assistant-api-key', assistantApiKey.value);
-            
+
             // Save provider-specific values
             localStorage.setItem(`assistant-model-${prov}`, assistantModel.value);
             localStorage.setItem(`assistant-endpoint-${prov}`, assistantEndpoint.value);
@@ -8997,7 +9205,7 @@
 
         function formatMessage(text) {
             let formatted = escapeHtml(text);
-            
+
             // Format code blocks: ```code``` with copy button
             const codeBlockRegex = /```([\s\S]*?)```/g;
             let codeBlockId = 0;
@@ -9012,7 +9220,7 @@
 
             // Format paragraphs (newlines to br)
             formatted = formatted.split('\n').join('<br>');
-            
+
             return formatted;
         }
 
@@ -9020,7 +9228,7 @@
             const wrapper = btn.closest('.code-block-wrapper');
             const codeEl = wrapper.querySelector('code');
             const text = codeEl.textContent || codeEl.innerText;
-            
+
             navigator.clipboard.writeText(text).then(() => {
                 btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
                 btn.title = 'Copied!';
@@ -9047,15 +9255,15 @@
 
         function saveCurrentConversation() {
             if (chatHistory.length === 0) return;
-            
+
             let list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
-            
+
             if (!currentConversationId) {
                 currentConversationId = 'conv_' + Date.now();
                 let firstUserMsg = chatHistory.find(msg => msg.role === 'user');
                 let title = firstUserMsg ? firstUserMsg.content.substring(0, 30) : 'New Chat';
                 if (title.length >= 30) title += '...';
-                
+
                 list.unshift({
                     id: currentConversationId,
                     title: title,
@@ -9081,14 +9289,14 @@
                     });
                 }
             }
-            
+
             localStorage.setItem('assistant-conversations', JSON.stringify(list));
         }
 
         function showCustomConfirm(message, title, onConfirm) {
             const existing = document.getElementById('custom-confirm-modal');
             if (existing) existing.remove();
-            
+
             const modal = document.createElement('div');
             modal.id = 'custom-confirm-modal';
             modal.style.position = 'fixed';
@@ -9105,7 +9313,7 @@
             modal.style.zIndex = '999999';
             modal.style.opacity = '0';
             modal.style.transition = 'opacity 0.2s ease-out';
-            
+
             const card = document.createElement('div');
             card.style.background = 'var(--surface-color)';
             card.style.border = '1px solid var(--border-color)';
@@ -9119,7 +9327,7 @@
             card.style.display = 'flex';
             card.style.flexDirection = 'column';
             card.style.gap = '16px';
-            
+
             card.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
@@ -9133,16 +9341,16 @@
                     <button id="confirm-ok-btn" class="primary-btn" style="margin-bottom:0; padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; background: #ef4444; color: white; border: none; cursor: pointer;">Delete</button>
                 </div>
             `;
-            
+
             modal.appendChild(card);
             document.body.appendChild(modal);
             lucide.createIcons({ root: modal });
-            
+
             setTimeout(() => {
                 modal.style.opacity = '1';
                 card.style.transform = 'scale(1)';
             }, 10);
-            
+
             const closeModal = () => {
                 modal.style.opacity = '0';
                 card.style.transform = 'scale(0.9)';
@@ -9150,13 +9358,13 @@
                     modal.remove();
                 }, 200);
             };
-            
+
             modal.querySelector('#confirm-cancel-btn').addEventListener('click', closeModal);
             modal.querySelector('#confirm-ok-btn').addEventListener('click', () => {
                 onConfirm();
                 closeModal();
             });
-            
+
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal();
             });
@@ -9165,21 +9373,21 @@
         function loadConversationsList() {
             conversationsList.innerHTML = '';
             const list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
-            
+
             if (list.length === 0) {
                 conversationsList.innerHTML = '<p style="font-size:0.75rem; text-align:center; color:var(--text-secondary); margin: 10px 0;">No saved chats</p>';
                 return;
             }
-            
+
             // Sort by timestamp descending
             list.sort((a, b) => b.timestamp - a.timestamp);
-            
+
             const getGroupLabel = (timestamp) => {
                 const date = new Date(timestamp);
                 const today = new Date();
                 const yesterday = new Date();
                 yesterday.setDate(today.getDate() - 1);
-                
+
                 if (date.toDateString() === today.toDateString()) {
                     return 'Today';
                 } else if (date.toDateString() === yesterday.toDateString()) {
@@ -9188,9 +9396,9 @@
                     return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                 }
             };
-            
+
             let currentGroup = '';
-            
+
             list.forEach(conv => {
                 const groupLabel = getGroupLabel(conv.timestamp);
                 if (groupLabel !== currentGroup) {
@@ -9206,7 +9414,7 @@
                     header.textContent = groupLabel;
                     conversationsList.appendChild(header);
                 }
-                
+
                 const item = document.createElement('div');
                 item.className = 'conv-item-wrap';
                 item.style.display = 'flex';
@@ -9219,13 +9427,13 @@
                 item.style.cursor = 'pointer';
                 item.style.transition = 'var(--transition)';
                 item.style.marginBottom = '6px';
-                
+
                 const infoDiv = document.createElement('div');
                 infoDiv.style.flex = '1';
                 infoDiv.style.minWidth = '0';
                 infoDiv.style.display = 'flex';
                 infoDiv.style.flexDirection = 'column';
-                
+
                 const titleSpan = document.createElement('span');
                 titleSpan.style.fontSize = '0.8rem';
                 titleSpan.style.fontWeight = '600';
@@ -9233,19 +9441,19 @@
                 titleSpan.style.overflow = 'hidden';
                 titleSpan.style.textOverflow = 'ellipsis';
                 titleSpan.textContent = conv.title || 'Untitled Chat';
-                
+
                 const timeSpan = document.createElement('span');
                 timeSpan.style.fontSize = '0.65rem';
                 timeSpan.style.color = 'var(--text-secondary)';
                 const date = new Date(conv.timestamp);
-                
+
                 // Formatted date and time in 12-hour AM/PM format
                 const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
                 timeSpan.textContent = formattedTime;
-                
+
                 infoDiv.appendChild(titleSpan);
                 infoDiv.appendChild(timeSpan);
-                
+
                 infoDiv.addEventListener('click', () => {
                     chatHistory = conv.history;
                     currentConversationId = conv.id;
@@ -9281,7 +9489,7 @@
                     input.className = 'conv-title-input';
                     input.value = currentTitle;
                     input.maxLength = 50;
-                    
+
                     titleSpan.replaceWith(input);
                     input.focus();
                     input.select();
@@ -9297,20 +9505,20 @@
                         newTitleSpan.textContent = newTitle;
                         newTitleSpan.dataset.convId = conv.id;
                         input.replaceWith(newTitleSpan);
-                        
+
                         let convList = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
                         const convIndex = convList.findIndex(c => c.id === conv.id);
                         if (convIndex !== -1) {
                             convList[convIndex].title = newTitle;
                             localStorage.setItem('assistant-conversations', JSON.stringify(convList));
                         }
-                        
+
                         notify('Chat renamed.', 'success');
                     };
 
                     input.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter') { e.preventDefault(); saveRename(); }
-                        if (e.key === 'Escape') { 
+                        if (e.key === 'Escape') {
                             const restored = document.createElement('span');
                             restored.style.fontSize = '0.8rem';
                             restored.style.fontWeight = '600';
@@ -9325,7 +9533,7 @@
                     input.addEventListener('blur', saveRename);
                 });
                 actionsDiv.appendChild(renameBtn);
-                
+
                 const deleteBtn = document.createElement('button');
                 deleteBtn.style.background = 'none';
                 deleteBtn.style.border = 'none';
@@ -9336,18 +9544,18 @@
                 deleteBtn.style.alignItems = 'center';
                 deleteBtn.style.justifyContent = 'center';
                 deleteBtn.innerHTML = '<i data-lucide="trash-2" style="width:12px; height:12px;"></i>';
-                
+
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     deleteConversation(conv.id);
                 });
                 actionsDiv.appendChild(deleteBtn);
-                
+
                 item.appendChild(infoDiv);
                 item.appendChild(actionsDiv);
                 conversationsList.appendChild(item);
             });
-            
+
             lucide.createIcons({ attrs: { class: 'lucide-icon' } });
         }
 
@@ -9356,13 +9564,13 @@
                 let list = JSON.parse(localStorage.getItem('assistant-conversations') || '[]');
                 list = list.filter(c => c.id !== id);
                 localStorage.setItem('assistant-conversations', JSON.stringify(list));
-                
+
                 if (currentConversationId === id) {
                     chatHistory = [];
                     currentConversationId = null;
                     renderChatHistory();
                 }
-                
+
                 loadConversationsList();
                 notify('Conversation deleted.', 'info');
             });
@@ -9436,8 +9644,8 @@
             senderLabel.style.fontWeight = '700';
             senderLabel.style.fontSize = '0.8rem';
             senderLabel.style.color = role === 'user' ? 'var(--accent-color)' : 'var(--text-secondary)';
-            senderLabel.innerHTML = role === 'user' 
-                ? '<i data-lucide="user" style="width:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> You' 
+            senderLabel.innerHTML = role === 'user'
+                ? '<i data-lucide="user" style="width:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> You'
                 : '<img src="logo.png" style="width:14px;height:14px;object-fit:cover;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:4px;"> Swift Assistant';
 
             header.appendChild(senderLabel);
@@ -9473,7 +9681,7 @@
                 sourcesContainer.style.border = '1px solid var(--border-color)';
                 sourcesContainer.style.borderRadius = '12px';
                 sourcesContainer.style.fontSize = '0.8rem';
-                
+
                 const sourcesHeader = document.createElement('div');
                 sourcesHeader.style.display = 'flex';
                 sourcesHeader.style.justifyContent = 'space-between';
@@ -9486,7 +9694,7 @@
                     </div>
                     <i data-lucide="chevron-down" class="chevron" style="width:14px; height:14px; transition:transform 0.3s; color:var(--text-secondary);"></i>
                 `;
-                
+
                 const sourcesList = document.createElement('div');
                 sourcesList.style.display = 'none';
                 sourcesList.style.flexDirection = 'column';
@@ -9494,7 +9702,7 @@
                 sourcesList.style.marginTop = '8px';
                 sourcesList.style.paddingTop = '8px';
                 sourcesList.style.borderTop = '1px dashed var(--border-color)';
-                
+
                 searchResults.forEach((res, i) => {
                     const srcLink = document.createElement('a');
                     srcLink.href = res.url.startsWith('http') ? res.url : `https://${res.url}`;
@@ -9508,23 +9716,23 @@
                     srcLink.style.transition = 'background 0.2s';
                     srcLink.onmouseenter = () => srcLink.style.background = 'var(--accent-alpha)';
                     srcLink.onmouseleave = () => srcLink.style.background = '';
-                    
+
                     srcLink.innerHTML = `
                         <span style="font-weight:600; color:var(--accent-color); font-size:0.75rem; display:flex; align-items:center; gap:4px;">
                             <i data-lucide="link" style="width:10px; height:10px;"></i>
-                            [${i+1}] ${res.title}
+                            [${i + 1}] ${res.title}
                         </span>
                         <span style="font-size:0.7rem; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${res.url}</span>
                     `;
                     sourcesList.appendChild(srcLink);
                 });
-                
+
                 sourcesHeader.addEventListener('click', () => {
                     const isHidden = sourcesList.style.display === 'none';
                     sourcesList.style.display = isHidden ? 'flex' : 'none';
                     sourcesHeader.querySelector('.chevron').style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
                 });
-                
+
                 sourcesContainer.appendChild(sourcesHeader);
                 sourcesContainer.appendChild(sourcesList);
                 bubble.appendChild(sourcesContainer);
@@ -9543,7 +9751,7 @@
                 attachDiv.style.display = 'inline-flex';
                 attachDiv.style.alignItems = 'center';
                 attachDiv.style.gap = '8px';
-                
+
                 if (attachment.type.startsWith('image/')) {
                     const img = document.createElement('img');
                     img.src = attachment.data;
@@ -9615,7 +9823,7 @@
             footer.appendChild(bottomCopyBtn);
 
             bubble.appendChild(footer);
-            
+
             return bubble;
         }
 
@@ -9718,7 +9926,7 @@
 
             const reader = new FileReader();
             const isText = file.type === 'text/plain' || file.name.endsWith('.txt') || file.name.endsWith('.csv') || file.name.endsWith('.json') || file.name.endsWith('.xml') || file.name.endsWith('.md');
-            
+
             reader.onload = () => {
                 attachedFile = {
                     name: file.name,
@@ -10004,21 +10212,21 @@
             // Append user prompt with attachment to history and render (skip on regenerate)
             if (!skipUserPush) {
                 const currentAttachment = attachedFile ? { ...attachedFile } : null;
-                
+
                 // Reset attachment inputs
                 attachedFile = null;
                 assistantFileInput.value = '';
                 renderAttachedFile();
 
-                chatHistory.push({ 
-                    role: 'user', 
+                chatHistory.push({
+                    role: 'user',
                     content: prompt,
                     attachment: currentAttachment,
                     timestamp: new Date().toISOString()
                 });
                 saveCurrentConversation();
                 renderChatHistory();
-                
+
                 // Clear input box
                 assistantInput.value = '';
                 assistantInput.style.height = 'auto'; // Reset height
@@ -10052,7 +10260,7 @@
                     const messagesPayload = chatHistory.map((msg, idx) => {
                         let content = msg.content;
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map((r, i) => `[Source ${i+1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                            const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                             content = `You have access to web search results to answer the user query.
 Search Results:
 ${contextStr}
@@ -10089,11 +10297,11 @@ User Query: ${msg.content}`;
 
                 } else if (provider === 'gemini') {
                     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                    
+
                     const contentsPayload = chatHistory.map((msg, idx) => {
                         let msgContent = msg.content;
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map((r, i) => `[Source ${i+1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                            const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                             msgContent = `You have access to web search results to answer the user query.
 Search Results:
 ${contextStr}
@@ -10181,7 +10389,7 @@ User Query: ${msg.content}`;
                     const messagesPayload = chatHistory.map((msg, idx) => {
                         let content = msg.content;
                         if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
-                            const contextStr = searchResults.map((r, i) => `[Source ${i+1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                            const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                             content = `You have access to web search results to answer the user query.
 Search Results:
 ${contextStr}
@@ -10270,7 +10478,7 @@ User Query: ${msg.content}`;
                     const hfUrl = `https://api-inference.huggingface.co/models/${model}`;
                     let hfPrompt = prompt;
                     if (searchResults && searchResults.length > 0) {
-                        const contextStr = searchResults.map((r, i) => `[Source ${i+1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                        const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                         hfPrompt = `You have access to web search results to answer the user query.
 Search Results:
 ${contextStr}
@@ -10282,7 +10490,7 @@ Instructions:
 
 User Query: ${prompt}`;
                     }
-                    
+
                     const res = await fetch(hfUrl, {
                         method: 'POST',
                         headers: {
@@ -10304,8 +10512,8 @@ User Query: ${prompt}`;
                 if (thinkingBubble.parentNode) thinkingBubble.remove();
 
                 // Append assistant response to history
-                chatHistory.push({ 
-                    role: 'assistant', 
+                chatHistory.push({
+                    role: 'assistant',
                     content: responseText,
                     searchResults: searchResults,
                     timestamp: new Date().toISOString()
@@ -10319,8 +10527,8 @@ User Query: ${prompt}`;
                 if (err.name === 'AbortError') {
                     // Save partial response if any text was streamed
                     if (responseText) {
-                        chatHistory.push({ 
-                            role: 'assistant', 
+                        chatHistory.push({
+                            role: 'assistant',
                             content: responseText + '\n\n_[Generation stopped]_',
                             searchResults: searchResults,
                             timestamp: new Date().toISOString()
@@ -10332,16 +10540,16 @@ User Query: ${prompt}`;
                         notify('Generation stopped.', 'info');
                     }
                 } else {
-                const errorBubble = document.createElement('div');
-                errorBubble.className = 'assistant-chat-bubble bot';
-                errorBubble.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-                errorBubble.style.background = 'rgba(239, 68, 68, 0.05)';
-                errorBubble.innerHTML = `
+                    const errorBubble = document.createElement('div');
+                    errorBubble.className = 'assistant-chat-bubble bot';
+                    errorBubble.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                    errorBubble.style.background = 'rgba(239, 68, 68, 0.05)';
+                    errorBubble.innerHTML = `
                     <p style="color:#ef4444; font-weight:700; font-size:0.85rem; margin-bottom:4px;">API Request Failed</p>
                     <p style="font-size:0.85rem; margin-bottom:0;">Error: ${err.message}. Please check your API key, selected provider, model config, or network connection.</p>
                 `;
-                assistantChatLog.appendChild(errorBubble);
-                scrollChatToBottom();
+                    assistantChatLog.appendChild(errorBubble);
+                    scrollChatToBottom();
                 }
             } finally {
                 setGeneratingState(false);
@@ -10696,7 +10904,7 @@ User Query: ${prompt}`;
         async function renderHistoryList() {
             historyDrawerContent.innerHTML = '';
             const items = await getHistoryItems();
-            
+
             // Sort descending by timestamp
             items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             historyCount.textContent = `${items.length} item${items.length === 1 ? '' : 's'}`;
@@ -10720,11 +10928,11 @@ User Query: ${prompt}`;
                 // Setup preview thumbnail
                 let thumbnailHtml = '';
                 let typeLabel = 'File';
-                
+
                 if (item.thumbnail) {
                     thumbnailHtml = `<img src="${item.thumbnail}" alt="${item.name}">`;
                 }
-                
+
                 if (item.type === 'application/pdf') {
                     if (!thumbnailHtml) thumbnailHtml = `<i data-lucide="file-text"></i>`;
                     typeLabel = 'PDF';
@@ -10952,7 +11160,7 @@ User Query: ${prompt}`;
             setTimeout(handleReceivedShare, 500);
         });
     </script>
-    
+
     <!-- History Drawer -->
     <div class="history-overlay" id="history-overlay"></div>
     <div class="history-drawer" id="history-drawer">
@@ -10966,12 +11174,13 @@ User Query: ${prompt}`;
             <!-- History items go here -->
         </div>
         <div class="history-drawer-footer">
-            <span id="history-count" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">0 items</span>
+            <span id="history-count" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">0
+                items</span>
             <button id="clear-all-history-btn" class="history-action-btn danger">
                 <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear All
             </button>
         </div>
-        
+
         <!-- Custom Clear Confirmation Dialog inside panel -->
         <div class="history-clear-dialog" id="history-clear-dialog">
             <div class="history-clear-dialog-card">
@@ -10981,8 +11190,10 @@ User Query: ${prompt}`;
                 <h3>Clear all history?</h3>
                 <p>This action will permanently delete all conversion logs and cached files. You cannot undo this.</p>
                 <div class="history-clear-dialog-actions">
-                    <button id="confirm-clear-btn" class="history-action-btn danger" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Yes, Clear</button>
-                    <button id="cancel-clear-btn" class="history-action-btn" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
+                    <button id="confirm-clear-btn" class="history-action-btn danger"
+                        style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Yes, Clear</button>
+                    <button id="cancel-clear-btn" class="history-action-btn"
+                        style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
                 </div>
             </div>
         </div>
@@ -10996,8 +11207,10 @@ User Query: ${prompt}`;
                 <h3>Delete file?</h3>
                 <p id="delete-dialog-desc">Are you sure you want to delete this file? This action cannot be undone.</p>
                 <div class="history-clear-dialog-actions">
-                    <button id="confirm-delete-btn" class="history-action-btn danger" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Yes, Delete</button>
-                    <button id="cancel-delete-btn" class="history-action-btn" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
+                    <button id="confirm-delete-btn" class="history-action-btn danger"
+                        style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Yes, Delete</button>
+                    <button id="cancel-delete-btn" class="history-action-btn"
+                        style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
                 </div>
             </div>
         </div>
