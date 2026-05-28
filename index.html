@@ -8741,7 +8741,7 @@
         // Web search helper
         async function searchWeb(query) {
             try {
-                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&location=${encodeURIComponent(detectedUserLocation || '')}`);
                 if (!response.ok) throw new Error('Search request failed');
                 const results = await response.json();
                 return Array.isArray(results) ? results.slice(0, 5) : [];
@@ -9918,6 +9918,22 @@
 
         // Attachment and Speech Recognition logic setup
         let attachedFile = null;
+        let detectedUserLocation = '';
+
+        async function detectUserLocation() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.city) {
+                        detectedUserLocation = `${data.city}, ${data.region}, ${data.country_name}`;
+                    }
+                }
+            } catch (e) {
+                console.log('Location detection failed:', e);
+            }
+        }
+        detectUserLocation();
 
         const assistantAttachBtn = document.getElementById('assistant-attach-btn');
         const assistantFileInput = document.getElementById('assistant-file-input');
@@ -10365,19 +10381,8 @@
             let endpoint = assistantEndpoint.value.trim();
 
             let userContextInfo = `Current Local Time: ${new Date().toLocaleString()}\nTimezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 1000);
-                const locRes = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-                clearTimeout(timeoutId);
-                if (locRes.ok) {
-                    const locData = await locRes.json();
-                    if (locData && locData.city) {
-                        userContextInfo += `\nLocation Context: ${locData.city}, ${locData.region}, ${locData.country_name}`;
-                    }
-                }
-            } catch (e) {
-                console.log('IP Location fetch skipped or timed out:', e);
+            if (detectedUserLocation) {
+                userContextInfo += `\nLocation Context: ${detectedUserLocation}`;
             }
 
             const systemPromptContent = `You are Swift Assistant, the smart AI companion for Swift File Tools. You help users manage, convert, and edit their PDF and image files.
