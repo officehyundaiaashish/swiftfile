@@ -1,0 +1,33 @@
+{
+  "name": "Swift File Tools",
+  "short_name": "SwiftFile",
+  "description": "Convert, merge, split, compress and redact PDF and image files instantly.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#f0f4f8",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "share_target": {
+    "action": "share-target.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*", "application/pdf", ".doc", ".docx", ".txt", ".csv", ".json"]
+        }
+      ]
+    }
+  }
+}
