@@ -1922,6 +1922,17 @@
                 width: 14px !important;
                 height: 14px !important;
             }
+            /* Send/Stop button wrapper - shrinks on mobile */
+            .assistant-input-row > div[style*="position: relative"],
+            .assistant-input-row > div:has(#assistant-send-btn) {
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+            }
+            .assistant-input-row > div:has(#assistant-send-btn) button {
+                width: 34px !important;
+                height: 34px !important;
+            }
             #assistant-input {
                 padding: 8px 10px !important;
                 font-size: 0.85rem !important;
@@ -2231,7 +2242,7 @@
             color: white;
         }
 
-        /* Stop Generation Button */
+        /* Stop Generation Button - overlaps send button position */
         .stop-gen-btn {
             background: rgba(239, 68, 68, 0.15) !important;
             color: #ef4444 !important;
@@ -2243,11 +2254,10 @@
             display: none;
             justify-content: center;
             align-items: center;
-            flex-shrink: 0;
-            margin-bottom: 0;
             cursor: pointer;
             transition: var(--transition);
             outline: none !important;
+            z-index: 2;
         }
         .stop-gen-btn:hover {
             background: #ef4444 !important;
@@ -3639,12 +3649,14 @@
                                 <button id="assistant-new-chat-btn" class="secondary-btn" title="New Chat" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0; border-color: rgba(255,255,255,0.1);">
                                     <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
                                 </button>
-                                <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
-                                    <i data-lucide="send" style="width: 18px; height: 18px;"></i>
-                                </button>
-                                <button id="assistant-stop-btn" class="stop-gen-btn" title="Stop generating">
-                                    <i data-lucide="square" style="width: 16px; height: 16px;"></i>
-                                </button>
+                                <div style="position: relative; flex-shrink: 0; width: 42px; height: 42px;">
+                                    <button id="assistant-send-btn" class="primary-btn btn-pro-ai" style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; position: absolute; top: 0; left: 0;">
+                                        <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                                    </button>
+                                    <button id="assistant-stop-btn" class="stop-gen-btn" title="Stop generating" style="position: absolute; top: 0; left: 0; width: 42px; height: 42px;">
+                                        <i data-lucide="square" style="width: 16px; height: 16px;"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
