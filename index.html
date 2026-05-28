@@ -3404,7 +3404,7 @@
                                 <button id="assistant-close-btn" class="chat-bubble-action-btn mobile-only-btn" title="Minimize" style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: none; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 4px;">
                                     <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
                                 </button>
-                                <i data-lucide="sparkles" style="width: 18px; height: 18px; color: var(--accent-color);"></i>
+                                <img src="logo.png" style="width: 20px; height: 20px; object-fit: cover; border-radius: 4px; display: inline-block;">
                                 <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Swift Assistant</span>
                             </div>
                             
@@ -9169,7 +9169,7 @@
             senderLabel.style.color = role === 'user' ? 'var(--accent-color)' : 'var(--text-secondary)';
             senderLabel.innerHTML = role === 'user' 
                 ? '<i data-lucide="user" style="width:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> You' 
-                : '<i data-lucide="sparkles" style="width:12px;display:inline-block;vertical-align:middle;margin-right:4px;color:var(--accent-color);"></i> Swift Assistant';
+                : '<img src="logo.png" style="width:14px;height:14px;object-fit:cover;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:4px;"> Swift Assistant';
 
             header.appendChild(senderLabel);
 
