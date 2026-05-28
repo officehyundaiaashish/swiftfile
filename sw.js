@@ -1,4 +1,4 @@
-const CACHE_NAME = 'swiftfile-v3';
+const CACHE_NAME = 'swiftfile-v2';
 const ASSETS = [
   './',
   './index.html',
