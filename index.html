@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#f0f4f8">
     <title>Swift File Tools - PDF & Image Tools</title>
     <link rel="icon" type="image/png" href="logo.png">
     <meta name="description" content="A modern, minimal, and beautiful PDF to Image and Image to PDF converter.">
@@ -1606,16 +1609,29 @@
         #assistant-chat-log {
             -webkit-user-select: text;
             user-select: text;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
+        }
+        #assistant-chat-log::-webkit-scrollbar {
+            width: 6px;
+        }
+        #assistant-chat-log::-webkit-scrollbar-thumb {
+            background: rgba(128, 128, 128, 0.25);
+            border-radius: 10px;
+        }
+        #assistant-chat-log::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 12px 0;
         }
         #assistant-input {
             -webkit-user-select: auto !important;
             user-select: auto !important;
             scrollbar-width: thin;
             scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
-            overflow-y: auto !important;
+            overflow-y: hidden !important;
         }
         #assistant-input::-webkit-scrollbar {
-            width: 3px;
+            width: 4px;
             background: transparent;
         }
         #assistant-input::-webkit-scrollbar-thumb {
@@ -1624,6 +1640,18 @@
         }
         #assistant-input::-webkit-scrollbar-track {
             background: transparent;
+            margin: 6px 0;
+        }
+        #search-web-toggle.active-on {
+            background: var(--accent-color) !important;
+            color: white !important;
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 2px 8px var(--accent-shadow) !important;
+        }
+        #search-web-toggle.active-auto {
+            background: var(--accent-alpha) !important;
+            color: var(--accent-color) !important;
+            border-color: var(--accent-border-alpha) !important;
         }
 
         @keyframes bubbleFadeIn {
@@ -3199,6 +3227,18 @@
 
                         <!-- Chat Input bar -->
                         <div class="assistant-input-bar" style="display: flex; flex-direction: column; width: 100%; flex-shrink: 0; padding-top: 8px;">
+                            <!-- Chat settings/toggles row -->
+                            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; padding: 0 4px;">
+                                <button id="search-web-toggle" class="secondary-btn" title="Cycle Web Search: Off / Auto / On" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 20px; height: 28px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0; cursor: pointer; transition: var(--transition);">
+                                    <i data-lucide="globe" style="width: 14px; height: 14px;"></i>
+                                    <span id="search-web-label">Search: Auto</span>
+                                </button>
+                                <span id="search-status-label" style="font-size: 0.75rem; color: var(--text-secondary); opacity: 0.8; display: none; align-items: center; gap: 4px;">
+                                    <i data-lucide="loader-2" class="spin" style="width: 12px; height: 12px;"></i>
+                                    Searching the web...
+                                </span>
+                            </div>
+
                             <!-- Attached files preview container -->
                             <div id="attached-files-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; padding: 0 4px;"></div>
                             
@@ -3274,6 +3314,17 @@
         const moonIcon = document.getElementById('moon-icon');
         const body = document.body;
 
+        function updateThemeColorMeta() {
+            const isDark = body.classList.contains('dark-theme');
+            let meta = document.querySelector('meta[name="theme-color"]');
+            if (!meta) {
+                meta = document.createElement('meta');
+                meta.setAttribute('name', 'theme-color');
+                document.head.appendChild(meta);
+            }
+            meta.setAttribute('content', isDark ? '#0b1120' : '#f0f4f8');
+        }
+
         // Load saved theme immediately
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
@@ -3282,6 +3333,7 @@
             sunIcon.classList.remove('hidden');
             moonIcon.classList.add('hidden');
         }
+        updateThemeColorMeta();
 
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('light-theme');
@@ -3291,6 +3343,7 @@
 
             const isDark = body.classList.contains('dark-theme');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeColorMeta();
         });
 
         // Tab Management
@@ -8084,6 +8137,83 @@
             });
         }
 
+        // Web search helper
+        async function searchWeb(query) {
+            try {
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://html.duckduckgo.com/html/?q=' + encodeURIComponent(query))}`;
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error('Search failed');
+                const html = await response.text();
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const results = [];
+                const resultElements = doc.querySelectorAll('.result');
+                
+                for (let i = 0; i < Math.min(resultElements.length, 5); i++) {
+                    const el = resultElements[i];
+                    const titleEl = el.querySelector('.result__snippet');
+                    const linkEl = el.querySelector('.result__url');
+                    if (titleEl) {
+                        results.push({
+                            title: el.querySelector('.result__title')?.textContent?.trim() || '',
+                            snippet: titleEl.textContent?.trim() || '',
+                            url: linkEl?.textContent?.trim() || ''
+                        });
+                    }
+                }
+                return results;
+            } catch (err) {
+                console.error('Search error:', err);
+                return [];
+            }
+        }
+
+        // Web Search Toggle State: 'off', 'auto', 'on'
+        let webSearchState = localStorage.getItem('web-search-state') || 'auto';
+        const searchWebToggle = document.getElementById('search-web-toggle');
+        const searchWebLabel = document.getElementById('search-web-label');
+        const searchStatusLabel = document.getElementById('search-status-label');
+
+        function updateSearchWebToggleUI() {
+            searchWebToggle.classList.remove('active-on', 'active-auto');
+            if (webSearchState === 'on') {
+                searchWebToggle.classList.add('active-on');
+                searchWebLabel.textContent = 'Search: On';
+            } else if (webSearchState === 'auto') {
+                searchWebToggle.classList.add('active-auto');
+                searchWebLabel.textContent = 'Search: Auto';
+            } else {
+                searchWebLabel.textContent = 'Search: Off';
+            }
+        }
+
+        searchWebToggle.addEventListener('click', () => {
+            if (webSearchState === 'off') {
+                webSearchState = 'auto';
+            } else if (webSearchState === 'auto') {
+                webSearchState = 'on';
+            } else {
+                webSearchState = 'off';
+            }
+            localStorage.setItem('web-search-state', webSearchState);
+            updateSearchWebToggleUI();
+        });
+
+        // Initial UI sync
+        updateSearchWebToggleUI();
+
+        // Auto-grow and scrollbar management for assistant input
+        assistantInput.addEventListener('input', () => {
+            assistantInput.style.height = 'auto';
+            assistantInput.style.height = Math.min(assistantInput.scrollHeight, 200) + 'px';
+            if (assistantInput.scrollHeight > assistantInput.clientHeight) {
+                assistantInput.style.overflowY = 'auto';
+            } else {
+                assistantInput.style.overflowY = 'hidden';
+            }
+        });
+
         // Reordered input bar New Chat button event
         if (assistantNewChatBtn) {
             assistantNewChatBtn.addEventListener('click', () => {
@@ -9071,6 +9201,23 @@
                 return;
             }
 
+            // Check if search should be performed
+            let shouldSearch = false;
+            if (webSearchState === 'on') {
+                shouldSearch = true;
+            } else if (webSearchState === 'auto') {
+                const searchKeywords = ['weather', 'stock', 'news', 'current', 'latest', 'today', 'who is', 'price of', 'recent', 'google', 'search', 'time in'];
+                const promptLower = prompt.toLowerCase();
+                shouldSearch = searchKeywords.some(keyword => promptLower.includes(keyword));
+            }
+
+            let searchResults = [];
+            if (shouldSearch && prompt) {
+                if (searchStatusLabel) searchStatusLabel.style.display = 'inline-flex';
+                searchResults = await searchWeb(prompt);
+                if (searchStatusLabel) searchStatusLabel.style.display = 'none';
+            }
+
             // Append user prompt with attachment to history and render
             const currentAttachment = attachedFile ? { ...attachedFile } : null;
             
@@ -9090,6 +9237,7 @@
             
             // Clear input box
             assistantInput.value = '';
+            assistantInput.style.height = 'auto'; // Reset height
 
             // Add bot thinking state bubble
             const thinkingBubble = document.createElement('div');
@@ -9113,14 +9261,19 @@
 
                 if (provider === 'builtin') {
                     // Route through Vercel proxy (API key stored securely on server)
-                    const messagesPayload = chatHistory.map(msg => {
+                    const messagesPayload = chatHistory.map((msg, idx) => {
+                        let content = msg.content;
+                        if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
+                            const contextStr = searchResults.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nLink: ${r.url}`).join('\n\n');
+                            content = `[Web Search Results]\n${contextStr}\n\n[User Prompt]\n${msg.content}`;
+                        }
                         if (msg.attachment) {
                             if (msg.attachment.isText) {
-                                return { role: msg.role, content: (msg.content || '') + `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}` };
+                                return { role: msg.role, content: (content || '') + `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}` };
                             }
-                            return { role: msg.role, content: (msg.content || '') + `\n\n[Attached File: ${msg.attachment.name}]` };
+                            return { role: msg.role, content: (content || '') + `\n\n[Attached File: ${msg.attachment.name}]` };
                         }
-                        return { role: msg.role, content: msg.content };
+                        return { role: msg.role, content: content };
                     });
 
                     const res = await fetch(VERCEL_PROXY_URL, {
@@ -9139,8 +9292,13 @@
                 } else if (provider === 'gemini') {
                     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                     
-                    const contentsPayload = chatHistory.map(msg => {
-                        const parts = [{ text: msg.content || 'Attached file details below:' }];
+                    const contentsPayload = chatHistory.map((msg, idx) => {
+                        let msgContent = msg.content;
+                        if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
+                            const contextStr = searchResults.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nLink: ${r.url}`).join('\n\n');
+                            msgContent = `[Web Search Results]\n${contextStr}\n\n[User Prompt]\n${msg.content}`;
+                        }
+                        const parts = [{ text: msgContent || 'Attached file details below:' }];
                         if (msg.attachment) {
                             if (msg.attachment.type.startsWith('image/')) {
                                 try {
@@ -9188,11 +9346,16 @@
 
                     if (!endpoint) throw new Error('API endpoint URL is required.');
 
-                    const messagesPayload = chatHistory.map(msg => {
+                    const messagesPayload = chatHistory.map((msg, idx) => {
+                        let content = msg.content;
+                        if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
+                            const contextStr = searchResults.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nLink: ${r.url}`).join('\n\n');
+                            content = `[Web Search Results]\n${contextStr}\n\n[User Prompt]\n${msg.content}`;
+                        }
                         if (msg.attachment) {
                             if (msg.attachment.type.startsWith('image/')) {
                                 const contentArray = [
-                                    { type: 'text', text: msg.content || 'Image attached below:' },
+                                    { type: 'text', text: content || 'Image attached below:' },
                                     { type: 'image_url', image_url: { url: msg.attachment.data } }
                                 ];
                                 return {
@@ -9202,18 +9365,18 @@
                             } else if (msg.attachment.isText) {
                                 return {
                                     role: msg.role,
-                                    content: (msg.content || '') + `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}`
+                                    content: (content || '') + `\n\n[Attached File: ${msg.attachment.name}]\n\n${msg.attachment.data}`
                                 };
                             } else {
                                 return {
                                     role: msg.role,
-                                    content: (msg.content || '') + `\n\n[Attached File Link: ${msg.attachment.name}]`
+                                    content: (content || '') + `\n\n[Attached File Link: ${msg.attachment.name}]`
                                 };
                             }
                         }
                         return {
                             role: msg.role,
-                            content: msg.content
+                            content: content
                         };
                     });
 
@@ -9238,6 +9401,11 @@
 
                 } else if (provider === 'huggingface') {
                     const hfUrl = `https://api-inference.huggingface.co/models/${model}`;
+                    let hfPrompt = prompt;
+                    if (searchResults && searchResults.length > 0) {
+                        const contextStr = searchResults.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nLink: ${r.url}`).join('\n\n');
+                        hfPrompt = `[Web Search Results]\n${contextStr}\n\n[User Prompt]\n${prompt}`;
+                    }
                     
                     const res = await fetch(hfUrl, {
                         method: 'POST',
@@ -9245,7 +9413,7 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${apiKey}`
                         },
-                        body: JSON.stringify({ inputs: prompt })
+                        body: JSON.stringify({ inputs: hfPrompt })
                     });
 
                     if (!res.ok) {
