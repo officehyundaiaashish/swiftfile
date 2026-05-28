@@ -4080,7 +4080,13 @@
                     await new Promise(r => setTimeout(r, 50));
                 }
                 const firstImgName = imageItems[0].file.name.replace(/\.[^/.]+$/, "");
-                pdf.save(`${firstImgName}_ToPDF.pdf`);
+                const _imgPdfBlob = pdf.output('blob');
+                const _imgPdfUrl = URL.createObjectURL(_imgPdfBlob);
+                const _imgPdfLink = document.createElement('a');
+                _imgPdfLink.href = _imgPdfUrl;
+                _imgPdfLink.download = `${firstImgName}_ToPDF.pdf`;
+                _imgPdfLink.click();
+                URL.revokeObjectURL(_imgPdfUrl);
                 showStatus('Success!', 2000);
             } catch (error) { console.error(error); notify('Error generating PDF.', 'error'); hideStatus(); }
         });
@@ -4551,7 +4557,13 @@
                     }
 
                     if (outPdf) {
-                        outPdf.save(file.name.replace(/\.[^/.]+$/, "") + '_Compressed.pdf');
+                        const _compPdfBlob = outPdf.output('blob');
+                        const _compPdfUrl = URL.createObjectURL(_compPdfBlob);
+                        const _compPdfLink = document.createElement('a');
+                        _compPdfLink.href = _compPdfUrl;
+                        _compPdfLink.download = file.name.replace(/\.[^/.]+$/, "") + '_Compressed.pdf';
+                        _compPdfLink.click();
+                        URL.revokeObjectURL(_compPdfUrl);
                     }
                     await new Promise(r => setTimeout(r, 500));
                 }
@@ -6390,7 +6402,13 @@
                             logging: false
                         },
                         callback: function (doc) {
-                            doc.save(filename);
+                            const _w2pBlob = doc.output('blob');
+                            const _w2pUrl = URL.createObjectURL(_w2pBlob);
+                            const _w2pLink = document.createElement('a');
+                            _w2pLink.href = _w2pUrl;
+                            _w2pLink.download = filename;
+                            _w2pLink.click();
+                            URL.revokeObjectURL(_w2pUrl);
                             resolve();
                         }
                     });
@@ -6424,7 +6442,13 @@
                         heightLeft -= pageHeight;
                     }
 
-                    pdfFallback.save(filename);
+                    const _fbBlob = pdfFallback.output('blob');
+                    const _fbUrl = URL.createObjectURL(_fbBlob);
+                    const _fbLink = document.createElement('a');
+                    _fbLink.href = _fbUrl;
+                    _fbLink.download = filename;
+                    _fbLink.click();
+                    URL.revokeObjectURL(_fbUrl);
                 } catch (fallbackErr) {
                     console.error('HTML to PDF fallback conversion failed:', fallbackErr);
                     throw fallbackErr;
@@ -7270,7 +7294,13 @@
             const w = scanW * scale;
             const h = scanH * scale;
             pdf.addImage(scannerResultImg.src, 'JPEG', (pageWidth - w) / 2, (pageHeight - h) / 2, w, h);
-            pdf.save(`SwiftScan_${Date.now()}.pdf`);
+            const _scanPdfBlob = pdf.output('blob');
+            const _scanPdfUrl = URL.createObjectURL(_scanPdfBlob);
+            const _scanPdfLink = document.createElement('a');
+            _scanPdfLink.href = _scanPdfUrl;
+            _scanPdfLink.download = `SwiftScan_${Date.now()}.pdf`;
+            _scanPdfLink.click();
+            URL.revokeObjectURL(_scanPdfUrl);
             notify('Document saved as PDF.', 'success');
         });
 
