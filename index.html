@@ -8741,72 +8741,10 @@
         // Web search helper
         async function searchWeb(query) {
             try {
-                // Try Google Search via allorigins proxy
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://www.google.com/search?q=' + encodeURIComponent(query))}`;
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('Google search request failed');
-                const html = await response.text();
-
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const results = [];
-
-                // Google search results container selector
-                const resultContainers = doc.querySelectorAll('.g, .MjjYad');
-
-                if (resultContainers && resultContainers.length > 0) {
-                    for (let i = 0; i < Math.min(resultContainers.length, 5); i++) {
-                        const container = resultContainers[i];
-                        const titleEl = container.querySelector('h3');
-                        const linkEl = container.querySelector('a');
-                        const snippetEl = container.querySelector('.VwiC3b, .yD755d, .MUFPAc, .s3C59');
-
-                        if (titleEl && linkEl) {
-                            let url = linkEl.getAttribute('href') || '';
-                            if (url.startsWith('/url?q=')) {
-                                url = url.substring(7).split('&')[0];
-                            }
-                            results.push({
-                                title: titleEl.textContent?.trim() || 'No Title',
-                                snippet: snippetEl ? snippetEl.textContent?.trim() : 'Click link to view details',
-                                url: url
-                            });
-                        }
-                    }
-                }
-
-                // Fallback to DuckDuckGo Lite if Google returned nothing
-                if (results.length === 0) {
-                    console.log('Google search returned no results, falling back to DuckDuckGo...');
-                    const ddgProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://lite.duckduckgo.com/lite/?q=' + encodeURIComponent(query))}`;
-                    const ddgResponse = await fetch(ddgProxyUrl);
-                    if (ddgResponse.ok) {
-                        const ddgHtml = await ddgResponse.text();
-                        const ddgDoc = parser.parseFromString(ddgHtml, 'text/html');
-
-                        const rows = ddgDoc.querySelectorAll('table tr');
-                        let currentResult = null;
-
-                        rows.forEach((row) => {
-                            const link = row.querySelector('a.result-link');
-                            const snippet = row.querySelector('.result-snippet');
-
-                            if (link) {
-                                if (currentResult) results.push(currentResult);
-                                currentResult = {
-                                    title: link.textContent?.trim() || '',
-                                    url: link.getAttribute('href') || '',
-                                    snippet: ''
-                                };
-                            } else if (snippet && currentResult) {
-                                currentResult.snippet = snippet.textContent?.trim() || '';
-                            }
-                        });
-                        if (currentResult) results.push(currentResult);
-                    }
-                }
-
-                return results.slice(0, 5);
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Search request failed');
+                const results = await response.json();
+                return Array.isArray(results) ? results.slice(0, 5) : [];
             } catch (err) {
                 console.error('Search error:', err);
                 return [];
