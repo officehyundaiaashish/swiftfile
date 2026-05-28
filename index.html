@@ -1971,6 +1971,7 @@
             display: flex;
             flex-direction: column;
             backdrop-filter: var(--glass-blur);
+            overscroll-behavior: contain;
         }
         .history-drawer.open {
             right: 0;
@@ -1997,6 +1998,10 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            overscroll-behavior: contain;
+        }
+        .history-drawer:has(.history-clear-dialog.open) .history-drawer-content {
+            overflow-y: hidden !important;
         }
         .history-empty-state {
             display: flex;
@@ -2117,6 +2122,73 @@
             align-items: center;
             background: var(--surface-color);
         }
+        
+        /* Custom Clear Warning Dialog inside Panel */
+        .history-clear-dialog {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 10100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .history-clear-dialog.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .history-clear-dialog-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .history-clear-dialog.open .history-clear-dialog-card {
+            transform: scale(1);
+        }
+        .history-clear-dialog-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .history-clear-dialog-icon i {
+            width: 24px;
+            height: 24px;
+        }
+        .history-clear-dialog-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .history-clear-dialog-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+        .history-clear-dialog-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
     </style>
     <script>
         let lastActiveTabId = 'swift-assistant';
@@ -2219,13 +2291,15 @@
                 <img src="logo.png" alt="Swift File" class="logo-img">
                 <span>Swift File</span>
             </div>
-            <button id="history-btn" class="icon-btn" title="View History" style="margin-right: 0.5rem;">
-                <i data-lucide="history"></i>
-            </button>
-            <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
-                <i data-lucide="sun" id="sun-icon" class="hidden"></i>
-                <i data-lucide="moon" id="moon-icon"></i>
-            </button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="history-btn" class="icon-btn" title="View History">
+                    <i data-lucide="history"></i>
+                </button>
+                <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                    <i data-lucide="sun" id="sun-icon" class="hidden"></i>
+                    <i data-lucide="moon" id="moon-icon"></i>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -10007,12 +10081,27 @@ User Query: ${prompt}`;
             if (historyOverlay) historyOverlay.addEventListener('click', closeHistoryDrawer);
 
             if (clearAllHistoryBtn) {
-                clearAllHistoryBtn.addEventListener('click', async () => {
-                    if (confirm("Are you sure you want to clear all conversion history? This will permanently delete local logs and cached files.")) {
-                        await clearHistory();
-                        renderHistoryList();
-                        notify("History cleared successfully.", "success");
-                    }
+                clearAllHistoryBtn.addEventListener('click', () => {
+                    const clearDialog = document.getElementById('history-clear-dialog');
+                    if (clearDialog) clearDialog.classList.add('open');
+                });
+            }
+
+            const confirmClearBtn = document.getElementById('confirm-clear-btn');
+            const cancelClearBtn = document.getElementById('cancel-clear-btn');
+            if (confirmClearBtn) {
+                confirmClearBtn.addEventListener('click', async () => {
+                    await clearHistory();
+                    renderHistoryList();
+                    const clearDialog = document.getElementById('history-clear-dialog');
+                    if (clearDialog) clearDialog.classList.remove('open');
+                    notify("History cleared successfully.", "success");
+                });
+            }
+            if (cancelClearBtn) {
+                cancelClearBtn.addEventListener('click', () => {
+                    const clearDialog = document.getElementById('history-clear-dialog');
+                    if (clearDialog) clearDialog.classList.remove('open');
                 });
             }
         }
@@ -10023,6 +10112,7 @@ User Query: ${prompt}`;
             if (historyDrawer && historyOverlay) {
                 historyDrawer.classList.add('open');
                 historyOverlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; // Lock background scrolling
                 if (window.history.state?.panel !== 'history') {
                     window.history.pushState({ panel: 'history' }, '');
                 }
@@ -10034,6 +10124,9 @@ User Query: ${prompt}`;
             if (historyDrawer && historyOverlay) {
                 historyDrawer.classList.remove('open');
                 historyOverlay.classList.remove('open');
+                const clearDialog = document.getElementById('history-clear-dialog');
+                if (clearDialog) clearDialog.classList.remove('open');
+                document.body.style.overflow = ''; // Unlock background scrolling
                 if (window.history.state?.panel === 'history') {
                     window.history.back();
                 }
@@ -10045,6 +10138,9 @@ User Query: ${prompt}`;
             const hDrawer = document.getElementById('history-drawer');
             if (hDrawer && hDrawer.classList.contains('open')) {
                 hDrawer.classList.remove('open');
+                const clearDialog = document.getElementById('history-clear-dialog');
+                if (clearDialog) clearDialog.classList.remove('open');
+                document.body.style.overflow = ''; // Unlock background scrolling
                 const hOverlay = document.getElementById('history-overlay');
                 if (hOverlay) hOverlay.classList.remove('open');
             }
@@ -10344,6 +10440,21 @@ User Query: ${prompt}`;
             <button id="clear-all-history-btn" class="history-action-btn danger">
                 <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear All
             </button>
+        </div>
+        
+        <!-- Custom Clear Confirmation Dialog inside panel -->
+        <div class="history-clear-dialog" id="history-clear-dialog">
+            <div class="history-clear-dialog-card">
+                <div class="history-clear-dialog-icon">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <h3>Clear all history?</h3>
+                <p>This action will permanently delete all conversion logs and cached files. You cannot undo this.</p>
+                <div class="history-clear-dialog-actions">
+                    <button id="confirm-clear-btn" class="history-action-btn danger" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Yes, Clear</button>
+                    <button id="cancel-clear-btn" class="history-action-btn" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>
