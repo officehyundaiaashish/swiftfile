@@ -1944,12 +1944,20 @@
                 width: 34px !important;
                 height: 34px !important;
                 min-width: 34px !important;
-                display: flex !important;
+                display: flex;
                 justify-content: center !important;
                 align-items: center !important;
                 flex-shrink: 0 !important;
                 padding: 0 !important;
                 border-radius: 50% !important;
+            }
+
+            .assistant-input-row button.stop-gen-btn {
+                display: none !important;
+            }
+
+            .assistant-input-row button.stop-gen-btn.active {
+                display: flex !important;
             }
 
             .assistant-input-row button i {
@@ -1958,14 +1966,13 @@
             }
 
             /* Send/Stop button wrapper - shrinks on mobile */
-            .assistant-input-row>div[style*="position: relative"],
-            .assistant-input-row>div:has(#assistant-send-btn) {
+            .assistant-send-wrapper {
                 width: 34px !important;
                 height: 34px !important;
                 min-width: 34px !important;
             }
 
-            .assistant-input-row>div:has(#assistant-send-btn) button {
+            .assistant-send-wrapper button {
                 width: 34px !important;
                 height: 34px !important;
             }
@@ -1974,13 +1981,12 @@
                 padding: 8px 10px !important;
                 font-size: 0.85rem !important;
                 border-radius: 12px !important;
-                height: 34px !important;
-                min-height: 34px !important;
-                max-height: 34px !important;
+                min-height: 38px !important;
+                max-height: 120px !important;
                 box-sizing: border-box !important;
                 width: 100% !important;
                 scrollbar-width: thin !important;
-                overflow-y: hidden !important;
+                height: 38px;
             }
 
             #assistant-settings-popover,
@@ -3855,7 +3861,7 @@
                                     style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0; border-color: rgba(255,255,255,0.1);">
                                     <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
                                 </button>
-                                <div style="position: relative; flex-shrink: 0; width: 42px; height: 42px;">
+                                <div class="assistant-send-wrapper" style="position: relative; flex-shrink: 0; width: 42px; height: 42px;">
                                     <button id="assistant-send-btn" class="primary-btn btn-pro-ai"
                                         style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; position: absolute; top: 0; left: 0;">
                                         <i data-lucide="send" style="width: 18px; height: 18px;"></i>
