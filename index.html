@@ -9037,6 +9037,7 @@
                 statusText.textContent = 'Disconnected';
             }
         }
+        setGeneratingState(false);
 
         function setDisconnectedStatus() {
             statusDot.style.backgroundColor = '#ef4444';
@@ -9997,13 +9998,13 @@
         function setGeneratingState(active) {
             isGenerating = active;
             if (active) {
-                assistantSendBtn.style.display = 'none';
-                assistantStopBtn.classList.add('active');
+                assistantSendBtn.style.setProperty('display', 'none', 'important');
+                assistantStopBtn.style.setProperty('display', 'flex', 'important');
                 assistantInput.disabled = true;
                 assistantInput.placeholder = 'Generating...';
             } else {
-                assistantSendBtn.style.display = '';
-                assistantStopBtn.classList.remove('active');
+                assistantSendBtn.style.setProperty('display', 'flex', 'important');
+                assistantStopBtn.style.setProperty('display', 'none', 'important');
                 assistantInput.disabled = false;
                 assistantInput.placeholder = 'Ask anything...';
             }
@@ -10188,6 +10189,11 @@
         async function sendAssistantMessage(skipUserPush = false) {
             const prompt = assistantInput.value.trim();
             if (!prompt && !attachedFile && !skipUserPush) return;
+
+            if (skipUserPush && chatHistory.length === 0) {
+                notify('No chat history to send.', 'warning');
+                return;
+            }
 
             const isBuiltinProvider = assistantProvider.value === 'builtin';
             const apiKey = assistantApiKey.value.trim();
@@ -10547,15 +10553,78 @@ User Query: ${prompt}`;
                         notify('Generation stopped.', 'info');
                     }
                 } else {
+                    let errorTitle = 'API Request Failed';
+                    let errorExplanation = `Error: ${err.message || 'Unknown error'}. Please check your configuration.`;
+                    let errorTips = [];
+
+                    const errMsg = (err.message || '').toLowerCase();
+                    if (errMsg.includes('api key') || errMsg.includes('unauthorized') || errMsg.includes('401') || errMsg.includes('invalid key')) {
+                        errorTitle = 'Invalid API Key';
+                        errorExplanation = 'The API key provided is invalid or unauthorized.';
+                        errorTips = [
+                            'Open Settings (gear icon) and verify your API key is correct.',
+                            'Make sure you have not added extra spaces or hidden characters.',
+                            'Check if your API key has been revoked or has correct permissions.'
+                        ];
+                    } else if (errMsg.includes('quota') || errMsg.includes('billing') || errMsg.includes('429') || errMsg.includes('limit exceeded')) {
+                        errorTitle = 'Rate Limit or Quota Exceeded';
+                        errorExplanation = 'You have exceeded your API rate limits or have insufficient billing credits.';
+                        errorTips = [
+                            'Check your provider dashboard to see if your billing is active.',
+                            'Wait a moment before sending another message (Rate Limit).',
+                            'Switch to another provider or model in settings.'
+                        ];
+                    } else if (errMsg.includes('model') || errMsg.includes('404') || errMsg.includes('not found')) {
+                        errorTitle = 'Model Not Found';
+                        errorExplanation = 'The requested AI model could not be found or is not accessible.';
+                        errorTips = [
+                            'Check if the model name is spelled correctly in Settings.',
+                            'Ensure your API key has access to this specific model.',
+                            'Try using the default model (e.g. "gemini-1.5-flash" or "llama-3.3-70b-versatile").'
+                        ];
+                    } else if (errMsg.includes('failed to fetch') || errMsg.includes('network') || errMsg.includes('cors') || errMsg.includes('mixed content')) {
+                        errorTitle = 'Network Connection Blocked';
+                        errorExplanation = 'The request was blocked or failed to reach the server.';
+                        errorTips = [
+                            'Check if your device has a working internet connection.',
+                            'If testing locally on a mobile device (e.g. via IP), browsers block secure HTTPS requests due to Mixed Content. Use HTTPS/ngrok.',
+                            'Check if your API provider is currently experiencing an outage.'
+                        ];
+                    } else {
+                        errorTips = [
+                            'Double-check your Settings (Provider, Model Name, and API Key).',
+                            'Check the browser developer tools console for detailed logs.',
+                            'Ensure your network connection is stable.'
+                        ];
+                    }
+
                     const errorBubble = document.createElement('div');
                     errorBubble.className = 'assistant-chat-bubble bot';
-                    errorBubble.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-                    errorBubble.style.background = 'rgba(239, 68, 68, 0.05)';
+                    errorBubble.style.borderColor = 'rgba(239, 68, 68, 0.25)';
+                    errorBubble.style.background = 'rgba(239, 68, 68, 0.03)';
+                    errorBubble.style.borderWidth = '1px';
+                    errorBubble.style.borderStyle = 'solid';
+                    errorBubble.style.padding = '14px 16px';
+                    errorBubble.style.borderRadius = '16px';
+                    errorBubble.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.05)';
+                    
+                    let tipsHtml = errorTips.map(tip => `<li style="margin-left: 18px; margin-top: 4px; font-size: 0.8rem; list-style-type: disc;">${tip}</li>`).join('');
+                    
                     errorBubble.innerHTML = `
-                    <p style="color:#ef4444; font-weight:700; font-size:0.85rem; margin-bottom:4px;">API Request Failed</p>
-                    <p style="font-size:0.85rem; margin-bottom:0;">Error: ${err.message}. Please check your API key, selected provider, model config, or network connection.</p>
-                `;
+                        <div style="display: flex; align-items: center; gap: 8px; color: #ef4444; margin-bottom: 6px;">
+                            <i data-lucide="alert-circle" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                            <strong style="font-size: 0.9rem; font-weight: 700;">${errorTitle}</strong>
+                        </div>
+                        <p style="font-size: 0.825rem; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4;">${errorExplanation}</p>
+                        <div style="border-top: 1px dashed rgba(239, 68, 68, 0.2); padding-top: 8px; margin-top: 8px; color: var(--text-secondary);">
+                            <span style="font-size: 0.775rem; font-weight: 600; display: block;">Troubleshooting Tips:</span>
+                            <ul style="margin-top: 4px; padding-left: 0;">
+                                ${tipsHtml}
+                            </ul>
+                        </div>
+                    `;
                     assistantChatLog.appendChild(errorBubble);
+                    lucide.createIcons({ attrs: { class: 'lucide-icon' } });
                     scrollChatToBottom();
                 }
             } finally {
