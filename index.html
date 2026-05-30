@@ -9849,7 +9849,10 @@
                 }
             }
             if (assistantHistoryPopover && !assistantHistoryPopover.classList.contains('hidden')) {
-                if (!assistantHistoryPopover.contains(e.target) && !assistantHistoryToggleBtn.contains(e.target)) {
+                if (!assistantHistoryPopover.contains(e.target) && 
+                    !assistantHistoryToggleBtn.contains(e.target) && 
+                    !e.target.closest('#custom-confirm-modal') && 
+                    e.target.id !== 'custom-confirm-modal') {
                     assistantHistoryPopover.classList.add('hidden');
                 }
             }
@@ -10424,7 +10427,11 @@
             if (idx !== -1) {
                 list[idx].pinned = !list[idx].pinned;
                 localStorage.setItem('assistant-conversations', JSON.stringify(list));
+                const savedScrollTop = assistantHistoryPopover ? assistantHistoryPopover.scrollTop : 0;
                 loadConversationsList();
+                if (assistantHistoryPopover) {
+                    assistantHistoryPopover.scrollTop = savedScrollTop;
+                }
                 notify(list[idx].pinned ? 'Chat pinned.' : 'Chat unpinned.', 'success');
             }
         }
@@ -10594,7 +10601,11 @@
                     renderChatHistory();
                 }
 
+                const savedScrollTop = assistantHistoryPopover ? assistantHistoryPopover.scrollTop : 0;
                 loadConversationsList();
+                if (assistantHistoryPopover) {
+                    assistantHistoryPopover.scrollTop = savedScrollTop;
+                }
                 notify('Conversation deleted.', 'info');
             });
         }
@@ -11073,10 +11084,13 @@
             remarksToggleBtn.addEventListener('click', () => {
                 remarksModeActive = !remarksModeActive;
                 const sparklesIcon = remarksToggleBtn.querySelector('[data-lucide="sparkles"]');
+                const searchWebToggle = document.getElementById('search-web-toggle');
                 if (remarksModeActive) {
                     remarksToggleBtn.classList.add('active');
                     if (sparklesIcon) sparklesIcon.style.color = '#ffffff';
 
+                    if (searchWebToggle) searchWebToggle.style.display = 'none';
+                    if (assistantNewChatBtn) assistantNewChatBtn.style.display = 'none';
                     if (remarksInputsContainer) remarksInputsContainer.style.display = 'flex';
                     if (assistantInput && assistantInput.parentNode) assistantInput.parentNode.style.display = 'none';
                     if (assistantAttachBtn) assistantAttachBtn.style.display = 'none';
@@ -11086,6 +11100,8 @@
                     remarksToggleBtn.classList.remove('active');
                     if (sparklesIcon) sparklesIcon.style.color = '#f59e0b';
 
+                    if (searchWebToggle) searchWebToggle.style.display = 'inline-flex';
+                    if (assistantNewChatBtn) assistantNewChatBtn.style.display = 'flex';
                     if (remarksInputsContainer) remarksInputsContainer.style.display = 'none';
                     if (assistantInput && assistantInput.parentNode) assistantInput.parentNode.style.display = 'block';
                     if (assistantAttachBtn) assistantAttachBtn.style.display = 'flex';
@@ -11707,25 +11723,25 @@ Remark 1:
 * Describe the actual defect/failure in the part.
 
 Remark 2:
-* Minimum 30 characters 
-* Maximum 40 characters
+* Minimum 40 characters 
+* Maximum 50 characters
 * Describe the customer complaint, symptom, or concern.
 * Explain what problem the customer experienced and reported.
 
 Remark 3:
-* Minimum 30 characters 
-* Maximum 40 characters
+* Minimum 40 characters 
+* Maximum 50 characters
 * State that the specified part was found defective during inspection.
 * Clearly mention the defective part name.
 
 Remark 4:
-* Minimum 30 characters 
-* Maximum 40 characters
+* Minimum 40 characters 
+* Maximum 50 characters
 * State the corrective action taken.
 * Clearly mention repair or replacement of the defective part.
 
 Important Rules:
-* Very Very Strictly follow the minimum and maximum character limits.
+* Very Strictly follow the minimum and maximum character limits.
 * Count spaces as characters.
 * Generate realistic automotive warranty remarks.
 * Use professional workshop and warranty claim language.
