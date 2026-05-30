@@ -255,6 +255,20 @@
             }
         }
 
+        .gradient-animated-title {
+            background: linear-gradient(135deg, #6c63ff, #ff6584, #3b82f6, #6c63ff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            animation: mobileLogoGradient 4s ease infinite !important;
+        }
+
+        @keyframes mobileLogoGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .hero p {
             font-size: 1.1rem;
             color: var(--text-secondary);
@@ -1327,11 +1341,7 @@
                 display: none !important;
             }
 
-            @keyframes mobileLogoGradient {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
+
 
             #theme-toggle,
             #history-btn {
@@ -2647,10 +2657,6 @@
                 margin-bottom: 4px !important;
             }
 
-            .hero > div {
-                display: none !important;
-            }
-
             .hero p {
                 font-size: 0.75rem !important;
                 margin: 0 !important;
@@ -2855,6 +2861,10 @@
             }
 
             .app-sidebar-resizer {
+                display: none !important;
+            }
+
+            .app-sidebar-panel .hero div {
                 display: none !important;
             }
         }
@@ -3110,8 +3120,8 @@
                 <section class="hero">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                         <img src="logo.png" alt="Swift File" style="height: 24px; width: 24px; border-radius: 6px;">
-                        <h1
-                            style="font-size: 1.25rem; font-weight: 700; margin: 0; background: none; -webkit-text-fill-color: initial; color: var(--text-primary);">
+                        <h1 class="gradient-animated-title"
+                            style="font-size: 1.25rem; font-weight: 800; margin: 0;">
                             Swift File Tools</h1>
                     </div>
                     <p>Convert your documents securely in your browser.</p>
