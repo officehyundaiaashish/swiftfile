@@ -1356,7 +1356,7 @@
                 display: flex;
                 align-items: center;
                 position: relative;
-                margin: 0.75rem 1rem 0 1rem;
+                margin: 0.5rem 1rem 0.25rem 1rem;
                 z-index: 400;
             }
 
@@ -3059,7 +3059,17 @@
                     <i data-lucide="sidebar"></i>
                 </button>
 
-                <!-- Mobile Search Bar (visible on mobile only) -->
+                <!-- Mobile Tool Selector (Custom Dropdown) — shown first -->
+                <div class="mobile-tool-selector hidden" id="mobile-tool-selector">
+                    <div class="tool-select-btn">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <i id="current-tool-icon" data-lucide="message-square"></i>
+                            <span id="current-tool-label">Swift Assistant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Search Bar (visible on mobile only) — shown after tab selector -->
                 <div class="mobile-search-wrap" id="mobile-search-wrap">
                     <i data-lucide="search" class="mobile-search-icon"></i>
                     <input
@@ -3074,16 +3084,6 @@
                     </button>
                     <!-- Dropdown results -->
                     <div class="mobile-search-dropdown" id="mobile-search-dropdown"></div>
-                </div>
-
-                <!-- Mobile Tool Selector (Custom Dropdown) -->
-                <div class="mobile-tool-selector hidden" id="mobile-tool-selector">
-                    <div class="tool-select-btn">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <i id="current-tool-icon" data-lucide="message-square"></i>
-                            <span id="current-tool-label">Swift Assistant</span>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="converter-card">
