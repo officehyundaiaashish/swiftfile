@@ -2566,6 +2566,116 @@
                 display: none !important;
             }
         }
+
+        /* Beautiful Custom Dropdown Select */
+        .custom-select-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 6px 10px;
+            height: 32px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .custom-select-trigger:hover {
+            border-color: var(--accent-color);
+        }
+
+        .custom-select-trigger .trigger-arrow {
+            width: 14px;
+            height: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.3s ease;
+        }
+
+        .custom-select-container.open .trigger-arrow {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            width: 100%;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 1010;
+            display: none;
+            flex-direction: column;
+            padding: 4px;
+            gap: 2px;
+            animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-select-container.open .custom-select-options {
+            display: flex;
+        }
+
+        .custom-select-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .custom-select-option:hover {
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+        }
+
+        .custom-select-option.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .custom-select-option .option-icon {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .custom-select-option.active .option-icon {
+            color: white;
+        }
+
+        .custom-select-option:not(.active):hover .option-icon {
+            color: var(--accent-color);
+        }
     </style>
     <script>
         let lastActiveTabId = 'swift-assistant';
@@ -3966,10 +4076,8 @@
                                             style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
                                             <div>
                                                 <label
-                                                    style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model
-                                                    Provider</label>
-                                                <select id="assistant-provider" class="password-input"
-                                                    style="padding: 6px 10px; height: 32px; margin-bottom: 0; width: 100%; font-size: 0.8rem;">
+                                                    style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Provider</label>
+                                                <select id="assistant-provider" class="hidden">
                                                     <option value="builtin" selected>Swift Assistant (Official)</option>
                                                     <option value="gemini">Google Gemini</option>
                                                     <option value="openrouter">OpenRouter</option>
@@ -3977,6 +4085,38 @@
                                                     <option value="huggingface">Hugging Face</option>
                                                     <option value="custom">Custom API</option>
                                                 </select>
+                                                <div class="custom-select-container" id="custom-provider-select">
+                                                    <div class="custom-select-trigger">
+                                                        <span class="trigger-label">Swift Assistant (Official)</span>
+                                                        <i data-lucide="chevron-down" class="trigger-arrow"></i>
+                                                    </div>
+                                                    <div class="custom-select-options">
+                                                        <div class="custom-select-option active" data-value="builtin">
+                                                            <i data-lucide="sparkles" class="option-icon"></i>
+                                                            <span>Swift Assistant (Official)</span>
+                                                        </div>
+                                                        <div class="custom-select-option" data-value="gemini">
+                                                            <i data-lucide="cpu" class="option-icon"></i>
+                                                            <span>Google Gemini</span>
+                                                        </div>
+                                                        <div class="custom-select-option" data-value="openrouter">
+                                                            <i data-lucide="network" class="option-icon"></i>
+                                                            <span>OpenRouter</span>
+                                                        </div>
+                                                        <div class="custom-select-option" data-value="groq">
+                                                            <i data-lucide="zap" class="option-icon"></i>
+                                                            <span>Groq Cloud</span>
+                                                        </div>
+                                                        <div class="custom-select-option" data-value="huggingface">
+                                                            <i data-lucide="smile" class="option-icon"></i>
+                                                            <span>Hugging Face</span>
+                                                        </div>
+                                                        <div class="custom-select-option" data-value="custom">
+                                                            <i data-lucide="code" class="option-icon"></i>
+                                                            <span>Custom API</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div>
@@ -12049,6 +12189,60 @@ User Query: ${prompt}`;
                     }
                 }
             });
+        }
+
+        // ==========================================
+        // CUSTOM MODEL PROVIDER SELECT DROPDOWN
+        // ==========================================
+        const customSelect = document.getElementById('custom-provider-select');
+        const nativeSelect = document.getElementById('assistant-provider');
+        if (customSelect && nativeSelect) {
+            const trigger = customSelect.querySelector('.custom-select-trigger');
+            const options = customSelect.querySelectorAll('.custom-select-option');
+            const triggerLabel = trigger.querySelector('.trigger-label');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                customSelect.classList.toggle('open');
+            });
+
+            options.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = opt.getAttribute('data-value');
+                    const label = opt.querySelector('span').textContent;
+
+                    // Sync active classes
+                    options.forEach(o => o.classList.toggle('active', o === opt));
+
+                    // Update label
+                    triggerLabel.textContent = label;
+
+                    // Set native select and trigger event
+                    nativeSelect.value = val;
+                    nativeSelect.dispatchEvent(new Event('change'));
+
+                    // Close dropdown
+                    customSelect.classList.remove('open');
+                });
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', () => {
+                customSelect.classList.remove('open');
+            });
+
+            // Sync initial state if native select is modified externally
+            const syncCustomSelect = () => {
+                const val = nativeSelect.value;
+                const activeOpt = Array.from(options).find(o => o.getAttribute('data-value') === val);
+                if (activeOpt) {
+                    options.forEach(o => o.classList.toggle('active', o === activeOpt));
+                    triggerLabel.textContent = activeOpt.querySelector('span').textContent;
+                }
+            };
+            nativeSelect.addEventListener('change', syncCustomSelect);
+            syncCustomSelect();
         }
     </script>
 
