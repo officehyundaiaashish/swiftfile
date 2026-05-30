@@ -34,89 +34,158 @@ export default async function handler(req, res) {
 
   try {
     // 1. Try Google Search
-    const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
-    const googleRes = await fetch(googleUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5'
-      }
-    });
-
-    if (googleRes.ok) {
-      const html = await googleRes.text();
-      
-      // Match result blocks (a href matched with h3 title)
-      const matches = html.matchAll(/<a\s+[^>]*href=["']([^"']+)["'][^>]*>(?:[\s\S]*?)<h3[^>]*>([\s\S]*?)<\/h3>/g);
-      for (const match of matches) {
-        let url = match[1];
-        let title = match[2].replace(/<[^>]*>/g, '').trim(); // Strip title HTML
-
-        if (url.startsWith('/url?q=')) {
-          url = url.substring(7).split('&')[0];
+    try {
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+      const googleRes = await fetch(googleUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5'
         }
+      });
 
-        if (url.startsWith('http') && !url.includes('google.com')) {
-          results.push({
-            title: decodeHtmlEntities(title),
-            url: decodeURIComponent(url),
-            snippet: 'View source page for full details.'
-          });
+      if (googleRes.ok) {
+        const html = await googleRes.text();
+        
+        // Match result blocks (a href matched with h3 title)
+        const matches = html.matchAll(/<a\s+[^>]*href=["']([^"']+)["'][^>]*>(?:[\s\S]*?)<h3[^>]*>([\s\S]*?)<\/h3>/g);
+        for (const match of matches) {
+          let url = match[1];
+          let title = match[2].replace(/<[^>]*>/g, '').trim(); // Strip title HTML
+
+          if (url.startsWith('/url?q=')) {
+            url = url.substring(7).split('&')[0];
+          }
+
+          if (url.startsWith('//')) {
+            url = 'https:' + url;
+          }
+
+          if (url.startsWith('http') && !url.includes('google.com')) {
+            results.push({
+              title: decodeHtmlEntities(title),
+              url: decodeURIComponent(url),
+              snippet: 'View source page for full details.'
+            });
+          }
+          if (results.length >= 5) break;
         }
-        if (results.length >= 5) break;
       }
+    } catch (googleError) {
+      console.warn('Google search fetch failed, moving to fallbacks:', googleError.message);
     }
 
     // 2. Fallback to DuckDuckGo Lite if Google returned nothing
     if (results.length === 0) {
       console.log('Google search returned no hits. Falling back to DuckDuckGo Lite...');
-      const ddgUrl = `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(searchQuery)}`;
-      const ddgRes = await fetch(ddgUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Referer': 'https://lite.duckduckgo.com/',
-          'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-          'Sec-Ch-Ua-Mobile': '?0',
-          'Sec-Ch-Ua-Platform': '"Windows"',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'same-origin',
-          'Sec-Fetch-User': '?1',
-          'Upgrade-Insecure-Requests': '1'
-        }
-      });
-
-      if (ddgRes.ok) {
-        const html = await ddgRes.text();
-        // Extract link elements. Handles flexible attribute order and single/double quotes.
-        let linkMatches = [...html.matchAll(/<a\s+[^>]*class=['"]result-link['"][^>]*href=['"]([^'"]+)['"][^>]*>([\s\S]*?)<\/a>/g)];
-        if (linkMatches.length === 0) {
-          linkMatches = [...html.matchAll(/<a\s+[^>]*href=['"]([^'"]+)['"][^>]*class=['"]result-link['"][^>]*>([\s\S]*?)<\/a>/g)];
-        }
-        // Extract snippet elements
-        const snippetMatches = [...html.matchAll(/<td\s+[^>]*class=['"]result-snippet['"][^>]*>([\s\S]*?)<\/td>/g)];
-
-        for (let i = 0; i < Math.min(linkMatches.length, 5); i++) {
-          let url = linkMatches[i][1];
-          const title = linkMatches[i][2].replace(/<[^>]*>/g, '').trim();
-          const snippet = snippetMatches[i] ? snippetMatches[i][1].replace(/<[^>]*>/g, '').trim() : 'Click link to read.';
-          
-          if (url.includes('uddg=')) {
-            const uddgMatch = url.match(/[?&]uddg=([^&]+)/);
-            if (uddgMatch) {
-              url = decodeURIComponent(uddgMatch[1]);
-            }
+      try {
+        const ddgUrl = `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(searchQuery)}`;
+        const ddgRes = await fetch(ddgUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://lite.duckduckgo.com/'
           }
+        });
+
+        if (ddgRes.ok) {
+          const html = await ddgRes.text();
           
-          results.push({
-            title: decodeHtmlEntities(title),
-            url: decodeURIComponent(url),
-            snippet: decodeHtmlEntities(snippet)
-          });
+          // Robust tag-level parser for DuckDuckGo Lite
+          const aTagRegex = /<a\s+[^>]*class=['"]result-link['"][^>]*>([\s\S]*?)<\/a>/gi;
+          const snippetRegex = /<td\s+[^>]*class=['"]result-snippet['"][^>]*>([\s\S]*?)<\/td>/gi;
+          
+          const tempLinks = [];
+          let match;
+          while ((match = aTagRegex.exec(html)) !== null) {
+            const fullTag = match[0];
+            const title = match[1].replace(/<[^>]*>/g, '').trim();
+            const hrefMatch = fullTag.match(/href=['"]([^'"]+)['"]/i);
+            let url = hrefMatch ? hrefMatch[1] : '';
+            
+            if (url.includes('uddg=')) {
+              const uddgMatch = url.match(/[?&]uddg=([^&]+)/);
+              if (uddgMatch) {
+                url = decodeURIComponent(uddgMatch[1]);
+              }
+            }
+            if (url.startsWith('//')) {
+              url = 'https:' + url;
+            }
+            tempLinks.push({ title, url });
+          }
+
+          const snippets = [];
+          while ((match = snippetRegex.exec(html)) !== null) {
+            snippets.push(match[1].replace(/<[^>]*>/g, '').trim());
+          }
+
+          for (let i = 0; i < Math.min(tempLinks.length, 5); i++) {
+            results.push({
+              title: decodeHtmlEntities(tempLinks[i].title),
+              url: tempLinks[i].url,
+              snippet: decodeHtmlEntities(snippets[i] || 'Click link to read.')
+            });
+          }
         }
+      } catch (ddgLiteError) {
+        console.warn('DuckDuckGo Lite fetch failed:', ddgLiteError.message);
+      }
+    }
+
+    // 3. Fallback to DuckDuckGo HTML if DuckDuckGo Lite and Google returned nothing
+    if (results.length === 0) {
+      console.log('DuckDuckGo Lite returned no hits. Falling back to DuckDuckGo HTML Search...');
+      try {
+        const ddgHtmlUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
+        const ddgHtmlRes = await fetch(ddgHtmlUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+          }
+        });
+
+        if (ddgHtmlRes.ok) {
+          const html = await ddgHtmlRes.text();
+          const linkRegex = /<a\s+[^>]*class=['"]result__a['"][^>]*>([\s\S]*?)<\/a>/gi;
+          const snippetRegex = /<a\s+[^>]*class=['"]result__snippet['"][^>]*>([\s\S]*?)<\/a>/gi;
+
+          const tempLinks = [];
+          let match;
+          while ((match = linkRegex.exec(html)) !== null) {
+            const fullTag = match[0];
+            const title = match[1].replace(/<[^>]*>/g, '').trim();
+            const hrefMatch = fullTag.match(/href=['"]([^'"]+)['"]/i);
+            let url = hrefMatch ? hrefMatch[1] : '';
+
+            if (url.includes('uddg=')) {
+              const uddgMatch = url.match(/[?&]uddg=([^&]+)/);
+              if (uddgMatch) {
+                url = decodeURIComponent(uddgMatch[1]);
+              }
+            }
+            if (url.startsWith('//')) {
+              url = 'https:' + url;
+            }
+            tempLinks.push({ title, url });
+          }
+
+          const snippets = [];
+          while ((match = snippetRegex.exec(html)) !== null) {
+            snippets.push(match[1].replace(/<[^>]*>/g, '').trim());
+          }
+
+          for (let i = 0; i < Math.min(tempLinks.length, 5); i++) {
+            results.push({
+              title: decodeHtmlEntities(tempLinks[i].title),
+              url: tempLinks[i].url,
+              snippet: decodeHtmlEntities(snippets[i] || 'Click link to read.')
+            });
+          }
+        }
+      } catch (ddgHtmlError) {
+        console.warn('DuckDuckGo HTML search fetch failed:', ddgHtmlError.message);
       }
     }
 
@@ -129,6 +198,7 @@ export default async function handler(req, res) {
 }
 
 function decodeHtmlEntities(text) {
+  if (!text) return '';
   return text
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
