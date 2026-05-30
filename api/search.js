@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       const html = await googleRes.text();
       
       // Match result blocks (a href matched with h3 title)
-      const matches = html.matchAll(/<a href="([^"]+)"[^>]*>\s*<h3[^>]*>([\s\S]*?)<\/h3>/g);
+      const matches = html.matchAll(/<a\s+[^>]*href=["']([^"']+)["'][^>]*>(?:[\s\S]*?)<h3[^>]*>([\s\S]*?)<\/h3>/g);
       for (const match of matches) {
         let url = match[1];
         let title = match[2].replace(/<[^>]*>/g, '').trim(); // Strip title HTML
@@ -73,21 +73,43 @@ export default async function handler(req, res) {
       const ddgUrl = `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(searchQuery)}`;
       const ddgRes = await fetch(ddgUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Referer': 'https://lite.duckduckgo.com/',
+          'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+          'Sec-Ch-Ua-Mobile': '?0',
+          'Sec-Ch-Ua-Platform': '"Windows"',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'same-origin',
+          'Sec-Fetch-User': '?1',
+          'Upgrade-Insecure-Requests': '1'
         }
       });
 
       if (ddgRes.ok) {
         const html = await ddgRes.text();
-        // Extract link elements
-        const linkMatches = [...html.matchAll(/<a class="result-link" href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)];
+        // Extract link elements. Handles flexible attribute order and single/double quotes.
+        let linkMatches = [...html.matchAll(/<a\s+[^>]*class=['"]result-link['"][^>]*href=['"]([^'"]+)['"][^>]*>([\s\S]*?)<\/a>/g)];
+        if (linkMatches.length === 0) {
+          linkMatches = [...html.matchAll(/<a\s+[^>]*href=['"]([^'"]+)['"][^>]*class=['"]result-link['"][^>]*>([\s\S]*?)<\/a>/g)];
+        }
         // Extract snippet elements
-        const snippetMatches = [...html.matchAll(/<td class="result-snippet">([\s\S]*?)<\/td>/g)];
+        const snippetMatches = [...html.matchAll(/<td\s+[^>]*class=['"]result-snippet['"][^>]*>([\s\S]*?)<\/td>/g)];
 
         for (let i = 0; i < Math.min(linkMatches.length, 5); i++) {
-          const url = linkMatches[i][1];
+          let url = linkMatches[i][1];
           const title = linkMatches[i][2].replace(/<[^>]*>/g, '').trim();
           const snippet = snippetMatches[i] ? snippetMatches[i][1].replace(/<[^>]*>/g, '').trim() : 'Click link to read.';
+          
+          if (url.includes('uddg=')) {
+            const uddgMatch = url.match(/[?&]uddg=([^&]+)/);
+            if (uddgMatch) {
+              url = decodeURIComponent(uddgMatch[1]);
+            }
+          }
           
           results.push({
             title: decodeHtmlEntities(title),
