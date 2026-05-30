@@ -11439,9 +11439,13 @@ User Query: ${prompt}`;
                 errorBubble.style.background = 'rgba(239, 68, 68, 0.05)';
                 errorBubble.innerHTML = `
                     <p style="color:#ef4444; font-weight:700; font-size:0.85rem; margin-bottom:4px;">API Request Failed</p>
-                    <p style="font-size:0.85rem; margin-bottom:0;">Error: ${err.message}. Please check your API key, selected provider, model config, or network connection.</p>
+                    <p style="font-size:0.85rem; margin-bottom:8px;">Error: ${err.message}. Please check your API key, selected provider, model config, or network connection.</p>
+                    <button onclick="retryLastAssistantMessage(this)" class="secondary-btn" style="padding:4px 10px; font-size:0.75rem; border-color:#ef4444; color:#ef4444; display:inline-flex; align-items:center; gap:4px; margin-bottom:0; background:transparent; font-weight:600; cursor:pointer;">
+                        <i data-lucide="rotate-ccw" style="width:12px; height:12px;"></i> Retry Request & Attachment
+                    </button>
                 `;
                 assistantChatLog.appendChild(errorBubble);
+                lucide.createIcons({ root: errorBubble });
                 scrollChatToBottom();
             } finally {
                 isGenerating = false;
@@ -12250,6 +12254,38 @@ User Query: ${prompt}`;
             nativeSelect.addEventListener('change', syncCustomSelect);
             syncCustomSelect();
         }
+
+        // ==========================================
+        // AUTO RETRY & RE-PARSE ASSISTANT MESSAGE ON FAILURE
+        // ==========================================
+        window.retryLastAssistantMessage = async function(buttonEl) {
+            if (buttonEl) {
+                const bubble = buttonEl.closest('.assistant-chat-bubble');
+                if (bubble) bubble.remove();
+            }
+
+            if (chatHistory.length > 0) {
+                const lastMsg = chatHistory[chatHistory.length - 1];
+                if (lastMsg.role === 'user') {
+                    // Pop from history to avoid duplicates
+                    chatHistory.pop();
+                    saveCurrentConversation();
+                    renderChatHistory();
+
+                    // Restore text prompt
+                    assistantInput.value = lastMsg.content || '';
+
+                    // Restore attachment to run the parser again
+                    if (lastMsg.attachment) {
+                        attachedFile = lastMsg.attachment;
+                        renderAttachedFile();
+                    }
+
+                    // Resend to AI
+                    await sendAssistantMessage();
+                }
+            }
+        };
     </script>
 
     <!-- History Drawer -->
