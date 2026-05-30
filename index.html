@@ -1347,6 +1347,7 @@
         .mobile-search-wrap {
             display: none;
         }
+
         .mobile-search-dropdown {
             display: none;
         }
@@ -1392,7 +1393,7 @@
                 letter-spacing: 0.01em;
                 border: 1.5px solid var(--border-color);
                 border-radius: 14px;
-                background: var(--input-bg, rgba(255,255,255,0.06));
+                background: var(--input-bg, rgba(255, 255, 255, 0.06));
                 color: var(--text-primary);
                 outline: none;
                 transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
@@ -1408,7 +1409,7 @@
 
             .mobile-search-wrap input:focus {
                 border-color: var(--accent-color);
-                box-shadow: 0 0 0 3px var(--accent-alpha, rgba(108,99,255,0.15)), 0 2px 14px rgba(0,0,0,0.07);
+                box-shadow: 0 0 0 3px var(--accent-alpha, rgba(108, 99, 255, 0.15)), 0 2px 14px rgba(0, 0, 0, 0.07);
                 background: var(--surface-color);
             }
 
@@ -1435,7 +1436,7 @@
             }
 
             .mobile-search-clear:hover {
-                background: var(--hover-bg, rgba(0,0,0,0.08));
+                background: var(--hover-bg, rgba(0, 0, 0, 0.08));
                 color: var(--text-primary);
             }
 
@@ -1454,7 +1455,7 @@
                 background: var(--surface-color);
                 border: 1px solid var(--border-color);
                 border-radius: 16px;
-                box-shadow: 0 12px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
                 z-index: 500;
                 overflow: hidden;
                 max-height: 280px;
@@ -1462,7 +1463,7 @@
                 opacity: 0;
                 pointer-events: none;
                 transform: translateY(-6px) scale(0.98);
-                transition: opacity 0.2s cubic-bezier(0.16,1,0.3,1), transform 0.2s cubic-bezier(0.16,1,0.3,1);
+                transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
                 scrollbar-width: thin;
             }
 
@@ -1491,7 +1492,7 @@
 
             .mobile-search-result-item:active,
             .mobile-search-result-item:hover {
-                background: var(--accent-alpha, rgba(108,99,255,0.08));
+                background: var(--accent-alpha, rgba(108, 99, 255, 0.08));
                 color: var(--accent-color);
             }
 
@@ -1499,7 +1500,7 @@
                 width: 32px;
                 height: 32px;
                 border-radius: 9px;
-                background: var(--accent-alpha, rgba(108,99,255,0.1));
+                background: var(--accent-alpha, rgba(108, 99, 255, 0.1));
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -1926,6 +1927,74 @@
             align-self: center;
             max-width: 90%;
             text-align: center;
+        }
+
+        .remarks-pill-btn {
+            background: rgba(148, 163, 184, 0.08) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 20px !important;
+            color: var(--text-secondary) !important;
+            cursor: pointer;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px !important;
+            height: 26px !important;
+            width: auto !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            outline: none;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            font-family: inherit;
+        }
+
+        .remarks-pill-btn:hover {
+            background: rgba(148, 163, 184, 0.15) !important;
+            color: var(--text-primary) !important;
+            transform: translateY(-1px);
+        }
+
+        .remarks-pill-btn.active {
+            background: linear-gradient(135deg, var(--accent-color), #3b82f6) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px var(--accent-shadow) !important;
+        }
+
+        .remark-copy-btn {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            color: var(--text-secondary) !important;
+            cursor: pointer;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 28px !important;
+            height: 28px !important;
+            padding: 6px !important;
+            transition: all 0.2s ease;
+            flex-shrink: 0 !important;
+        }
+
+        .remark-copy-btn:hover {
+            color: var(--accent-color) !important;
+            border-color: var(--accent-color) !important;
+            background: var(--accent-alpha) !important;
+        }
+
+        .remark-copy-btn svg {
+            width: 14px !important;
+            height: 14px !important;
+            display: block;
+        }
+
+        .remarks-pill-btn i,
+        .remarks-pill-btn svg {
+            width: 12px !important;
+            height: 12px !important;
         }
 
         .chat-bubble-action-btn {
@@ -2809,6 +2878,7 @@
                 opacity: 0;
                 transform: translateY(-4px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -3079,15 +3149,14 @@
                 <!-- Mobile Search Bar (visible on mobile only) — shown after tab selector -->
                 <div class="mobile-search-wrap" id="mobile-search-wrap">
                     <i data-lucide="search" class="mobile-search-icon"></i>
-                    <input
-                        type="search"
-                        id="mobile-search-input"
-                        placeholder="Search tools…"
-                        autocomplete="off"
-                        spellcheck="false"
-                    >
+                    <input type="search" id="mobile-search-input" placeholder="Search tools…" autocomplete="off"
+                        spellcheck="false">
                     <button class="mobile-search-clear" id="mobile-search-clear" aria-label="Clear search">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
                     </button>
                     <!-- Dropdown results -->
                     <div class="mobile-search-dropdown" id="mobile-search-dropdown"></div>
@@ -4240,8 +4309,13 @@
                                     </div>
 
                                     <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+                                        <button id="remarks-toggle-btn" class="remarks-pill-btn"
+                                            title="Toggle Remarks Generator">
+                                            <i data-lucide="sparkles" style="color: #f59e0b;"></i>
+                                            <span>Remarks</span>
+                                        </button>
                                         <span id="status-dot"
-                                            style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444;"></span>
+                                            style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; margin: 0 4px; flex-shrink: 0;"></span>
                                         <button id="assistant-history-toggle-btn" class="chat-bubble-action-btn"
                                             title="Previous Conversations"
                                             style="padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">
@@ -4274,7 +4348,8 @@
                                             style="position: absolute; top: 36px; right: 0; width: 280px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; z-index: 1000; box-shadow: var(--shadow); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
                                             <div>
                                                 <label
-                                                    style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Provider</label>
+                                                    style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model
+                                                    Provider</label>
                                                 <select id="assistant-provider" class="hidden">
                                                     <option value="builtin" selected>Swift Assistant (Official)</option>
                                                     <option value="gemini">Google Gemini</option>
@@ -4412,6 +4487,16 @@
                                             <textarea id="assistant-input" class="password-input"
                                                 placeholder="Ask anything..." rows="1"
                                                 style="resize: none; margin-bottom: 0; padding: 10px 14px; font-size: 0.95rem; border-radius: 18px; width: 100%; box-sizing: border-box;"></textarea>
+                                        </div>
+
+                                        <!-- Special Remarks Input Fields -->
+                                        <div id="remarks-inputs-container"
+                                            style="display: none; flex: 1; min-width: 0; flex-direction: column; gap: 6px;">
+                                            <input type="text" id="remarks-part-name"
+                                                placeholder="Part Name (e.g. Brake Pads)"
+                                                style="background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 12px; padding: 8px 12px; font-size: 0.85rem; outline: none; width: 100%; font-family: inherit;">
+                                            <input type="text" id="remarks-nature" placeholder="Nature of problem"
+                                                style="background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 12px; padding: 8px 12px; font-size: 0.85rem; outline: none; width: 100%; font-family: inherit;">
                                         </div>
 
                                         <!-- Right Control Buttons -->
@@ -9334,6 +9419,12 @@
         const assistantCloseBtn = document.getElementById('assistant-close-btn');
         const assistantNewChatBtn = document.getElementById('assistant-new-chat-btn');
 
+        let remarksModeActive = false;
+        const remarksToggleBtn = document.getElementById('remarks-toggle-btn');
+        const remarksInputsContainer = document.getElementById('remarks-inputs-container');
+        const remarksPartName = document.getElementById('remarks-part-name');
+        const remarksNature = document.getElementById('remarks-nature');
+
         let chatHistory = []; // stores {role: 'user'|'assistant', content: '...', timestamp: '...'}
         let currentConversationId = null;
         let currentAbortController = null;
@@ -10441,7 +10532,7 @@
             };
         }
 
-        function createChatBubble(role, content, index, attachment = null, timestamp = null, searchResults = null) {
+        function createChatBubble(role, content, index, attachment = null, timestamp = null, searchResults = null, isRemarks = false) {
             const bubble = document.createElement('div');
             bubble.className = `assistant-chat-bubble ${role === 'user' ? 'user' : 'bot'}`;
             bubble.dataset.index = index;
@@ -10480,7 +10571,62 @@
 
             const textContainer = document.createElement('div');
             textContainer.style.fontSize = '0.9rem';
-            textContainer.innerHTML = formatMessage(content);
+            textContainer.style.width = '100%';
+
+            function parseRemarks(text) {
+                return text.split('\n')
+                    .map(line => line.trim())
+                    .map(line => line.replace(/^(Remark\s*\d+[:\-]?|Remark\s*[:\-]?|\d+[:\.\-]?\s*)/i, '').trim())
+                    .filter(line => line.length > 0);
+            }
+
+            if (role === 'bot' && isRemarks) {
+                const remarksList = parseRemarks(content);
+                textContainer.style.display = 'flex';
+                textContainer.style.flexDirection = 'column';
+                textContainer.style.gap = '8px';
+
+                remarksList.forEach((remarkText) => {
+                    const remarkRow = document.createElement('div');
+                    remarkRow.style.display = 'flex';
+                    remarkRow.style.justifyContent = 'space-between';
+                    remarkRow.style.alignItems = 'center';
+                    remarkRow.style.background = 'var(--input-bg)';
+                    remarkRow.style.border = '1px solid var(--border-color)';
+                    remarkRow.style.borderRadius = '12px';
+                    remarkRow.style.padding = '8px 12px';
+                    remarkRow.style.gap = '12px';
+                    remarkRow.style.width = '100%';
+
+                    const textSpan = document.createElement('span');
+                    textSpan.style.fontSize = '0.9rem';
+                    textSpan.style.color = 'var(--text-primary)';
+                    textSpan.style.lineHeight = '1.4';
+                    textSpan.style.flex = '1';
+                    textSpan.textContent = remarkText;
+
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'remark-copy-btn';
+                    copyBtn.title = 'Copy Remark';
+                    copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+
+                    copyBtn.addEventListener('click', () => {
+                        copyBotResponse(remarkText);
+                        copyBtn.style.color = 'var(--accent-color)';
+                        copyBtn.style.borderColor = 'var(--accent-color)';
+                        setTimeout(() => {
+                            copyBtn.style.color = '';
+                            copyBtn.style.borderColor = '';
+                        }, 1000);
+                    });
+
+                    remarkRow.appendChild(textSpan);
+                    remarkRow.appendChild(copyBtn);
+                    textContainer.appendChild(remarkRow);
+                });
+            } else {
+                textContainer.innerHTML = formatMessage(content);
+            }
 
             bubble.appendChild(header);
 
@@ -10682,7 +10828,7 @@
                 if (msg.content && (msg.content.includes('[SYSTEM TOOL EXECUTION RESULT]') || msg.content.includes('"action":'))) {
                     return;
                 }
-                const bubble = createChatBubble(msg.role, msg.content, idx, msg.attachment, msg.timestamp, msg.searchResults);
+                const bubble = createChatBubble(msg.role, msg.content, idx, msg.attachment, msg.timestamp, msg.searchResults, msg.isRemarks);
                 assistantChatLog.appendChild(bubble);
             });
             lucide.createIcons({ attrs: { class: 'lucide-icon' } });
@@ -10725,6 +10871,50 @@
                 sendAssistantMessage();
             }
         });
+
+        if (remarksToggleBtn) {
+            remarksToggleBtn.addEventListener('click', () => {
+                remarksModeActive = !remarksModeActive;
+                const sparklesIcon = remarksToggleBtn.querySelector('[data-lucide="sparkles"]');
+                if (remarksModeActive) {
+                    remarksToggleBtn.classList.add('active');
+                    if (sparklesIcon) sparklesIcon.style.color = '#ffffff';
+
+                    if (remarksInputsContainer) remarksInputsContainer.style.display = 'flex';
+                    if (assistantInput && assistantInput.parentNode) assistantInput.parentNode.style.display = 'none';
+                    if (assistantAttachBtn) assistantAttachBtn.style.display = 'none';
+                    if (assistantVoiceBtn) assistantVoiceBtn.style.display = 'none';
+                    if (remarksPartName) remarksPartName.focus();
+                } else {
+                    remarksToggleBtn.classList.remove('active');
+                    if (sparklesIcon) sparklesIcon.style.color = '#f59e0b';
+
+                    if (remarksInputsContainer) remarksInputsContainer.style.display = 'none';
+                    if (assistantInput && assistantInput.parentNode) assistantInput.parentNode.style.display = 'block';
+                    if (assistantAttachBtn) assistantAttachBtn.style.display = 'flex';
+                    if (assistantVoiceBtn) assistantVoiceBtn.style.display = 'flex';
+                    if (assistantInput) assistantInput.focus();
+                }
+            });
+        }
+
+        if (remarksPartName) {
+            remarksPartName.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendAssistantMessage();
+                }
+            });
+        }
+
+        if (remarksNature) {
+            remarksNature.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendAssistantMessage();
+                }
+            });
+        }
 
         assistantSendBtn.addEventListener('click', () => {
             if (isGenerating) {
@@ -11197,8 +11387,20 @@
         }
 
         async function sendAssistantMessage() {
-            const prompt = assistantInput.value.trim();
-            if (!prompt && !attachedFile) return;
+            let prompt = '';
+            let isRemarksMode = typeof remarksModeActive !== 'undefined' && remarksModeActive;
+            if (isRemarksMode) {
+                const partVal = remarksPartName ? remarksPartName.value.trim() : '';
+                const natureVal = remarksNature ? remarksNature.value.trim() : '';
+                if (!partVal) {
+                    notify('Please enter a Part Name.', 'warning');
+                    return;
+                }
+                prompt = `Part Name: ${partVal}\nNature of problem: ${natureVal}`;
+            } else {
+                prompt = assistantInput.value.trim();
+                if (!prompt && !attachedFile) return;
+            }
 
             const isBuiltinProvider = assistantProvider.value === 'builtin';
             const apiKey = assistantApiKey.value.trim();
@@ -11215,12 +11417,14 @@
 
             // Check if search should be performed
             let shouldSearch = false;
-            if (webSearchState === 'on') {
-                shouldSearch = true;
-            } else if (webSearchState === 'auto') {
-                const searchKeywords = ['weather', 'stock', 'news', 'current', 'latest', 'today', 'who is', 'price of', 'recent', 'google', 'search', 'time in'];
-                const promptLower = prompt.toLowerCase();
-                shouldSearch = searchKeywords.some(keyword => promptLower.includes(keyword));
+            if (!isRemarksMode) {
+                if (webSearchState === 'on') {
+                    shouldSearch = true;
+                } else if (webSearchState === 'auto') {
+                    const searchKeywords = ['weather', 'stock', 'news', 'current', 'latest', 'today', 'who is', 'price of', 'recent', 'google', 'search', 'time in'];
+                    const promptLower = prompt.toLowerCase();
+                    shouldSearch = searchKeywords.some(keyword => promptLower.includes(keyword));
+                }
             }
 
             let searchResults = [];
@@ -11248,14 +11452,20 @@
                 role: 'user',
                 content: prompt,
                 attachment: currentAttachment,
+                isRemarks: isRemarksMode,
                 timestamp: new Date().toISOString()
             });
             saveCurrentConversation();
             renderChatHistory();
 
             // Clear input box
-            assistantInput.value = '';
-            assistantInput.style.height = 'auto'; // Reset height
+            if (isRemarksMode) {
+                if (remarksPartName) remarksPartName.value = '';
+                if (remarksNature) remarksNature.value = '';
+            } else {
+                assistantInput.value = '';
+                assistantInput.style.height = 'auto'; // Reset height
+            }
 
             // Add bot thinking state bubble
             const thinkingBubble = document.createElement('div');
@@ -11279,7 +11489,55 @@
                 userContextInfo += `\nLocation Context: ${detectedUserLocation}`;
             }
 
-            const systemPromptContent = `You are Swift Assistant, the smart AI companion for Swift File Tools. You help users manage, convert, and edit their PDF and image files.
+            let systemPromptContent = '';
+            if (isRemarksMode) {
+                systemPromptContent = `You are an automotive warranty claim remark generator for Hyundai dealership.
+
+When I provide only a Part Name, generate 4 warranty claim remarks.
+
+Character Limit Rules (Mandatory)
+
+Remark 1:
+* Minimum 80 characters
+* Maximum 90 characters
+* Describe the actual defect/failure in the part.
+
+Remark 2:
+* Minimum 55 characters 
+* Maximum 60 characters
+* Describe the customer complaint, symptom, or concern.
+* Explain what problem the customer experienced and reported.
+
+Remark 3:
+* Minimum 55 characters 
+* Maximum 60 characters
+* State that the specified part was found defective during inspection.
+* Clearly mention the defective part name.
+
+Remark 4:
+* Minimum 55 characters 
+* Maximum 60 characters
+* State the corrective action taken.
+* Clearly mention repair or replacement of the defective part.
+
+Important Rules:
+* Strictly follow the minimum and maximum character limits.
+* Count spaces as characters.
+* Generate realistic automotive warranty remarks.
+* Use professional workshop and warranty claim language.
+* Do not use generic statements.
+* Remarks must be logically connected:
+  1. Defect in the part.
+  2. Customer complaint.
+  3. Defective part confirmed during inspection.
+  4. Corrective action performed.
+* Assume the part is defective and warranty replacement is justified.
+* Output only the 4 remarks.
+* Do not show character counts.
+* Do not add explanations or headings.
+* Return the remarks separated by newlines, with each remark on its own line. Do not prefix them with "Remark 1:" or "1." or any indicators. Just return the raw remarks, one per line.`;
+            } else {
+                systemPromptContent = `You are Swift Assistant, the smart AI companion for Swift File Tools. You help users manage, convert, and edit their PDF and image files.
 You have access to some client-side helper tools if navigation or info is needed, but minimize tool use unless directly requested by the user.
 
 - If search results are already provided in the prompt context, use them directly; do NOT invoke the web_search tool block.
@@ -11295,6 +11553,79 @@ ${userContextInfo}
 
 CRITICAL RULES:
 - Never state "I cannot access real-time information" or "I do not have internet access".`;
+            }
+
+            function getAPIPayloadContent(msg) {
+                if (msg.isRemarks && msg.role === 'user') {
+                    let partName = '';
+                    let natureOfProblem = '';
+                    const lines = msg.content.split('\n');
+                    lines.forEach(line => {
+                        if (line.startsWith('Part Name:')) {
+                            partName = line.replace('Part Name:', '').trim();
+                        } else if (line.startsWith('Nature of problem:')) {
+                            natureOfProblem = line.replace('Nature of problem:', '').trim();
+                        }
+                    });
+                    return `You are an automotive warranty claim remark generator for Hyundai dealership.
+
+When I provide only a Part Name, generate 4 warranty claim remarks.
+
+Character Limit Rules (Mandatory)
+
+Remark 1:
+* Minimum 80 characters
+* Maximum 90 characters
+* Describe the actual defect/failure in the part.
+
+Remark 2:
+* Minimum 55 characters 
+* Maximum 60 characters
+* Describe the customer complaint, symptom, or concern.
+* Explain what problem the customer experienced and reported.
+
+Remark 3:
+* Minimum 55 characters 
+* Maximum 60 characters
+* State that the specified part was found defective during inspection.
+* Clearly mention the defective part name.
+
+Remark 4:
+* Minimum 55 characters 
+* Maximum 60 characters
+* State the corrective action taken.
+* Clearly mention repair or replacement of the defective part.
+
+Important Rules:
+* Strictly follow the minimum and maximum character limits.
+* Count spaces as characters.
+* Generate realistic automotive warranty remarks.
+* Use professional workshop and warranty claim language.
+* Do not use generic statements.
+* Normalize case of part name and nature entered by user.
+* Remarks must be logically connected:
+  1. Defect in the part.
+  2. Customer complaint.
+  3. Defective part confirmed during inspection.
+  4. Corrective action performed.
+* Assume the part is defective and warranty replacement is justified.
+* Output only the 4 remarks.
+* Do not show character counts.
+* Do not add explanations or headings.
+
+Output Format aLL REMARKS RESPECTIVELY:
+1
+2
+3
+4
+
+
+
+Part Name: ${partName}
+Nature of problem: ${natureOfProblem}`;
+                }
+                return msg.content;
+            }
 
             let loopCount = 0;
             const maxLoops = 2;
@@ -11308,7 +11639,7 @@ CRITICAL RULES:
                         const messagesPayload = [
                             { role: 'system', content: systemPromptContent },
                             ...chatHistory.map((msg, idx) => {
-                                let content = msg.content;
+                                let content = getAPIPayloadContent(msg);
                                 if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
                                     const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                                     content = `You have access to web search results to answer the user query.
@@ -11320,7 +11651,7 @@ Instructions:
 2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
 3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
 
-User Query: ${msg.content}`;
+User Query: ${content}`;
                                 }
                                 if (msg.attachment) {
                                     if (msg.attachment.extractedText) {
@@ -11352,7 +11683,7 @@ User Query: ${msg.content}`;
                         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
                         const contentsPayload = chatHistory.map((msg, idx) => {
-                            let msgContent = msg.content;
+                            let msgContent = getAPIPayloadContent(msg);
                             if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
                                 const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                                 msgContent = `You have access to web search results to answer the user query.
@@ -11364,7 +11695,7 @@ Instructions:
 2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
 3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
 
-User Query: ${msg.content}`;
+User Query: ${msgContent}`;
                             }
                             const parts = [{ text: msgContent || 'Attached file details below:' }];
                             if (msg.attachment) {
@@ -11423,7 +11754,7 @@ User Query: ${msg.content}`;
                         const messagesPayload = [
                             { role: 'system', content: systemPromptContent },
                             ...chatHistory.map((msg, idx) => {
-                                let content = msg.content;
+                                let content = getAPIPayloadContent(msg);
                                 if (idx === chatHistory.length - 1 && msg.role === 'user' && searchResults && searchResults.length > 0) {
                                     const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
                                     content = `You have access to web search results to answer the user query.
@@ -11435,7 +11766,7 @@ Instructions:
 2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
 3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
 
-User Query: ${msg.content}`;
+User Query: ${content}`;
                                 }
                                 if (msg.attachment) {
                                     if (msg.attachment.type.startsWith('image/')) {
@@ -11496,6 +11827,8 @@ User Query: ${msg.content}`;
                         let hfPrompt = `System instructions:\n${systemPromptContent}\n\n`;
                         if (searchResults && searchResults.length > 0) {
                             const contextStr = searchResults.map((r, i) => `[Source ${i + 1}] Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.snippet}`).join('\n\n');
+                            const lastMsg = chatHistory[chatHistory.length - 1];
+                            const lastMsgContent = lastMsg ? getAPIPayloadContent(lastMsg) : prompt;
                             hfPrompt += `You have access to web search results to answer the user query.
 Search Results:
 ${contextStr}
@@ -11505,9 +11838,11 @@ Instructions:
 2. Cite your sources using inline numeric footnotes matching the sources above (e.g. [1](URL) or [2](URL)) right after the statement.
 3. Keep the tone helpful, modern, and direct. Do not mention that you did a search or reference these instructions.
 
-User Query: ${prompt}`;
+User Query: ${lastMsgContent}`;
                         } else {
-                            hfPrompt += `User Query: ${prompt}`;
+                            const lastMsg = chatHistory[chatHistory.length - 1];
+                            const lastMsgContent = lastMsg ? getAPIPayloadContent(lastMsg) : prompt;
+                            hfPrompt += `User Query: ${lastMsgContent}`;
                         }
 
                         const res = await fetch(hfUrl, {
@@ -11616,6 +11951,7 @@ User Query: ${prompt}`;
                         role: 'assistant',
                         content: responseText,
                         searchResults: searchResults,
+                        isRemarks: isRemarksMode,
                         timestamp: new Date().toISOString()
                     });
                     saveCurrentConversation();
@@ -12352,23 +12688,23 @@ User Query: ${prompt}`;
 
         // Shared synonyms map reused for both desktop sidebar & mobile
         const toolSynonymsShared = {
-                'swift-assistant': ['assistant', 'chat', 'ai', 'question', 'help', 'ask', 'prompt', 'gpt', 'search web', 'bot', 'llm', 'message', 'talk', 'write'],
-                'img-to-pdf': ['image to pdf', 'jpg to pdf', 'png to pdf', 'photo to pdf', 'pictures to pdf', 'convert', 'compile', 'format', 'jpeg to pdf', 'webp to pdf', 'heic to pdf', 'tiff to pdf'],
-                'pdf-to-img': ['pdf to image', 'pdf to jpg', 'pdf to png', 'extract pages', 'convert', 'render', 'pdf to jpeg', 'pdf to picture', 'pdf to photo'],
-                'merge-pdf': ['merge pdf', 'combine pdf', 'join pdf', 'concatenate pdf', 'multiple files', 'append', 'put together', 'union', 'attach pdf'],
-                'split-pdf': ['split pdf', 'cut pdf', 'extract pages', 'divide pdf', 'separate pdf', 'crop pdf pages', 'break pdf', 'segment pdf'],
-                'compress-pdf': ['compress pdf', 'shrink pdf size', 'reduce pdf size', 'optimize pdf', 'make smaller', 'lightweight', 'compressor', 'downsize pdf'],
-                'compress-image': ['compress image', 'optimize photo', 'shrink photo', 'reduce image size', 'webp quality', 'jpg compress', 'quality adjust', 'resize image'],
-                'unlock-pdf': ['unlock pdf', 'decrypt pdf', 'remove password', 'crack pdf', 'access locked pdf', 'open secured pdf', 'bypass restriction', 'unprotect pdf'],
-                'protect-pdf': ['protect pdf', 'encrypt pdf', 'add password to pdf', 'lock pdf', 'secure document', 'restrict editing', 'password protect', 'censor access'],
-                'bg-remover': ['remove bg', 'background remover', 'transparent image', 'erase background', 'cutout', 'ai remover', 'swift removal', 'bg erase', 'png cutout', 'remove backdrop', 'mask background'],
-                'collage-maker': ['collage maker', 'photo grid', 'combine images', 'layout grid', 'moodboard', 'photomontage', 'grid layout', 'arrange photos', 'stitch pictures'],
-                'word-to-pdf': ['word to pdf', 'docx to pdf', 'doc to pdf', 'office convert', 'microsoft word to pdf', 'convert docx', 'convert doc'],
-                'scanner': ['scanner', 'camera scan', 'scan document', 'crop scanner', 'scan page', 'ocr', 'extract text from image', 'digitize', 'image ocr', 'read text'],
-                'webpage-to-pdf': ['webpage to pdf', 'url to pdf', 'website scan', 'save website', 'html to pdf', 'convert url', 'link to pdf', 'download site'],
-                'redact-pdf': ['redact pdf', 'censor pdf', 'blackout text', 'hide sensitive info', 'erase text from pdf', 'cover up content', 'blur information', 'whiteout text', 'privacy tool'],
-                'watermark-tool': ['watermark', 'stamp pdf', 'add logo to pdf', 'add text overlay', 'signature', 'brand pdf', 'sign document', 'watermark image', 'overlay brand']
-            };
+            'swift-assistant': ['assistant', 'chat', 'ai', 'question', 'help', 'ask', 'prompt', 'gpt', 'search web', 'bot', 'llm', 'message', 'talk', 'write'],
+            'img-to-pdf': ['image to pdf', 'jpg to pdf', 'png to pdf', 'photo to pdf', 'pictures to pdf', 'convert', 'compile', 'format', 'jpeg to pdf', 'webp to pdf', 'heic to pdf', 'tiff to pdf'],
+            'pdf-to-img': ['pdf to image', 'pdf to jpg', 'pdf to png', 'extract pages', 'convert', 'render', 'pdf to jpeg', 'pdf to picture', 'pdf to photo'],
+            'merge-pdf': ['merge pdf', 'combine pdf', 'join pdf', 'concatenate pdf', 'multiple files', 'append', 'put together', 'union', 'attach pdf'],
+            'split-pdf': ['split pdf', 'cut pdf', 'extract pages', 'divide pdf', 'separate pdf', 'crop pdf pages', 'break pdf', 'segment pdf'],
+            'compress-pdf': ['compress pdf', 'shrink pdf size', 'reduce pdf size', 'optimize pdf', 'make smaller', 'lightweight', 'compressor', 'downsize pdf'],
+            'compress-image': ['compress image', 'optimize photo', 'shrink photo', 'reduce image size', 'webp quality', 'jpg compress', 'quality adjust', 'resize image'],
+            'unlock-pdf': ['unlock pdf', 'decrypt pdf', 'remove password', 'crack pdf', 'access locked pdf', 'open secured pdf', 'bypass restriction', 'unprotect pdf'],
+            'protect-pdf': ['protect pdf', 'encrypt pdf', 'add password to pdf', 'lock pdf', 'secure document', 'restrict editing', 'password protect', 'censor access'],
+            'bg-remover': ['remove bg', 'background remover', 'transparent image', 'erase background', 'cutout', 'ai remover', 'swift removal', 'bg erase', 'png cutout', 'remove backdrop', 'mask background'],
+            'collage-maker': ['collage maker', 'photo grid', 'combine images', 'layout grid', 'moodboard', 'photomontage', 'grid layout', 'arrange photos', 'stitch pictures'],
+            'word-to-pdf': ['word to pdf', 'docx to pdf', 'doc to pdf', 'office convert', 'microsoft word to pdf', 'convert docx', 'convert doc'],
+            'scanner': ['scanner', 'camera scan', 'scan document', 'crop scanner', 'scan page', 'ocr', 'extract text from image', 'digitize', 'image ocr', 'read text'],
+            'webpage-to-pdf': ['webpage to pdf', 'url to pdf', 'website scan', 'save website', 'html to pdf', 'convert url', 'link to pdf', 'download site'],
+            'redact-pdf': ['redact pdf', 'censor pdf', 'blackout text', 'hide sensitive info', 'erase text from pdf', 'cover up content', 'blur information', 'whiteout text', 'privacy tool'],
+            'watermark-tool': ['watermark', 'stamp pdf', 'add logo to pdf', 'add text overlay', 'signature', 'brand pdf', 'sign document', 'watermark image', 'overlay brand']
+        };
 
         // Shared filter function used by both inputs
         function applyToolSearch(query) {
@@ -12409,21 +12745,21 @@ User Query: ${prompt}`;
             // Tool metadata for mobile search results
             const mobileToolMeta = [
                 { id: 'swift-assistant', label: 'Swift Assistant', icon: 'message-square' },
-                { id: 'img-to-pdf',      label: 'Image to PDF',    icon: 'image' },
-                { id: 'pdf-to-img',      label: 'PDF to Image',    icon: 'file-text' },
-                { id: 'merge-pdf',       label: 'Merge PDF',       icon: 'copy' },
-                { id: 'split-pdf',       label: 'Split PDF',       icon: 'scissors' },
-                { id: 'compress-pdf',    label: 'Compress PDF',    icon: 'minimize-2' },
-                { id: 'compress-image',  label: 'Compress Image',  icon: 'image' },
-                { id: 'unlock-pdf',      label: 'Unlock PDF',      icon: 'unlock' },
-                { id: 'protect-pdf',     label: 'Protect PDF',     icon: 'lock' },
-                { id: 'bg-remover',      label: 'Remove BG',       icon: 'eraser' },
-                { id: 'collage-maker',   label: 'Collage Maker',   icon: 'layout' },
-                { id: 'word-to-pdf',     label: 'Word to PDF',     icon: 'file-up' },
-                { id: 'scanner',         label: 'Scanner',         icon: 'scan' },
-                { id: 'webpage-to-pdf',  label: 'Webpage to PDF',  icon: 'globe' },
-                { id: 'redact-pdf',      label: 'Redact PDF',      icon: 'eye-off' },
-                { id: 'watermark-tool',  label: 'Watermark',       icon: 'stamp' },
+                { id: 'img-to-pdf', label: 'Image to PDF', icon: 'image' },
+                { id: 'pdf-to-img', label: 'PDF to Image', icon: 'file-text' },
+                { id: 'merge-pdf', label: 'Merge PDF', icon: 'copy' },
+                { id: 'split-pdf', label: 'Split PDF', icon: 'scissors' },
+                { id: 'compress-pdf', label: 'Compress PDF', icon: 'minimize-2' },
+                { id: 'compress-image', label: 'Compress Image', icon: 'image' },
+                { id: 'unlock-pdf', label: 'Unlock PDF', icon: 'unlock' },
+                { id: 'protect-pdf', label: 'Protect PDF', icon: 'lock' },
+                { id: 'bg-remover', label: 'Remove BG', icon: 'eraser' },
+                { id: 'collage-maker', label: 'Collage Maker', icon: 'layout' },
+                { id: 'word-to-pdf', label: 'Word to PDF', icon: 'file-up' },
+                { id: 'scanner', label: 'Scanner', icon: 'scan' },
+                { id: 'webpage-to-pdf', label: 'Webpage to PDF', icon: 'globe' },
+                { id: 'redact-pdf', label: 'Redact PDF', icon: 'eye-off' },
+                { id: 'watermark-tool', label: 'Watermark', icon: 'stamp' },
             ];
 
             function getLucideIconSVG(name) {
@@ -12579,7 +12915,7 @@ User Query: ${prompt}`;
         // ==========================================
         // AUTO RETRY & RE-PARSE ASSISTANT MESSAGE ON FAILURE
         // ==========================================
-        window.retryLastAssistantMessage = async function(buttonEl) {
+        window.retryLastAssistantMessage = async function (buttonEl) {
             if (buttonEl) {
                 const bubble = buttonEl.closest('.assistant-chat-bubble');
                 if (bubble) bubble.remove();
