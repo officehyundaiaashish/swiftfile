@@ -1351,6 +1351,13 @@
             display: none;
         }
 
+        /* Hide old sidebar search on mobile — replaced by new mobile search bar */
+        @media (max-width: 768px) {
+            .sidebar-search-wrap {
+                display: none !important;
+            }
+        }
+
         @media (max-width: 768px) {
             .mobile-search-wrap {
                 display: flex;
