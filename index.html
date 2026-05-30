@@ -1341,6 +1341,113 @@
             }
         }
 
+        /* ================================================
+           Mobile Search Bar — Premium Glassmorphic Style
+           ================================================ */
+        .mobile-search-wrap {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-search-wrap {
+                display: flex;
+                align-items: center;
+                position: relative;
+                margin: 0.75rem 1rem 0 1rem;
+                z-index: 10;
+            }
+
+            .mobile-search-wrap .mobile-search-icon {
+                position: absolute;
+                left: 0.9rem;
+                width: 15px;
+                height: 15px;
+                color: var(--text-secondary);
+                pointer-events: none;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+
+            .mobile-search-wrap input {
+                width: 100%;
+                padding: 0.7rem 1rem 0.7rem 2.5rem;
+                font-size: 0.875rem;
+                font-family: inherit;
+                font-weight: 450;
+                letter-spacing: 0.01em;
+                border: 1.5px solid var(--border-color);
+                border-radius: 14px;
+                background: var(--input-bg, rgba(255,255,255,0.06));
+                color: var(--text-primary);
+                outline: none;
+                transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+                -webkit-appearance: none;
+            }
+
+            .mobile-search-wrap input::placeholder {
+                color: var(--text-secondary);
+                opacity: 0.6;
+                font-weight: 400;
+            }
+
+            .mobile-search-wrap input:focus {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 3px var(--accent-alpha, rgba(108,99,255,0.15)), 0 2px 12px rgba(0,0,0,0.08);
+                background: var(--surface-color);
+            }
+
+            .mobile-search-wrap input:focus + .mobile-search-icon,
+            .mobile-search-wrap:focus-within .mobile-search-icon {
+                opacity: 1;
+                color: var(--accent-color);
+            }
+
+            .mobile-search-clear {
+                position: absolute;
+                right: 0.75rem;
+                background: none;
+                border: none;
+                padding: 4px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                pointer-events: none;
+                color: var(--text-secondary);
+                border-radius: 50%;
+                transition: opacity 0.18s, background 0.18s;
+            }
+
+            .mobile-search-wrap.has-value .mobile-search-clear {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .mobile-search-clear:hover {
+                background: var(--hover-bg, rgba(0,0,0,0.08));
+                color: var(--text-primary);
+            }
+
+            .mobile-search-clear svg {
+                width: 13px;
+                height: 13px;
+            }
+
+            .mobile-search-no-results {
+                display: none;
+                text-align: center;
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                opacity: 0.7;
+            }
+
+            .mobile-search-no-results.visible {
+                display: block;
+            }
+        }
+
         /* Specialized Mobile Optimizations */
         @media (max-width: 768px) {
 
@@ -2885,6 +2992,23 @@
                 <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" title="Toggle Sidebar">
                     <i data-lucide="sidebar"></i>
                 </button>
+
+                <!-- Mobile Search Bar (visible on mobile only) -->
+                <div class="mobile-search-wrap" id="mobile-search-wrap">
+                    <i data-lucide="search" class="mobile-search-icon"></i>
+                    <input
+                        type="search"
+                        id="mobile-search-input"
+                        placeholder="Search tools…"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <button class="mobile-search-clear" id="mobile-search-clear" aria-label="Clear search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="mobile-search-no-results" id="mobile-search-no-results">No tools found</div>
+
                 <!-- Mobile Tool Selector (Custom Dropdown) -->
                 <div class="mobile-tool-selector hidden" id="mobile-tool-selector">
                     <div class="tool-select-btn">
@@ -12145,11 +12269,16 @@ User Query: ${prompt}`;
         }
 
         // ==========================================
-        // SIDEBAR TOOLS SEARCH FILTER (WITH SYNONYMS & ENTER KEYBOARD SHORTCUT)
+        // SIDEBAR + MOBILE TOOLS SEARCH FILTER (WITH SYNONYMS & ENTER KEYBOARD SHORTCUT)
         // ==========================================
         const searchInput = document.getElementById('sidebar-search-input');
-        if (searchInput) {
-            const toolSynonyms = {
+        const mobileSearchInput = document.getElementById('mobile-search-input');
+        const mobileSearchWrap = document.getElementById('mobile-search-wrap');
+        const mobileSearchClear = document.getElementById('mobile-search-clear');
+        const mobileSearchNoResults = document.getElementById('mobile-search-no-results');
+
+        // Shared synonyms map reused for both desktop sidebar & mobile
+        const toolSynonymsShared = {
                 'swift-assistant': ['assistant', 'chat', 'ai', 'question', 'help', 'ask', 'prompt', 'gpt', 'search web', 'bot', 'llm', 'message', 'talk', 'write'],
                 'img-to-pdf': ['image to pdf', 'jpg to pdf', 'png to pdf', 'photo to pdf', 'pictures to pdf', 'convert', 'compile', 'format', 'jpeg to pdf', 'webp to pdf', 'heic to pdf', 'tiff to pdf'],
                 'pdf-to-img': ['pdf to image', 'pdf to jpg', 'pdf to png', 'extract pages', 'convert', 'render', 'pdf to jpeg', 'pdf to picture', 'pdf to photo'],
@@ -12168,37 +12297,83 @@ User Query: ${prompt}`;
                 'watermark-tool': ['watermark', 'stamp pdf', 'add logo to pdf', 'add text overlay', 'signature', 'brand pdf', 'sign document', 'watermark image', 'overlay brand']
             };
 
+        // Shared filter function used by both inputs
+        function applyToolSearch(query) {
+            const tabButtons = document.querySelectorAll('.converter-tabs .tab-btn');
+            let matchCount = 0;
+            tabButtons.forEach(btn => {
+                const tabId = btn.getAttribute('data-tab');
+                const labelText = btn.textContent.toLowerCase();
+                const keywords = toolSynonymsShared[tabId] || [];
+                const matchesKeyword = keywords.some(k => k.includes(query) || query.includes(k));
+                const matchesLabel = labelText.includes(query);
+                const visible = query === '' || matchesLabel || matchesKeyword;
+                btn.style.display = visible ? '' : 'none';
+                if (visible) matchCount++;
+            });
+            // Mobile no-results indicator
+            if (mobileSearchNoResults) {
+                mobileSearchNoResults.classList.toggle('visible', matchCount === 0 && query !== '');
+            }
+        }
+
+        // --- Desktop sidebar search ---
+        if (searchInput) {
+            const toolSynonyms = toolSynonymsShared;
+
             searchInput.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase().trim();
-                const tabButtons = document.querySelectorAll('.converter-tabs .tab-btn');
-                
-                tabButtons.forEach(btn => {
-                    const tabId = btn.getAttribute('data-tab');
-                    const labelText = btn.textContent.toLowerCase();
-                    
-                    const keywords = toolSynonyms[tabId] || [];
-                    const matchesKeyword = keywords.some(keyword => keyword.includes(query) || query.includes(keyword));
-                    const matchesLabel = labelText.includes(query);
-                    
-                    if (query === '' || matchesLabel || matchesKeyword) {
-                        btn.style.display = '';
-                    } else {
-                        btn.style.display = 'none';
-                    }
-                });
+                applyToolSearch(e.target.value.toLowerCase().trim());
             });
 
             searchInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     const visibleButtons = Array.from(document.querySelectorAll('.converter-tabs .tab-btn')).filter(btn => btn.style.display !== 'none');
                     if (visibleButtons.length > 0) {
-                        // Click the first matching tool
                         visibleButtons[0].click();
-                        // Blur input to transition focus to the active workspace
                         searchInput.blur();
                     }
                 }
             });
+        }
+
+        // --- Mobile search bar ---
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                applyToolSearch(query);
+                if (mobileSearchWrap) {
+                    mobileSearchWrap.classList.toggle('has-value', query.length > 0);
+                }
+            });
+
+            mobileSearchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const visibleButtons = Array.from(document.querySelectorAll('.converter-tabs .tab-btn')).filter(btn => btn.style.display !== 'none');
+                    if (visibleButtons.length > 0) {
+                        visibleButtons[0].click();
+                        mobileSearchInput.blur();
+                        // Clear search after navigation
+                        mobileSearchInput.value = '';
+                        if (mobileSearchWrap) mobileSearchWrap.classList.remove('has-value');
+                        applyToolSearch('');
+                    }
+                }
+                if (e.key === 'Escape') {
+                    mobileSearchInput.value = '';
+                    if (mobileSearchWrap) mobileSearchWrap.classList.remove('has-value');
+                    applyToolSearch('');
+                    mobileSearchInput.blur();
+                }
+            });
+
+            if (mobileSearchClear) {
+                mobileSearchClear.addEventListener('click', () => {
+                    mobileSearchInput.value = '';
+                    if (mobileSearchWrap) mobileSearchWrap.classList.remove('has-value');
+                    applyToolSearch('');
+                    mobileSearchInput.focus();
+                });
+            }
         }
 
         // ==========================================
