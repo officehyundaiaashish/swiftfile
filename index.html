@@ -9214,7 +9214,10 @@
         // Web search helper
         async function searchWeb(query, signal) {
             try {
-                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&location=${encodeURIComponent(detectedUserLocation || '')}`, { signal });
+                const searchBase = window.location.hostname.includes('vercel.app')
+                    ? '/api/search'
+                    : 'https://swiftfile.vercel.app/api/search';
+                const response = await fetch(`${searchBase}?q=${encodeURIComponent(query)}&location=${encodeURIComponent(detectedUserLocation || '')}`, { signal });
                 if (!response.ok) throw new Error('Search request failed');
                 const results = await response.json();
                 return Array.isArray(results) ? results.slice(0, 5) : [];
