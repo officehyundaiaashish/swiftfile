@@ -33,46 +33,6 @@ export default async function handler(req, res) {
   const results = [];
 
   try {
-    // 0. Try Bright Data (Luminati) SERP API Scraper if credentials are set
-    const BRIGHT_DATA_API_KEY = process.env.BRIGHT_DATA_API_KEY || process.env.LUMINATI_API_KEY;
-    const BRIGHT_DATA_ZONE = process.env.BRIGHT_DATA_ZONE || process.env.LUMINATI_ZONE;
-
-    if (BRIGHT_DATA_API_KEY && BRIGHT_DATA_ZONE) {
-      console.log('Bright Data credentials found. Executing Bright Data Google Search Scraper...');
-      try {
-        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&brd_json=1`;
-        const response = await fetch('https://api.brightdata.com/request', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${BRIGHT_DATA_API_KEY}`
-          },
-          body: JSON.stringify({
-            zone: BRIGHT_DATA_ZONE,
-            url: searchUrl
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.organic && Array.isArray(data.organic)) {
-            for (const item of data.organic) {
-              results.push({
-                title: decodeHtmlEntities(item.title),
-                url: item.link,
-                snippet: decodeHtmlEntities(item.description || 'View source page for full details.')
-              });
-              if (results.length >= 5) break;
-            }
-          }
-        } else {
-          console.warn('Bright Data Search API returned non-OK status:', response.status);
-        }
-      } catch (bdError) {
-        console.warn('Bright Data Search API failed, falling back to scrapers:', bdError.message);
-      }
-    }
-
     // 1. Try Google Search
     try {
       const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
