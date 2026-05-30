@@ -12052,9 +12052,15 @@ User Query: ${prompt}`;
             }
         }
 
-        // Check for shared items on load
+        // Check for shared items on load & auto focus chat input on desktop
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(handleReceivedShare, 500);
+            if (window.innerWidth > 1024) {
+                const inputField = document.getElementById('assistant-input');
+                if (inputField) {
+                    inputField.focus();
+                }
+            }
         });
 
         // ==========================================
