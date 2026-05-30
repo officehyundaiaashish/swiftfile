@@ -1347,6 +1347,9 @@
         .mobile-search-wrap {
             display: none;
         }
+        .mobile-search-dropdown {
+            display: none;
+        }
 
         @media (max-width: 768px) {
             .mobile-search-wrap {
@@ -1354,7 +1357,7 @@
                 align-items: center;
                 position: relative;
                 margin: 0.75rem 1rem 0 1rem;
-                z-index: 10;
+                z-index: 400;
             }
 
             .mobile-search-wrap .mobile-search-icon {
@@ -1364,13 +1367,18 @@
                 height: 15px;
                 color: var(--text-secondary);
                 pointer-events: none;
-                opacity: 0.7;
-                transition: opacity 0.2s;
+                opacity: 0.65;
+                transition: opacity 0.2s, color 0.2s;
+            }
+
+            .mobile-search-wrap:focus-within .mobile-search-icon {
+                opacity: 1;
+                color: var(--accent-color);
             }
 
             .mobile-search-wrap input {
                 width: 100%;
-                padding: 0.7rem 1rem 0.7rem 2.5rem;
+                padding: 0.72rem 2.4rem 0.72rem 2.5rem;
                 font-size: 0.875rem;
                 font-family: inherit;
                 font-weight: 450;
@@ -1382,32 +1390,27 @@
                 outline: none;
                 transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
                 -webkit-appearance: none;
+                appearance: none;
             }
 
             .mobile-search-wrap input::placeholder {
                 color: var(--text-secondary);
-                opacity: 0.6;
+                opacity: 0.55;
                 font-weight: 400;
             }
 
             .mobile-search-wrap input:focus {
                 border-color: var(--accent-color);
-                box-shadow: 0 0 0 3px var(--accent-alpha, rgba(108,99,255,0.15)), 0 2px 12px rgba(0,0,0,0.08);
+                box-shadow: 0 0 0 3px var(--accent-alpha, rgba(108,99,255,0.15)), 0 2px 14px rgba(0,0,0,0.07);
                 background: var(--surface-color);
-            }
-
-            .mobile-search-wrap input:focus + .mobile-search-icon,
-            .mobile-search-wrap:focus-within .mobile-search-icon {
-                opacity: 1;
-                color: var(--accent-color);
             }
 
             .mobile-search-clear {
                 position: absolute;
-                right: 0.75rem;
+                right: 0.65rem;
                 background: none;
                 border: none;
-                padding: 4px;
+                padding: 5px;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
@@ -1434,17 +1437,80 @@
                 height: 13px;
             }
 
-            .mobile-search-no-results {
-                display: none;
-                text-align: center;
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
-                color: var(--text-secondary);
-                opacity: 0.7;
+            /* Search Results Dropdown */
+            .mobile-search-dropdown {
+                display: block;
+                position: absolute;
+                top: calc(100% + 6px);
+                left: 0;
+                right: 0;
+                background: var(--surface-color);
+                border: 1px solid var(--border-color);
+                border-radius: 16px;
+                box-shadow: 0 12px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+                z-index: 500;
+                overflow: hidden;
+                max-height: 280px;
+                overflow-y: auto;
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(-6px) scale(0.98);
+                transition: opacity 0.2s cubic-bezier(0.16,1,0.3,1), transform 0.2s cubic-bezier(0.16,1,0.3,1);
+                scrollbar-width: thin;
             }
 
-            .mobile-search-no-results.visible {
-                display: block;
+            .mobile-search-dropdown.open {
+                opacity: 1;
+                pointer-events: all;
+                transform: translateY(0) scale(1);
+            }
+
+            .mobile-search-result-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 0.72rem 1rem;
+                cursor: pointer;
+                border-bottom: 1px solid var(--border-color);
+                transition: background 0.15s;
+                color: var(--text-primary);
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+
+            .mobile-search-result-item:last-child {
+                border-bottom: none;
+            }
+
+            .mobile-search-result-item:active,
+            .mobile-search-result-item:hover {
+                background: var(--accent-alpha, rgba(108,99,255,0.08));
+                color: var(--accent-color);
+            }
+
+            .mobile-search-result-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 9px;
+                background: var(--accent-alpha, rgba(108,99,255,0.1));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                color: var(--accent-color);
+            }
+
+            .mobile-search-result-icon svg {
+                width: 15px;
+                height: 15px;
+            }
+
+            .mobile-search-no-results-msg {
+                padding: 1.1rem 1rem;
+                text-align: center;
+                font-size: 0.82rem;
+                color: var(--text-secondary);
+                opacity: 0.7;
             }
         }
 
@@ -3006,8 +3072,9 @@
                     <button class="mobile-search-clear" id="mobile-search-clear" aria-label="Clear search">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
+                    <!-- Dropdown results -->
+                    <div class="mobile-search-dropdown" id="mobile-search-dropdown"></div>
                 </div>
-                <div class="mobile-search-no-results" id="mobile-search-no-results">No tools found</div>
 
                 <!-- Mobile Tool Selector (Custom Dropdown) -->
                 <div class="mobile-tool-selector hidden" id="mobile-tool-selector">
@@ -12275,7 +12342,6 @@ User Query: ${prompt}`;
         const mobileSearchInput = document.getElementById('mobile-search-input');
         const mobileSearchWrap = document.getElementById('mobile-search-wrap');
         const mobileSearchClear = document.getElementById('mobile-search-clear');
-        const mobileSearchNoResults = document.getElementById('mobile-search-no-results');
 
         // Shared synonyms map reused for both desktop sidebar & mobile
         const toolSynonymsShared = {
@@ -12300,21 +12366,14 @@ User Query: ${prompt}`;
         // Shared filter function used by both inputs
         function applyToolSearch(query) {
             const tabButtons = document.querySelectorAll('.converter-tabs .tab-btn');
-            let matchCount = 0;
             tabButtons.forEach(btn => {
                 const tabId = btn.getAttribute('data-tab');
                 const labelText = btn.textContent.toLowerCase();
                 const keywords = toolSynonymsShared[tabId] || [];
                 const matchesKeyword = keywords.some(k => k.includes(query) || query.includes(k));
                 const matchesLabel = labelText.includes(query);
-                const visible = query === '' || matchesLabel || matchesKeyword;
-                btn.style.display = visible ? '' : 'none';
-                if (visible) matchCount++;
+                btn.style.display = (query === '' || matchesLabel || matchesKeyword) ? '' : 'none';
             });
-            // Mobile no-results indicator
-            if (mobileSearchNoResults) {
-                mobileSearchNoResults.classList.toggle('visible', matchCount === 0 && query !== '');
-            }
         }
 
         // --- Desktop sidebar search ---
@@ -12336,32 +12395,105 @@ User Query: ${prompt}`;
             });
         }
 
-        // --- Mobile search bar ---
+        // --- Mobile search bar (dropdown results) ---
         if (mobileSearchInput) {
+            const mobileDropdown = document.getElementById('mobile-search-dropdown');
+
+            // Tool metadata for mobile search results
+            const mobileToolMeta = [
+                { id: 'swift-assistant', label: 'Swift Assistant', icon: 'message-square' },
+                { id: 'img-to-pdf',      label: 'Image to PDF',    icon: 'image' },
+                { id: 'pdf-to-img',      label: 'PDF to Image',    icon: 'file-text' },
+                { id: 'merge-pdf',       label: 'Merge PDF',       icon: 'copy' },
+                { id: 'split-pdf',       label: 'Split PDF',       icon: 'scissors' },
+                { id: 'compress-pdf',    label: 'Compress PDF',    icon: 'minimize-2' },
+                { id: 'compress-image',  label: 'Compress Image',  icon: 'image' },
+                { id: 'unlock-pdf',      label: 'Unlock PDF',      icon: 'unlock' },
+                { id: 'protect-pdf',     label: 'Protect PDF',     icon: 'lock' },
+                { id: 'bg-remover',      label: 'Remove BG',       icon: 'eraser' },
+                { id: 'collage-maker',   label: 'Collage Maker',   icon: 'layout' },
+                { id: 'word-to-pdf',     label: 'Word to PDF',     icon: 'file-up' },
+                { id: 'scanner',         label: 'Scanner',         icon: 'scan' },
+                { id: 'webpage-to-pdf',  label: 'Webpage to PDF',  icon: 'globe' },
+                { id: 'redact-pdf',      label: 'Redact PDF',      icon: 'eye-off' },
+                { id: 'watermark-tool',  label: 'Watermark',       icon: 'stamp' },
+            ];
+
+            function getLucideIconSVG(name) {
+                // Generate a simple inline SVG via lucide icons (we use the data-lucide attr trick)
+                const tmp = document.createElement('i');
+                tmp.setAttribute('data-lucide', name);
+                document.body.appendChild(tmp);
+                lucide.createIcons({ root: tmp });
+                const svg = tmp.querySelector('svg');
+                const svgHtml = svg ? svg.outerHTML : '';
+                document.body.removeChild(tmp);
+                return svgHtml;
+            }
+
+            function buildDropdownResults(query) {
+                if (!mobileDropdown) return;
+                const q = query.toLowerCase().trim();
+
+                if (q === '') {
+                    mobileDropdown.classList.remove('open');
+                    mobileDropdown.innerHTML = '';
+                    return;
+                }
+
+                const matches = mobileToolMeta.filter(tool => {
+                    const label = tool.label.toLowerCase();
+                    const keywords = toolSynonymsShared[tool.id] || [];
+                    return label.includes(q) || keywords.some(k => k.includes(q) || q.includes(k));
+                });
+
+                if (matches.length === 0) {
+                    mobileDropdown.innerHTML = `<div class="mobile-search-no-results-msg">No tools found for "${q}"</div>`;
+                } else {
+                    mobileDropdown.innerHTML = matches.map(tool => {
+                        return `<div class="mobile-search-result-item" data-tab="${tool.id}">
+                            <div class="mobile-search-result-icon"><i data-lucide="${tool.icon}"></i></div>
+                            <span>${tool.label}</span>
+                        </div>`;
+                    }).join('');
+                    // Activate lucide icons
+                    lucide.createIcons({ root: mobileDropdown });
+
+                    mobileDropdown.querySelectorAll('.mobile-search-result-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const tabId = item.getAttribute('data-tab');
+                            switchTab(tabId);
+                            // Clear + close
+                            mobileSearchInput.value = '';
+                            if (mobileSearchWrap) mobileSearchWrap.classList.remove('has-value');
+                            mobileDropdown.classList.remove('open');
+                            mobileDropdown.innerHTML = '';
+                            mobileSearchInput.blur();
+                        });
+                    });
+                }
+
+                mobileDropdown.classList.add('open');
+            }
+
             mobileSearchInput.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase().trim();
-                applyToolSearch(query);
+                const query = e.target.value;
                 if (mobileSearchWrap) {
                     mobileSearchWrap.classList.toggle('has-value', query.length > 0);
                 }
+                buildDropdownResults(query);
             });
 
             mobileSearchInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
-                    const visibleButtons = Array.from(document.querySelectorAll('.converter-tabs .tab-btn')).filter(btn => btn.style.display !== 'none');
-                    if (visibleButtons.length > 0) {
-                        visibleButtons[0].click();
-                        mobileSearchInput.blur();
-                        // Clear search after navigation
-                        mobileSearchInput.value = '';
-                        if (mobileSearchWrap) mobileSearchWrap.classList.remove('has-value');
-                        applyToolSearch('');
-                    }
+                    // Navigate to first result
+                    const firstItem = mobileDropdown && mobileDropdown.querySelector('.mobile-search-result-item');
+                    if (firstItem) firstItem.click();
                 }
                 if (e.key === 'Escape') {
                     mobileSearchInput.value = '';
                     if (mobileSearchWrap) mobileSearchWrap.classList.remove('has-value');
-                    applyToolSearch('');
+                    if (mobileDropdown) { mobileDropdown.classList.remove('open'); mobileDropdown.innerHTML = ''; }
                     mobileSearchInput.blur();
                 }
             });
@@ -12370,10 +12502,17 @@ User Query: ${prompt}`;
                 mobileSearchClear.addEventListener('click', () => {
                     mobileSearchInput.value = '';
                     if (mobileSearchWrap) mobileSearchWrap.classList.remove('has-value');
-                    applyToolSearch('');
+                    if (mobileDropdown) { mobileDropdown.classList.remove('open'); mobileDropdown.innerHTML = ''; }
                     mobileSearchInput.focus();
                 });
             }
+
+            // Close dropdown when tapping outside
+            document.addEventListener('click', (e) => {
+                if (mobileSearchWrap && !mobileSearchWrap.contains(e.target)) {
+                    if (mobileDropdown) mobileDropdown.classList.remove('open');
+                }
+            }, { passive: true });
         }
 
         // ==========================================
