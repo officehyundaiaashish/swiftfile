@@ -4445,6 +4445,115 @@
                                             drafts, or
                                             answer questions. Configure your API key to get started.</p>
                                     </div>
+
+                                    <!-- Special Remarks Output Workspace -->
+                                    <div id="remarks-generator-workspace"
+                                        style="display: none; flex-direction: column; gap: 12px; width: 100%;">
+                                        <div
+                                            style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;">
+                                            <div
+                                                style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #10b981; font-size: 0.85rem;">
+                                                <i data-lucide="sparkles"
+                                                    style="width: 14px; height: 14px; color: #10b981;"></i>
+                                                <span>Warranty Remarks Generator Active</span>
+                                            </div>
+                                            <p
+                                                style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+                                                Enter the Part Name and Nature of problem below, then click Send. The
+                                                generated claims remarks will auto-populate in the fields below.
+                                            </p>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                                            <!-- Remark 1 -->
+                                            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                                                <span
+                                                    style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark
+                                                    1 (Defect Description)</span>
+                                                <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
+                                                    <textarea id="remark-field-1" readonly
+                                                        placeholder="Awaiting generation..."
+                                                        style="flex: 1; height: 48px; font-size: 0.82rem; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); padding: 8px 12px; resize: none; outline: none; font-family: inherit; line-height: 1.4;"></textarea>
+                                                    <button class="remark-copy-btn" onclick="copyRemarkField(1)"
+                                                        title="Copy Remark 1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                            <path
+                                                                d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!-- Remark 2 -->
+                                            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                                                <span
+                                                    style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark
+                                                    2 (Customer Complaint)</span>
+                                                <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
+                                                    <textarea id="remark-field-2" readonly
+                                                        placeholder="Awaiting generation..."
+                                                        style="flex: 1; height: 48px; font-size: 0.82rem; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); padding: 8px 12px; resize: none; outline: none; font-family: inherit; line-height: 1.4;"></textarea>
+                                                    <button class="remark-copy-btn" onclick="copyRemarkField(2)"
+                                                        title="Copy Remark 2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                            <path
+                                                                d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!-- Remark 3 -->
+                                            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                                                <span
+                                                    style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark
+                                                    3 (Defective Confirmation)</span>
+                                                <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
+                                                    <textarea id="remark-field-3" readonly
+                                                        placeholder="Awaiting generation..."
+                                                        style="flex: 1; height: 48px; font-size: 0.82rem; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); padding: 8px 12px; resize: none; outline: none; font-family: inherit; line-height: 1.4;"></textarea>
+                                                    <button class="remark-copy-btn" onclick="copyRemarkField(3)"
+                                                        title="Copy Remark 3">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                            <path
+                                                                d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!-- Remark 4 -->
+                                            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                                                <span
+                                                    style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark
+                                                    4 (Corrective Action)</span>
+                                                <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
+                                                    <textarea id="remark-field-4" readonly
+                                                        placeholder="Awaiting generation..."
+                                                        style="flex: 1; height: 48px; font-size: 0.82rem; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); padding: 8px 12px; resize: none; outline: none; font-family: inherit; line-height: 1.4;"></textarea>
+                                                    <button class="remark-copy-btn" onclick="copyRemarkField(4)"
+                                                        title="Copy Remark 4">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                            <path
+                                                                d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Chat Input bar -->
@@ -10414,6 +10523,17 @@
                     chatHistory = conv.history;
                     currentConversationId = conv.id;
                     renderChatHistory();
+                    if (typeof remarksModeActive !== 'undefined' && remarksModeActive) {
+                        const lastBotMsg = [...chatHistory].reverse().find(msg => msg.role === 'assistant');
+                        if (lastBotMsg && lastBotMsg.content) {
+                            populateRemarksFields(lastBotMsg.content);
+                        } else {
+                            for (let i = 1; i <= 4; i++) {
+                                const f = document.getElementById(`remark-field-${i}`);
+                                if (f) f.value = '';
+                            }
+                        }
+                    }
                     assistantHistoryPopover.classList.add('hidden');
                 });
 
@@ -10580,38 +10700,62 @@
                     .filter(line => line.length > 0);
             }
 
-            if (role === 'bot' && isRemarks) {
+            const isRemarksBubble = isRemarks || (typeof remarksModeActive !== 'undefined' && remarksModeActive && index >= chatHistory.length - 2);
+            if (role === 'bot' && isRemarksBubble) {
                 const remarksList = parseRemarks(content);
                 textContainer.style.display = 'flex';
                 textContainer.style.flexDirection = 'column';
-                textContainer.style.gap = '8px';
+                textContainer.style.gap = '10px';
+                textContainer.style.width = '100%';
 
-                remarksList.forEach((remarkText) => {
-                    const remarkRow = document.createElement('div');
-                    remarkRow.style.display = 'flex';
-                    remarkRow.style.justifyContent = 'space-between';
-                    remarkRow.style.alignItems = 'center';
-                    remarkRow.style.background = 'var(--input-bg)';
-                    remarkRow.style.border = '1px solid var(--border-color)';
-                    remarkRow.style.borderRadius = '12px';
-                    remarkRow.style.padding = '8px 12px';
-                    remarkRow.style.gap = '12px';
-                    remarkRow.style.width = '100%';
+                const labels = [
+                    'Remark 1 (Defect/Failure Description)',
+                    'Remark 2 (Customer Complaint/Symptom)',
+                    'Remark 3 (Inspection Defect Confirmation)',
+                    'Remark 4 (Corrective Action Taken)'
+                ];
 
-                    const textSpan = document.createElement('span');
-                    textSpan.style.fontSize = '0.9rem';
-                    textSpan.style.color = 'var(--text-primary)';
-                    textSpan.style.lineHeight = '1.4';
-                    textSpan.style.flex = '1';
-                    textSpan.textContent = remarkText;
+                labels.forEach((labelText, i) => {
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.style.display = 'flex';
+                    fieldDiv.style.flexDirection = 'column';
+                    fieldDiv.style.gap = '4px';
+                    fieldDiv.style.width = '100%';
+
+                    const labelSpan = document.createElement('span');
+                    labelSpan.style.fontSize = '0.72rem';
+                    labelSpan.style.color = 'var(--text-secondary)';
+                    labelSpan.style.fontWeight = '600';
+                    labelSpan.textContent = labelText;
+
+                    const rowDiv = document.createElement('div');
+                    rowDiv.style.display = 'flex';
+                    rowDiv.style.gap = '8px';
+                    rowDiv.style.alignItems = 'center';
+                    rowDiv.style.width = '100%';
+
+                    const textarea = document.createElement('textarea');
+                    textarea.readOnly = true;
+                    textarea.value = remarksList[i] || '';
+                    textarea.style.flex = '1';
+                    textarea.style.height = '48px';
+                    textarea.style.fontSize = '0.82rem';
+                    textarea.style.background = 'var(--input-bg)';
+                    textarea.style.border = '1px solid var(--border-color)';
+                    textarea.style.borderRadius = '8px';
+                    textarea.style.color = 'var(--text-primary)';
+                    textarea.style.padding = '6px 10px';
+                    textarea.style.resize = 'none';
+                    textarea.style.outline = 'none';
+                    textarea.style.fontFamily = 'inherit';
 
                     const copyBtn = document.createElement('button');
                     copyBtn.className = 'remark-copy-btn';
-                    copyBtn.title = 'Copy Remark';
+                    copyBtn.title = `Copy Remark ${i + 1}`;
                     copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
 
                     copyBtn.addEventListener('click', () => {
-                        copyBotResponse(remarkText);
+                        copyBotResponse(remarksList[i] || '');
                         copyBtn.style.color = 'var(--accent-color)';
                         copyBtn.style.borderColor = 'var(--accent-color)';
                         setTimeout(() => {
@@ -10620,9 +10764,11 @@
                         }, 1000);
                     });
 
-                    remarkRow.appendChild(textSpan);
-                    remarkRow.appendChild(copyBtn);
-                    textContainer.appendChild(remarkRow);
+                    rowDiv.appendChild(textarea);
+                    rowDiv.appendChild(copyBtn);
+                    fieldDiv.appendChild(labelSpan);
+                    fieldDiv.appendChild(rowDiv);
+                    textContainer.appendChild(fieldDiv);
                 });
             } else {
                 textContainer.innerHTML = formatMessage(content);
@@ -10817,13 +10963,64 @@
             }
         }
 
+        window.populateRemarksFields = function (text) {
+            const remarksList = [];
+            const rawLines = text.split('\n');
+            rawLines.forEach(line => {
+                const trimmed = line.trim();
+                if (trimmed) {
+                    const cleaned = trimmed.replace(/^(Remark\s*\d+[:\-]?|Remark\s*[:\-]?|\d+[:\.\-]?\s*)/i, '').trim();
+                    if (cleaned) {
+                        remarksList.push(cleaned);
+                    }
+                }
+            });
+
+            for (let i = 1; i <= 4; i++) {
+                const f = document.getElementById(`remark-field-${i}`);
+                if (f) {
+                    f.value = remarksList[i - 1] || '';
+                }
+            }
+        };
+
+        window.copyRemarkField = async function (num) {
+            const f = document.getElementById(`remark-field-${num}`);
+            if (f && f.value && f.value !== 'Generating...' && f.value !== 'Awaiting generation...') {
+                await copyBotResponse(f.value);
+                const btn = f.nextElementSibling;
+                if (btn) {
+                    btn.style.color = 'var(--accent-color)';
+                    btn.style.borderColor = 'var(--accent-color)';
+                    setTimeout(() => {
+                        btn.style.color = '';
+                        btn.style.borderColor = '';
+                    }, 1000);
+                }
+            }
+        };
+
         function renderChatHistory() {
-            // Remove all bubbles except system welcome bubble
+            // Remove all bubbles except system welcome bubble and remarks workspace
             const systemBubble = assistantChatLog.querySelector('.system');
+            const remarksWorkspace = document.getElementById('remarks-generator-workspace');
             assistantChatLog.innerHTML = '';
             if (systemBubble) assistantChatLog.appendChild(systemBubble);
+            if (remarksWorkspace) assistantChatLog.appendChild(remarksWorkspace);
+
+            const isRemarksMode = typeof remarksModeActive !== 'undefined' && remarksModeActive;
+            if (remarksWorkspace) {
+                if (isRemarksMode) {
+                    remarksWorkspace.style.display = 'flex';
+                    if (systemBubble) systemBubble.style.display = 'none';
+                } else {
+                    remarksWorkspace.style.display = 'none';
+                    if (systemBubble) systemBubble.style.display = 'block';
+                }
+            }
 
             chatHistory.forEach((msg, idx) => {
+                if (isRemarksMode) return; // Skip rendering chat bubbles when in remarks generator mode
                 // Skip rendering raw JSON tool prompts/triggers and system execution results
                 if (msg.content && (msg.content.includes('[SYSTEM TOOL EXECUTION RESULT]') || msg.content.includes('"action":'))) {
                     return;
@@ -10895,6 +11092,7 @@
                     if (assistantVoiceBtn) assistantVoiceBtn.style.display = 'flex';
                     if (assistantInput) assistantInput.focus();
                 }
+                renderChatHistory();
             });
         }
 
@@ -11411,6 +11609,12 @@
             }
 
             isGenerating = true;
+            if (isRemarksMode) {
+                for (let i = 1; i <= 4; i++) {
+                    const f = document.getElementById(`remark-field-${i}`);
+                    if (f) f.value = 'Generating...';
+                }
+            }
             updateSendButtonState();
             currentAbortController = new AbortController();
             const signal = currentAbortController.signal;
@@ -11503,25 +11707,25 @@ Remark 1:
 * Describe the actual defect/failure in the part.
 
 Remark 2:
-* Minimum 55 characters 
-* Maximum 60 characters
+* Minimum 40 characters 
+* Maximum 50 characters
 * Describe the customer complaint, symptom, or concern.
 * Explain what problem the customer experienced and reported.
 
 Remark 3:
-* Minimum 55 characters 
-* Maximum 60 characters
+* Minimum 40 characters 
+* Maximum 50 characters
 * State that the specified part was found defective during inspection.
 * Clearly mention the defective part name.
 
 Remark 4:
-* Minimum 55 characters 
-* Maximum 60 characters
+* Minimum 40 characters 
+* Maximum 50 characters
 * State the corrective action taken.
 * Clearly mention repair or replacement of the defective part.
 
 Important Rules:
-* Strictly follow the minimum and maximum character limits.
+* Very Strictly follow the minimum and maximum character limits.
 * Count spaces as characters.
 * Generate realistic automotive warranty remarks.
 * Use professional workshop and warranty claim language.
@@ -11602,7 +11806,6 @@ Important Rules:
 * Generate realistic automotive warranty remarks.
 * Use professional workshop and warranty claim language.
 * Do not use generic statements.
-* Normalize case of part name and nature entered by user.
 * Remarks must be logically connected:
   1. Defect in the part.
   2. Customer complaint.
@@ -11614,10 +11817,6 @@ Important Rules:
 * Do not add explanations or headings.
 
 Output Format aLL REMARKS RESPECTIVELY:
-1
-2
-3
-4
 
 
 
@@ -11956,6 +12155,9 @@ User Query: ${lastMsgContent}`;
                     });
                     saveCurrentConversation();
                     renderChatHistory();
+                    if (isRemarksMode) {
+                        populateRemarksFields(responseText);
+                    }
                     break;
                 }
 
