@@ -3012,6 +3012,7 @@
                 'redact-pdf': 'Redact PDF',
                 'watermark-tool': 'Watermark',
                 'video-compressor': 'Video Compressor',
+                'youtube-downloader': 'YouTube Downloader',
                 'swift-assistant': 'Swift Assistant'
             };
             const toolIcons = {
@@ -3031,6 +3032,7 @@
                 'redact-pdf': 'eye-off',
                 'watermark-tool': 'stamp',
                 'video-compressor': 'video',
+                'youtube-downloader': 'youtube',
                 'swift-assistant': 'message-square'
             };
 
@@ -3185,6 +3187,9 @@
                     </button>
                     <button class="tab-btn" data-tab="video-compressor" onclick="switchTab('video-compressor')">
                         <i data-lucide="video"></i> Video Compressor
+                    </button>
+                    <button class="tab-btn" data-tab="youtube-downloader" onclick="switchTab('youtube-downloader')">
+                        <i data-lucide="youtube"></i> YouTube Downloader
                     </button>
                 </div>
 
@@ -4565,6 +4570,93 @@
                                     <div style="margin-top: auto; padding-top: 0.5rem;">
                                         <button id="video-compress-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center; border-radius: 10px; height: 38px; font-weight: 700; font-size: 0.85rem; margin: 0;">
                                             <i data-lucide="zap" style="width: 14px; height: 14px; margin-right: 4px;"></i> Compress & Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- YouTube Downloader Section -->
+                    <div id="youtube-downloader" class="tab-content" style="height: 100%; display: flex; flex-direction: column; min-height: 0;">
+                        <!-- Input Url Bar -->
+                        <div class="yt-input-section" style="display: flex; gap: 12px; margin-bottom: 1rem; flex-shrink: 0;">
+                            <div style="position: relative; flex: 1;">
+                                <input type="text" id="yt-url-input" placeholder="Paste YouTube Video Link here (e.g., https://www.youtube.com/watch?v=...)" style="width: 100%; padding: 12px 16px 12px 40px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-family: inherit; font-size: 0.9rem; outline: none; transition: var(--transition);">
+                                <i data-lucide="link" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-secondary); opacity: 0.7;"></i>
+                            </div>
+                            <button id="yt-fetch-btn" class="primary-btn" style="border-radius: 12px; height: 44px; padding: 0 24px; font-size: 0.85rem; font-weight: 700; margin: 0; flex-shrink: 0;">
+                                <i data-lucide="search" style="width: 16px; height: 16px;"></i> Fetch Details
+                            </button>
+                        </div>
+
+                        <!-- Fetching Loader Skeleton -->
+                        <div id="yt-loader" class="hidden" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--shadow);">
+                            <div class="spin" style="color: var(--accent-color);"><i data-lucide="loader-2" style="width: 36px; height: 36px;"></i></div>
+                            <span style="font-weight: 600; color: var(--text-secondary); font-size: 0.9rem;">Fetching YouTube Video details...</span>
+                        </div>
+
+                        <!-- Main Downloader Work Area (Hidden until url fetched) -->
+                        <div id="yt-work-area" class="hidden" style="flex: 1; min-height: 0; height: calc(100% - 60px); display: flex; flex-direction: column;">
+                            <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 310px; gap: 1.5rem; flex: 1; min-height: 0; height: 100%; align-items: stretch;">
+                                <!-- Left: Video Preview Player -->
+                                <div style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 0; height: 100%;">
+                                    <div id="yt-preview-box" style="position: relative; background: #000; border-radius: 12px; overflow: hidden; flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+                                        <img id="yt-thumbnail" style="width: 100%; height: 100%; object-fit: contain; display: block;" src="" alt="Video Thumbnail">
+                                        <video id="yt-video-player" style="width: 100%; height: 100%; object-fit: contain; display: none;" controls crossorigin="anonymous" playsinline></video>
+                                        <button id="yt-play-preview-btn" style="position: absolute; width: 56px; height: 56px; border-radius: 50%; background: var(--accent-color); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px var(--accent-shadow); z-index: 5;">
+                                            <i data-lucide="play" style="width: 20px; height: 20px; margin-left: 2px;"></i>
+                                        </button>
+                                        <span id="yt-duration-badge" style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.75); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-family: monospace; font-weight: 600; pointer-events: none; z-index: 4;">0:00</span>
+                                    </div>
+                                    <div class="video-info-row" style="background: var(--input-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); flex-shrink: 0;">
+                                        <h4 id="yt-video-title" style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">YouTube Video Title</h4>
+                                    </div>
+                                </div>
+
+                                <!-- Right: Download Settings & Options -->
+                                <div class="bg-controls-panel" style="background: var(--surface-color); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.25rem; box-shadow: var(--shadow); height: 100%; overflow-y: auto; margin: 0;">
+                                    <div class="control-group">
+                                        <label style="display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Download Option</label>
+                                        <div class="custom-dropdown" id="dropdown-yt-quality">
+                                            <input type="hidden" id="yt-quality-select" value="">
+                                            <div class="custom-dropdown-trigger">
+                                                <span class="custom-dropdown-value">Select Quality</span>
+                                                <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
+                                            </div>
+                                            <div class="custom-dropdown-options hidden" id="yt-quality-dropdown-options">
+                                                <!-- Populated dynamically via JS -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Only Audio Checkbox Option -->
+                                    <div class="control-group" style="display: flex; align-items: center; gap: 8px; background: var(--input-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color);">
+                                        <input type="checkbox" id="yt-audio-only-checkbox" style="width: 16px; height: 16px; accent-color: var(--accent-color); cursor: pointer;">
+                                        <label for="yt-audio-only-checkbox" style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer; user-select: none;">Extract Audio Only (MP3)</label>
+                                    </div>
+
+                                    <div class="control-group" style="margin-top: 0.25rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                                        <div style="background: var(--accent-alpha); padding: 10px; border-radius: 10px; text-align: center; border: 1px solid var(--accent-border-alpha);">
+                                            <div style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 2px;">Estimated File Size</div>
+                                            <div id="yt-est-size" style="font-weight: 700; font-size: 0.95rem; color: var(--accent-color);">Calculating...</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Progress indicator -->
+                                    <div id="yt-download-progress-container" class="hidden" style="margin-top: 0.25rem; padding: 10px; background: var(--input-bg); border-radius: 10px; border: 1px dashed var(--border-color);">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 600; margin-bottom: 4px;">
+                                            <span id="yt-progress-status">Downloading video...</span>
+                                            <span id="yt-download-pct">0%</span>
+                                        </div>
+                                        <div style="width: 100%; height: 5px; background: var(--border-color); border-radius: 3px; overflow: hidden;">
+                                            <div id="yt-download-progress-bar" style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.1s linear;"></div>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: auto; padding-top: 0.5rem;">
+                                        <button id="yt-download-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center; border-radius: 10px; height: 40px; font-weight: 700; font-size: 0.85rem; margin: 0;">
+                                            <i data-lucide="download" style="width: 16px; height: 16px; margin-right: 6px;"></i> Download Video
                                         </button>
                                     </div>
                                 </div>
@@ -13957,6 +14049,10 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             } else {
                 stopVideoPlayback();
             }
+            if (tabId !== 'youtube-downloader') {
+                const player = document.getElementById('yt-video-player');
+                if (player) player.pause();
+            }
         };
 
         // Sync desktop sidebar toggle to trigger redraws
@@ -13966,6 +14062,255 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 if (videoFile) setTimeout(renderComparisonFrame, 200);
             });
         }
+
+        // ==========================================
+        // YOUTUBE DOWNLOADER TOOL LOGIC
+        // ==========================================
+        let ytVideoData = null;
+        const ytUrlInput = document.getElementById('yt-url-input');
+        const ytFetchBtn = document.getElementById('yt-fetch-btn');
+        const ytLoader = document.getElementById('yt-loader');
+        const ytWorkArea = document.getElementById('yt-work-area');
+        
+        const ytThumbnail = document.getElementById('yt-thumbnail');
+        const ytVideoPlayer = document.getElementById('yt-video-player');
+        const ytPlayPreviewBtn = document.getElementById('yt-play-preview-btn');
+        const ytDurationBadge = document.getElementById('yt-duration-badge');
+        const ytVideoTitle = document.getElementById('yt-video-title');
+        
+        const ytQualitySelect = document.getElementById('yt-quality-select');
+        const ytQualityDropdownOptions = document.getElementById('yt-quality-dropdown-options');
+        const ytAudioOnlyCheckbox = document.getElementById('yt-audio-only-checkbox');
+        const ytEstSize = document.getElementById('yt-est-size');
+        
+        const ytDownloadProgressContainer = document.getElementById('yt-download-progress-container');
+        const ytProgressStatus = document.getElementById('yt-progress-status');
+        const ytDownloadPct = document.getElementById('yt-download-pct');
+        const ytDownloadProgressBar = document.getElementById('yt-download-progress-bar');
+        const ytDownloadBtn = document.getElementById('yt-download-btn');
+
+        // Custom Dropdown trigger for YouTube Quality
+        const dropdownYtQuality = document.getElementById('dropdown-yt-quality');
+        if (dropdownYtQuality) {
+            const trigger = dropdownYtQuality.querySelector('.custom-dropdown-trigger');
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close other dropdowns
+                document.querySelectorAll('.custom-dropdown-options').forEach(el => {
+                    if (el !== ytQualityDropdownOptions) el.classList.add('hidden');
+                });
+                ytQualityDropdownOptions.classList.toggle('hidden');
+            });
+        }
+
+        // Fetch YouTube details
+        ytFetchBtn.addEventListener('click', async () => {
+            const url = ytUrlInput.value.trim();
+            if (!url) {
+                notify('Please enter a valid YouTube URL.', 'error');
+                return;
+            }
+
+            ytLoader.classList.remove('hidden');
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const apiBase = isLocal ? '' : 'https://swiftfile.vercel.app';
+
+            ytWorkArea.classList.add('hidden');
+            ytFetchBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${apiBase}/api/yt?action=info&url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                ytVideoData = data;
+                
+                // Set metadata values
+                ytThumbnail.src = data.thumbnail;
+                ytThumbnail.style.display = 'block';
+                ytVideoPlayer.style.display = 'none';
+                ytVideoPlayer.src = '';
+                ytPlayPreviewBtn.classList.remove('hidden');
+                ytVideoTitle.textContent = data.title;
+                ytDurationBadge.textContent = formatDuration(data.duration);
+
+                // Default check state
+                ytAudioOnlyCheckbox.checked = false;
+
+                // Render quality formats list
+                renderYtQualityOptions(false);
+                
+                ytWorkArea.classList.remove('hidden');
+                notify('Video metadata fetched successfully!', 'success');
+            } catch (err) {
+                notify(err.message || 'Failed to fetch details.', 'error');
+                console.error(err);
+            } finally {
+                ytLoader.classList.add('hidden');
+                ytFetchBtn.disabled = false;
+            }
+        });
+
+        // Toggle Audio-Only / Video options list
+        ytAudioOnlyCheckbox.addEventListener('change', () => {
+            if (ytVideoData) {
+                renderYtQualityOptions(ytAudioOnlyCheckbox.checked);
+            }
+        });
+
+        function renderYtQualityOptions(onlyAudio) {
+            ytQualityDropdownOptions.innerHTML = '';
+            if (!ytVideoData || !ytVideoData.formats) return;
+
+            const filtered = ytVideoData.formats.filter(f => onlyAudio ? f.is_audio : !f.is_audio);
+            
+            if (filtered.length === 0) {
+                const opt = document.createElement('div');
+                opt.className = 'custom-dropdown-option';
+                opt.textContent = onlyAudio ? 'No audio-only formats found' : 'No video formats found';
+                ytQualityDropdownOptions.appendChild(opt);
+                return;
+            }
+
+            filtered.forEach((format, idx) => {
+                const opt = document.createElement('div');
+                opt.className = 'custom-dropdown-option';
+                if (idx === 0) opt.classList.add('selected');
+                opt.setAttribute('data-value', format.format_id);
+                
+                const sizeStr = format.filesize ? ` (${formatBytes(format.filesize)})` : '';
+                opt.textContent = `${format.resolution} - ${format.ext.toUpperCase()}${sizeStr}`;
+                
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectYtQualityOption(format);
+                });
+
+                ytQualityDropdownOptions.appendChild(opt);
+            });
+
+            // Select the first option by default
+            selectYtQualityOption(filtered[0]);
+        }
+
+        function selectYtQualityOption(format) {
+            ytQualitySelect.value = format.format_id;
+            
+            const dropdownVal = dropdownYtQuality.querySelector('.custom-dropdown-value');
+            const sizeStr = format.filesize ? ` (${formatBytes(format.filesize)})` : '';
+            dropdownVal.textContent = `${format.resolution} - ${format.ext.toUpperCase()}${sizeStr}`;
+            
+            // Update estimated size card
+            ytEstSize.textContent = format.filesize ? formatBytes(format.filesize) : 'Unknown (Streams dynamically)';
+
+            // Set selected CSS class
+            const options = ytQualityDropdownOptions.querySelectorAll('.custom-dropdown-option');
+            options.forEach(opt => {
+                const val = opt.getAttribute('data-value');
+                opt.classList.toggle('selected', val === format.format_id);
+            });
+
+            ytQualityDropdownOptions.classList.add('hidden');
+        }
+
+        // Inline video preview playback
+        ytPlayPreviewBtn.addEventListener('click', () => {
+            const url = ytUrlInput.value.trim();
+            if (!url || !ytVideoData) return;
+
+            const formatId = ytQualitySelect.value;
+            ytPlayPreviewBtn.classList.add('hidden');
+            ytThumbnail.style.display = 'none';
+            
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const apiBase = isLocal ? '' : 'https://swiftfile.vercel.app';
+
+            // Set source directly to streaming endpoint proxy
+            ytVideoPlayer.src = `${apiBase}/api/yt?action=download&url=${encodeURIComponent(url)}&format_id=${formatId}`;
+            ytVideoPlayer.style.display = 'block';
+            ytVideoPlayer.play();
+            
+            notify('Initializing inline preview stream...', 'info');
+        });
+
+        // Stream and download file with premium readable stream progress bar
+        ytDownloadBtn.addEventListener('click', async () => {
+            const url = ytUrlInput.value.trim();
+            if (!url || !ytVideoData) return;
+
+            const formatId = ytQualitySelect.value;
+            const isAudio = ytAudioOnlyCheckbox.checked;
+
+            ytDownloadProgressContainer.classList.remove('hidden');
+            ytDownloadBtn.disabled = true;
+            ytDownloadProgressBar.style.width = '0%';
+            ytDownloadPct.textContent = '0%';
+            ytProgressStatus.textContent = isAudio ? 'Extracting audio (MP3)...' : 'Downloading video (MP4)...';
+
+            try {
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const apiBase = isLocal ? '' : 'https://swiftfile.vercel.app';
+                const downloadUrl = `${apiBase}/api/yt?action=download&url=${encodeURIComponent(url)}&format_id=${formatId}`;
+                const response = await fetch(downloadUrl);
+                
+                if (!response.ok) {
+                    throw new Error('Download request failed on serverless function backend.');
+                }
+
+                const reader = response.body.getReader();
+                const contentLength = parseInt(response.headers.get('Content-Length')) || 0;
+                let receivedLength = 0;
+                let chunks = [];
+
+                while(true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    chunks.push(value);
+                    receivedLength += value.length;
+
+                    if (contentLength > 0) {
+                        const pct = Math.round((receivedLength / contentLength) * 100);
+                        ytDownloadProgressBar.style.width = `${pct}%`;
+                        ytDownloadPct.textContent = `${pct}%`;
+                    } else {
+                        // Indeterminate progress if no content length header
+                        ytDownloadPct.textContent = 'Streaming...';
+                        ytDownloadProgressBar.style.width = '50%';
+                    }
+                }
+
+                const blob = new Blob(chunks, { type: isAudio ? 'audio/mpeg' : 'video/mp4' });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                
+                const safeTitle = ytVideoTitle.textContent.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                a.download = `${safeTitle}.${isAudio ? 'mp3' : 'mp4'}`;
+                
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+                }, 100);
+
+                notify('Download completed successfully!', 'success');
+            } catch (err) {
+                notify(err.message || 'Download failed.', 'error');
+                console.error(err);
+            } finally {
+                ytDownloadBtn.disabled = false;
+                setTimeout(() => {
+                    ytDownloadProgressContainer.classList.add('hidden');
+                }, 1000);
+            }
+        });
 
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
