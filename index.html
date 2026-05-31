@@ -13746,7 +13746,31 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
         let compressionRecorder = null;
         let compressionAudioCtx = null;
         let compressionAudioSource = null;
+        let compressionGainNode = null;
+        let compressionDestNode = null;
         let renderLoopId = null;
+
+        async function ensureAudioRoute() {
+            try {
+                if (!compressionAudioCtx) {
+                    compressionAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (compressionAudioCtx.state === 'suspended') {
+                    await compressionAudioCtx.resume();
+                }
+                if (!compressionAudioSource) {
+                    compressionAudioSource = compressionAudioCtx.createMediaElementSource(videoSource);
+                    compressionGainNode = compressionAudioCtx.createGain();
+                    compressionAudioSource.connect(compressionGainNode);
+                    compressionGainNode.connect(compressionAudioCtx.destination);
+                }
+                if (compressionGainNode) {
+                    compressionGainNode.gain.value = videoSource.muted ? 0 : 1;
+                }
+            } catch (err) {
+                console.warn('Audio routing error:', err);
+            }
+        }
 
         const videoCompressInput = document.getElementById('video-compress-input');
         const videoCompressDropZone = document.getElementById('video-compress-drop-zone');
@@ -14106,7 +14130,8 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             lucide.createIcons({ root: videoBtnPlay });
         }
 
-        videoBtnPlay.addEventListener('click', () => {
+        videoBtnPlay.addEventListener('click', async () => {
+            await ensureAudioRoute();
             if (videoSource.paused || videoSource.ended) {
                 videoSource.play();
                 videoBtnPlay.innerHTML = '<i data-lucide="pause" style="width: 18px; height: 18px;"></i>';
@@ -14117,8 +14142,9 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             lucide.createIcons({ root: videoBtnPlay });
         });
 
-        videoBtnMute.addEventListener('click', () => {
+        videoBtnMute.addEventListener('click', async () => {
             videoSource.muted = !videoSource.muted;
+            await ensureAudioRoute();
             videoBtnMute.innerHTML = videoSource.muted 
                 ? '<i data-lucide="volume-x" style="width: 18px; height: 18px;"></i>' 
                 : '<i data-lucide="volume-2" style="width: 18px; height: 18px;"></i>';
@@ -14198,37 +14224,16 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
             // Audio Context Setup
             try {
-                if (!compressionAudioCtx) {
-                    compressionAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (compressionAudioCtx.state === 'suspended') {
-                    await compressionAudioCtx.resume();
-                }
+                await ensureAudioRoute();
 
-                // If not already connected, connect audio source
-                if (!compressionAudioSource) {
-                    compressionAudioSource = compressionAudioCtx.createMediaElementSource(videoSource);
+                if (!compressionDestNode) {
+                    compressionDestNode = compressionAudioCtx.createMediaStreamAudioDestination();
+                    compressionAudioSource.connect(compressionDestNode);
                 }
 
-                const destNode = compressionAudioCtx.createMediaStreamAudioDestination();
-                compressionAudioSource.connect(destNode);
-
-                // Connect to destination speakers so audio works, but mute if videoSource.muted is true
-                const gainNode = compressionAudioCtx.createGain();
-                gainNode.gain.value = videoSource.muted ? 0 : 1;
-                compressionAudioSource.connect(gainNode);
-                gainNode.connect(compressionAudioCtx.destination);
-
-                destNode.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+                compressionDestNode.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
             } catch (err) {
                 console.warn('Audio capture could not be initialized (might be silent or no audio tracks):', err);
-                // Mute and continue with pure video capture
-                try {
-                    // Fallback local speaker routing if media source already connected
-                    if (compressionAudioSource) {
-                        compressionAudioSource.connect(compressionAudioCtx.destination);
-                    }
-                } catch(e) {}
             }
 
             // Recorder options
@@ -14288,7 +14293,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
             // Run compression playback loop
             videoSource.currentTime = 0;
-            videoSource.playbackRate = 1.5; // Compress 1.5x faster than real-time
+            videoSource.playbackRate = 1.0; // Compress at normal speed to prevent audio sync and encode failure issues
 
             videoSource.play();
             compressionRecorder.start();
