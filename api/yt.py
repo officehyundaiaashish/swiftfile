@@ -13,30 +13,34 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        # Parse query params
-        parsed_path = urllib.parse.urlparse(self.path)
-        query = urllib.parse.parse_qs(parsed_path.query)
-        
-        action = query.get('action', ['info'])[0]
-        video_url = query.get('url', [''])[0]
-        
-        if not video_url:
-            self.send_error_response(400, "Missing 'url' parameter.")
-            return
+        try:
+            # Parse query params
+            parsed_path = urllib.parse.urlparse(self.path)
+            query = urllib.parse.parse_qs(parsed_path.query)
+            
+            action = query.get('action', ['info'])[0]
+            video_url = query.get('url', [''])[0]
+            
+            if not video_url:
+                self.send_error_response(400, "Missing 'url' parameter.")
+                return
 
-        if action == 'info':
-            self.handle_info(video_url)
-        elif action == 'download':
-            format_id = query.get('format_id', [''])[0]
-            self.handle_download(video_url, format_id)
-        else:
-            self.send_error_response(400, f"Unknown action: {action}")
+            if action == 'info':
+                self.handle_info(video_url)
+            elif action == 'download':
+                format_id = query.get('format_id', [''])[0]
+                self.handle_download(video_url, format_id)
+            else:
+                self.send_error_response(400, f"Unknown action: {action}")
+        except Exception as e:
+            self.send_error_response(500, f"Server Error: {str(e)}")
 
     def handle_info(self, url):
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
             'skip_download': True,
+            'cachedir': False,
         }
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -103,6 +107,7 @@ class handler(BaseHTTPRequestHandler):
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
+            'cachedir': False,
         }
         if format_id:
             ydl_opts['format'] = format_id
