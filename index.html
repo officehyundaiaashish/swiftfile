@@ -14117,7 +14117,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
             ytLoader.classList.remove('hidden');
             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const apiBase = isLocal ? '' : 'https://swiftfile.vercel.app';
+            const apiBase = isLocal ? 'http://localhost:3000' : 'https://YOUR-BACKEND-SERVER-URL.render.com';
 
             ytWorkArea.classList.add('hidden');
             ytFetchBtn.disabled = true;
@@ -14230,7 +14230,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             ytThumbnail.style.display = 'none';
             
             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const apiBase = isLocal ? '' : 'https://swiftfile.vercel.app';
+            const apiBase = isLocal ? 'http://localhost:3000' : 'https://YOUR-BACKEND-SERVER-URL.render.com';
 
             // Set source directly to streaming endpoint proxy
             ytVideoPlayer.src = `${apiBase}/api/yt?action=download&url=${encodeURIComponent(url)}&format_id=${formatId}`;
@@ -14256,7 +14256,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
             try {
                 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                const apiBase = isLocal ? '' : 'https://swiftfile.vercel.app';
+                const apiBase = isLocal ? 'http://localhost:3000' : 'https://YOUR-BACKEND-SERVER-URL.render.com';
                 const downloadUrl = `${apiBase}/api/yt?action=download&url=${encodeURIComponent(url)}&format_id=${formatId}`;
                 const response = await fetch(downloadUrl);
                 
