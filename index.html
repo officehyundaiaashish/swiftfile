@@ -760,6 +760,32 @@
             }
         }
 
+        @media (max-width: 768px) {
+            .bg-tool-layout {
+                grid-template-columns: 1fr !important;
+                height: auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1rem !important;
+            }
+            .bg-tool-layout > div {
+                width: 100% !important;
+            }
+            .collage-main-preview {
+                height: auto !important;
+                min-height: 300px !important;
+            }
+            #video-preview-box {
+                height: 250px !important;
+                min-height: 250px !important;
+                flex: none !important;
+            }
+            .bg-controls-panel {
+                height: auto !important;
+                overflow-y: visible !important;
+            }
+        }
+
         .preview-item {
             position: relative;
             border-radius: 12px;
@@ -1176,90 +1202,31 @@
                 padding: 0 1rem;
             }
 
-            /* Mobile Tool Dropdown - Premium Custom Style */
+            /* Sidebar Backdrop Overlay */
+            .sidebar-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.4);
+                backdrop-filter: blur(4px);
+                z-index: 9998;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+            .sidebar-backdrop.visible {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
             .mobile-tool-selector {
-                display: block !important;
-                margin: 0 0 1.5rem 0 !important;
-                position: relative !important;
-                z-index: 1000 !important;
-            }
-
-            .tool-select-btn {
-                width: 100% !important;
-                background: white !important;
-                border: 1px solid rgba(0, 0, 0, 0.05) !important;
-                padding: 1.1rem 1.25rem !important;
-                border-radius: 20px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: flex-start !important;
-                color: var(--text-primary) !important;
-                font-weight: 600 !important;
-                font-size: 1rem !important;
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04) !important;
-                border-left: 4px solid var(--accent-color) !important;
-            }
-
-            .dark-theme .tool-select-btn {
-                background: rgba(255, 255, 255, 0.04) !important;
-                border: 1px solid rgba(255, 255, 255, 0.08) !important;
-                border-left: 4px solid var(--accent-color) !important;
-                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
-                /* backdrop-filter removed for performance */
-            }
-
-            .tool-dropdown-menu {
                 display: none !important;
-            }
-
-            .tool-option {
-                padding: 0.85rem 1.25rem !important;
-                display: flex !important;
-                align-items: center !important;
-                gap: 12px !important;
-                color: var(--text-primary) !important;
-                font-weight: 500 !important;
-                font-size: 0.9rem !important;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
-                transition: background 0.2s !important;
-            }
-
-            .dark-theme .tool-option {
-                border-bottom-color: rgba(255, 255, 255, 0.05) !important;
-            }
-
-            .tool-option:last-child {
-                border-bottom: none !important;
-            }
-
-            .tool-option:active {
-                background: var(--accent-alpha) !important;
-            }
-
-            .tool-option i {
-                width: 18px !important;
-                color: var(--accent-color) !important;
             }
 
             .converter-tabs {
-                display: flex !important;
-                overflow-x: auto !important;
-                gap: 10px !important;
-                padding: 0.5rem 2px !important;
-                margin-bottom: 1rem !important;
-                scrollbar-width: none !important;
-                -ms-overflow-style: none !important;
-            }
-
-            .converter-tabs::-webkit-scrollbar {
-                display: none !important;
-            }
-
-            .tab-btn {
-                flex-shrink: 0 !important;
-                padding: 0.75rem 1.25rem !important;
-                font-size: 0.85rem !important;
-                white-space: nowrap !important;
+                display: none;
             }
 
             .converter-card {
@@ -2868,8 +2835,65 @@
                 display: none !important;
             }
 
-            .app-sidebar-panel .hero div {
-                display: none !important;
+            /* Turn Sidebar into Mobile Navigation Drawer */
+            .app-sidebar-panel {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 280px !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+                z-index: 9999 !important;
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.25) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                background: var(--surface-color) !important;
+                border-right: 1px solid var(--border-color) !important;
+            }
+
+            .app-sidebar-panel.open {
+                transform: translateX(0) !important;
+            }
+
+            /* Make layout wrapper flex row/column properly */
+            .app-layout-wrapper {
+                display: block !important;
+                position: relative !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+
+            .app-main-workspace {
+                width: 100% !important;
+                height: auto !important;
+                min-height: calc(100vh - 80px) !important;
+                padding: 1.5rem !important;
+            }
+
+            /* Keep tab buttons list vertical in drawer */
+            .app-sidebar-panel .converter-tabs {
+                display: flex !important;
+                flex-direction: column !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                height: calc(100% - 150px) !important;
+                padding: 1rem !important;
+                gap: 8px !important;
+            }
+
+            .app-sidebar-panel .tab-btn {
+                width: 100% !important;
+                white-space: nowrap !important;
+                justify-content: flex-start !important;
+                flex-shrink: 0 !important;
+                display: flex !important;
+            }
+
+            /* Show mobile menu button in header */
+            #mobile-menu-btn {
+                display: flex !important;
             }
         }
 
@@ -2987,6 +3011,9 @@
     <script>
         let lastActiveTabId = 'swift-assistant';
         function switchTab(tabId) {
+            // Close mobile menu if open
+            toggleMobileMenu(false);
+
             if (tabId !== 'swift-assistant') {
                 lastActiveTabId = tabId;
             }
@@ -3077,6 +3104,17 @@
         function handleMobileToolSelect(tabId, labelText, iconName) {
             switchTab(tabId);
         }
+
+        function toggleMobileMenu(open) {
+            const sidebar = document.getElementById('app-sidebar-panel');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar) {
+                sidebar.classList.toggle('open', open);
+            }
+            if (backdrop) {
+                backdrop.classList.toggle('visible', open);
+            }
+        }
     </script>
 </head>
 
@@ -3086,12 +3124,18 @@
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileMenu(false)"></div>
 
     <header>
         <div class="container header-content">
-            <div class="logo">
-                <img src="logo.png" alt="Swift File" class="logo-img">
-                <span>Swift File Tools</span>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button id="mobile-menu-btn" class="icon-btn" style="display: none;" title="Open Menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="logo">
+                    <img src="logo.png" alt="Swift File" class="logo-img">
+                    <span>Swift File Tools</span>
+                </div>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
                 <button id="history-btn" class="icon-btn" title="View History">
@@ -14324,6 +14368,15 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 if (inputField) {
                     inputField.focus();
                 }
+            }
+
+            // Bind mobile menu button click
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleMobileMenu(true);
+                });
             }
         });
 
