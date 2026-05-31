@@ -14293,7 +14293,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
             // Run compression playback loop
             videoSource.currentTime = 0;
-            videoSource.playbackRate = 1.0; // Compress at normal speed to prevent audio sync and encode failure issues
+            videoSource.playbackRate = 2.5; // Compress 2.5x faster than real-time
 
             videoSource.play();
             compressionRecorder.start();
