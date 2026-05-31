@@ -2139,12 +2139,12 @@
             /* ===== Fullscreen Mode ===== */
             #swift-assistant.mobile-fullscreen {
                 position: fixed !important;
-                top: 0 !important;
+                top: 60px !important;
                 left: 0 !important;
                 width: 100vw !important;
-                height: 100vh !important;
-                height: 100dvh !important;
-                z-index: 9999 !important;
+                height: calc(100vh - 60px) !important;
+                height: calc(100dvh - 60px) !important;
+                z-index: 999 !important;
                 background: var(--bg-color) !important;
                 padding: 0 !important;
                 margin: 0 !important;
@@ -2827,6 +2827,35 @@
         }
 
         @media (max-width: 1024px) {
+            header {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 60px !important;
+                z-index: 10000 !important;
+                background: var(--surface-color) !important;
+                border-bottom: 1px solid var(--border-color) !important;
+                padding: 0 1rem !important;
+                display: flex !important;
+                align-items: center !important;
+                margin: 0 !important;
+            }
+
+            .header-content {
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            main.container {
+                margin-top: 60px !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+
             .sidebar-toggle-btn {
                 display: none !important;
             }
@@ -2835,26 +2864,40 @@
                 display: none !important;
             }
 
-            /* Turn Sidebar into Mobile Navigation Drawer */
+            /* Turn Sidebar into Mobile Bottom Navigation Drawer */
             .app-sidebar-panel {
                 position: fixed !important;
-                top: 0 !important;
+                bottom: 0 !important;
                 left: 0 !important;
-                width: 280px !important;
-                height: 100vh !important;
-                height: 100dvh !important;
+                top: auto !important;
+                width: 100% !important;
+                height: 70vh !important;
+                height: 70dvh !important;
                 z-index: 9999 !important;
-                transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                box-shadow: 0 0 30px rgba(0, 0, 0, 0.25) !important;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15) !important;
                 display: flex !important;
                 flex-direction: column !important;
                 background: var(--surface-color) !important;
-                border-right: 1px solid var(--border-color) !important;
+                border-top: 1px solid var(--border-color) !important;
+                border-left: none !important;
+                border-right: none !important;
+                border-radius: 24px 24px 0 0 !important;
             }
 
             .app-sidebar-panel.open {
-                transform: translateX(0) !important;
+                transform: translateY(0) !important;
+            }
+
+            /* Show pull handle indicator only on mobile bottom drawer */
+            .app-sidebar-panel .bottom-drawer-handle {
+                display: block !important;
+            }
+
+            /* Hide desktop hero inside mobile drawer to save space */
+            .app-sidebar-panel .hero {
+                display: none !important;
             }
 
             /* Make layout wrapper flex row/column properly */
@@ -2868,8 +2911,9 @@
             .app-main-workspace {
                 width: 100% !important;
                 height: auto !important;
-                min-height: calc(100vh - 80px) !important;
-                padding: 1.5rem !important;
+                min-height: calc(100vh - 60px) !important;
+                padding: 1rem !important;
+                margin-top: 0 !important;
             }
 
             /* Keep tab buttons list vertical in drawer */
@@ -2878,8 +2922,8 @@
                 flex-direction: column !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
-                height: calc(100% - 150px) !important;
-                padding: 1rem !important;
+                height: calc(100% - 60px) !important;
+                padding: 1.25rem 1rem !important;
                 gap: 8px !important;
             }
 
@@ -3077,7 +3121,7 @@
             }
 
             if (tabId === 'swift-assistant') {
-                if (window.innerWidth <= 768) {
+                if (window.innerWidth <= 1024) {
                     document.getElementById('swift-assistant').classList.add('mobile-fullscreen');
                     if (window.history.state?.panel !== 'assistant') {
                         window.history.pushState({ panel: 'assistant' }, '');
@@ -3169,6 +3213,7 @@
         <div class="app-layout-wrapper">
             <!-- Resizable Left Sidebar Panel -->
             <div class="app-sidebar-panel" id="app-sidebar-panel">
+                <div class="bottom-drawer-handle" style="width: 40px; height: 4px; background: var(--border-color); border-radius: 2px; margin: 8px auto 0 auto; flex-shrink: 0; display: none;"></div>
                 <section class="hero">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                         <img src="logo.png" alt="Swift File" style="height: 24px; width: 24px; border-radius: 6px;">
@@ -14363,7 +14408,9 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(handleReceivedShare, 500);
-            if (window.innerWidth > 1024) {
+            if (window.innerWidth <= 1024) {
+                switchTab('swift-assistant');
+            } else {
                 const inputField = document.getElementById('assistant-input');
                 if (inputField) {
                     inputField.focus();
