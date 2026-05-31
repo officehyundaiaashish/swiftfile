@@ -4339,25 +4339,8 @@
                         </div>
                     </div>
 
+                    <!-- Video Compressor Section -->
                     <div id="video-compressor" class="tab-content">
-                        <style>
-                            .custom-dropdown-item {
-                                padding: 8px 12px;
-                                font-size: 0.8rem;
-                                cursor: pointer;
-                                transition: var(--transition);
-                                color: var(--text-primary);
-                            }
-                            .custom-dropdown-item:hover {
-                                background: var(--accent-alpha);
-                                color: var(--accent-color);
-                            }
-                            .custom-dropdown-item.active {
-                                background: var(--accent-color) !important;
-                                color: #ffffff !important;
-                                font-weight: 600;
-                            }
-                        </style>
                         <div class="drop-zone" id="video-compress-drop-zone">
                             <input type="file" id="video-compress-input" accept="video/*" hidden>
                             <div class="drop-zone-content">
@@ -4369,6 +4352,64 @@
                                 <span class="file-info">Supports MP4, WebM, MOV, AVI, MKV, FLV, and more</span>
                             </div>
                         </div>
+
+                        <style>
+                            .custom-dropdown {
+                                position: relative;
+                                width: 100%;
+                            }
+                            .custom-dropdown-trigger {
+                                width: 100%;
+                                background: var(--input-bg);
+                                border: 1px solid var(--border-color);
+                                border-radius: 8px;
+                                padding: 8px 12px;
+                                font-size: 0.8rem;
+                                font-weight: 600;
+                                color: var(--text-primary);
+                                cursor: pointer;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                transition: var(--transition);
+                                user-select: none;
+                            }
+                            .custom-dropdown-trigger:hover {
+                                border-color: var(--accent-color);
+                            }
+                            .custom-dropdown-options {
+                                position: absolute;
+                                top: calc(100% + 4px);
+                                left: 0;
+                                right: 0;
+                                background: var(--surface-color);
+                                border: 1px solid var(--border-color);
+                                border-radius: 8px;
+                                box-shadow: var(--shadow);
+                                z-index: 1000;
+                                max-height: 200px;
+                                overflow-y: auto;
+                            }
+                            .custom-dropdown-options.hidden {
+                                display: none;
+                            }
+                            .custom-dropdown-option {
+                                padding: 8px 12px;
+                                font-size: 0.8rem;
+                                font-weight: 500;
+                                color: var(--text-primary);
+                                cursor: pointer;
+                                transition: background 0.15s;
+                            }
+                            .custom-dropdown-option:hover {
+                                background: var(--accent-alpha);
+                                color: var(--accent-color);
+                            }
+                            .custom-dropdown-option.selected {
+                                background: var(--accent-color);
+                                color: white;
+                            }
+                        </style>
 
                         <div id="video-compress-preview-container" class="preview-container hidden" style="height: 100%; display: flex; flex-direction: column; min-height: 0; padding: 0.5rem 0;">
                             <div class="preview-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.75rem; flex-shrink: 0;">
@@ -4425,29 +4466,25 @@
                                                 <button id="video-btn-step-forward" class="icon-btn" style="width: 34px; height: 34px; border-radius: 8px; padding: 0;" title="Step Forward 5s">
                                                     <i data-lucide="chevrons-right" style="width: 16px; height: 16px;"></i>
                                                 </button>
-                                                                                   <div style="display: flex; align-items: center; gap: 6px;">
-                                                <!-- Speed control -->
-                                                <select id="video-speed" style="display: none;">
-                                                    <option value="0.25">0.25x</option>
-                                                    <option value="0.5">0.5x</option>
-                                                    <option value="1.0" selected>1.0x</option>
-                                                    <option value="1.5">1.5x</option>
-                                                    <option value="2.0">2.0x</option>
-                                                </select>
-                                                <div class="custom-dropdown" id="dropdown-speed-container" style="position: relative; width: 100px;">
-                                                    <button type="button" class="custom-dropdown-trigger" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px 8px; font-size: 0.75rem; font-weight: 600; color: var(--text-primary); cursor: pointer; outline: none; height: 34px;">
-                                                        <span id="dropdown-speed-value">1.0x</span>
-                                                        <i data-lucide="chevron-down" style="width: 12px; height: 12px; color: var(--text-secondary);"></i>
-                                                    </button>
-                                                    <div class="custom-dropdown-menu hidden" style="position: absolute; bottom: 102%; left: 0; width: 100%; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: var(--shadow); z-index: 100; max-height: 200px; overflow-y: auto; padding: 4px 0;">
-                                                        <div class="custom-dropdown-item" data-value="0.25">0.25x</div>
-                                                        <div class="custom-dropdown-item" data-value="0.5">0.5x</div>
-                                                        <div class="custom-dropdown-item active" data-value="1.0">1.0x</div>
-                                                        <div class="custom-dropdown-item" data-value="1.5">1.5x</div>
-                                                        <div class="custom-dropdown-item" data-value="2.0">2.0x</div>
+                                            </div>
+
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <!-- Speed control custom dropdown -->
+                                                <div class="custom-dropdown" id="dropdown-speed" style="width: 100px;">
+                                                    <input type="hidden" id="video-speed" value="1.0">
+                                                    <div class="custom-dropdown-trigger" style="height: 34px; padding: 4px 8px; border-radius: 8px;">
+                                                        <span class="custom-dropdown-value">1.0x Speed</span>
+                                                        <i data-lucide="chevron-down" style="width: 12px; height: 12px;"></i>
+                                                    </div>
+                                                    <div class="custom-dropdown-options hidden" style="bottom: 100%; top: auto; margin-bottom: 4px; border-radius: 8px;">
+                                                        <div class="custom-dropdown-option" data-value="0.25">0.25x Speed</div>
+                                                        <div class="custom-dropdown-option" data-value="0.5">0.5x Speed</div>
+                                                        <div class="custom-dropdown-option selected" data-value="1.0">1.0x Speed</div>
+                                                        <div class="custom-dropdown-option" data-value="1.5">1.5x Speed</div>
+                                                        <div class="custom-dropdown-option" data-value="2.0">2.0x Speed</div>
                                                     </div>
                                                 </div>
- 
+
                                                 <!-- Mute/Volume -->
                                                 <button id="video-btn-mute" class="icon-btn" style="width: 34px; height: 34px; border-radius: 8px; padding: 0;" title="Mute/Unmute">
                                                     <i data-lucide="volume-2" style="width: 16px; height: 16px;"></i>
@@ -4456,33 +4493,27 @@
                                         </div>
                                     </div>
                                 </div>
- 
+
                                 <!-- Right side: Settings Panel -->
                                 <div class="bg-controls-panel" style="background: var(--surface-color); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1rem; box-shadow: var(--shadow); height: 100%; overflow-y: auto; margin: 0;">
                                     <div class="control-group">
                                         <label style="display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Resolution Preset</label>
-                                        <select id="video-compress-resolution" style="display: none;">
-                                            <option value="original" selected>Keep Original Resolution</option>
-                                            <option value="1080">1080p (FHD)</option>
-                                            <option value="720">720p (HD)</option>
-                                            <option value="480">480p (SD)</option>
-                                            <option value="360">360p (Low)</option>
-                                        </select>
-                                        <div class="custom-dropdown" id="dropdown-resolution-container" style="position: relative; width: 100%;">
-                                            <button type="button" class="custom-dropdown-trigger" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer; outline: none; height: 34px;">
-                                                <span id="dropdown-resolution-value">Keep Original Resolution</span>
-                                                <i data-lucide="chevron-down" style="width: 14px; height: 14px; color: var(--text-secondary);"></i>
-                                            </button>
-                                            <div class="custom-dropdown-menu hidden" style="position: absolute; top: 102%; left: 0; width: 100%; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: var(--shadow); z-index: 100; max-height: 200px; overflow-y: auto; padding: 4px 0;">
-                                                <div class="custom-dropdown-item active" data-value="original">Keep Original Resolution</div>
-                                                <div class="custom-dropdown-item" data-value="1080">1080p (FHD)</div>
-                                                <div class="custom-dropdown-item" data-value="720">720p (HD)</div>
-                                                <div class="custom-dropdown-item" data-value="480">480p (SD)</div>
-                                                <div class="custom-dropdown-item" data-value="360">360p (Low)</div>
+                                        <div class="custom-dropdown" id="dropdown-resolution">
+                                            <input type="hidden" id="video-compress-resolution" value="original">
+                                            <div class="custom-dropdown-trigger">
+                                                <span class="custom-dropdown-value">Keep Original Resolution</span>
+                                                <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
+                                            </div>
+                                            <div class="custom-dropdown-options hidden">
+                                                <div class="custom-dropdown-option selected" data-value="original">Keep Original Resolution</div>
+                                                <div class="custom-dropdown-option" data-value="1080">1080p (FHD)</div>
+                                                <div class="custom-dropdown-option" data-value="720">720p (HD)</div>
+                                                <div class="custom-dropdown-option" data-value="480">480p (SD)</div>
+                                                <div class="custom-dropdown-option" data-value="360">360p (Low)</div>
                                             </div>
                                         </div>
                                     </div>
- 
+
                                     <div class="control-group">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                                             <label style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Compression Level</label>
@@ -4490,24 +4521,21 @@
                                         </div>
                                         <input type="range" id="video-compress-quality-slider" min="0" max="90" step="5" value="30" style="width: 100%; height: 5px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
                                     </div>
- 
+
                                     <div class="control-group">
                                         <label style="display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Target Format</label>
-                                        <select id="video-compress-format" style="display: none;">
-                                            <option value="webm" selected>WebM (Recommended)</option>
-                                            <option value="mp4">MP4 (Browser Native)</option>
-                                        </select>
-                                        <div class="custom-dropdown" id="dropdown-format-container" style="position: relative; width: 100%;">
-                                            <button type="button" class="custom-dropdown-trigger" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer; outline: none; height: 34px;">
-                                                <span id="dropdown-format-value">WebM (Recommended)</span>
-                                                <i data-lucide="chevron-down" style="width: 14px; height: 14px; color: var(--text-secondary);"></i>
-                                            </button>
-                                            <div class="custom-dropdown-menu hidden" style="position: absolute; top: 102%; left: 0; width: 100%; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: var(--shadow); z-index: 100; max-height: 200px; overflow-y: auto; padding: 4px 0;">
-                                                <div class="custom-dropdown-item active" data-value="webm">WebM (Recommended)</div>
-                                                <div class="custom-dropdown-item" data-value="mp4">MP4 (Browser Native)</div>
+                                        <div class="custom-dropdown" id="dropdown-format">
+                                            <input type="hidden" id="video-compress-format" value="webm">
+                                            <div class="custom-dropdown-trigger">
+                                                <span class="custom-dropdown-value">WebM (Recommended)</span>
+                                                <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
+                                            </div>
+                                            <div class="custom-dropdown-options hidden">
+                                                <div class="custom-dropdown-option selected" data-value="webm">WebM (Recommended)</div>
+                                                <div class="custom-dropdown-option" data-value="mp4">MP4 (Browser Native)</div>
                                             </div>
                                         </div>
-                                    </div>         </div>
+                                    </div>
 
                                     <div class="control-group" style="margin-top: 0.25rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
                                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -13380,6 +13408,59 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
         const offscreenCanvas = document.createElement('canvas');
         const offCtx = offscreenCanvas.getContext('2d');
 
+        // Reusable custom dropdown initializer
+        function initCustomDropdown(dropdownId, onChangeCallback) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            const trigger = dropdown.querySelector('.custom-dropdown-trigger');
+            const optionsContainer = dropdown.querySelector('.custom-dropdown-options');
+            const valueSpan = dropdown.querySelector('.custom-dropdown-value');
+            const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+            const options = dropdown.querySelectorAll('.custom-dropdown-option');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close other dropdowns
+                document.querySelectorAll('.custom-dropdown-options').forEach(el => {
+                    if (el !== optionsContainer) el.classList.add('hidden');
+                });
+                optionsContainer.classList.toggle('hidden');
+            });
+
+            options.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = opt.getAttribute('data-value');
+                    const text = opt.textContent;
+
+                    // Set value
+                    hiddenInput.value = val;
+                    valueSpan.textContent = text;
+
+                    // Update selected class
+                    options.forEach(o => o.classList.toggle('selected', o === opt));
+
+                    optionsContainer.classList.add('hidden');
+
+                    // Trigger callback
+                    if (onChangeCallback) onChangeCallback(val);
+
+                    // Manually trigger standard change event on the hidden input so other listeners work
+                    hiddenInput.dispatchEvent(new Event('change'));
+                });
+            });
+        }
+
+        // Close dropdowns on window click
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-dropdown-options').forEach(el => el.classList.add('hidden'));
+        });
+
+        // Initialize our custom dropdowns
+        initCustomDropdown('dropdown-resolution');
+        initCustomDropdown('dropdown-format');
+        initCustomDropdown('dropdown-speed');
+
         // Helpers
         function formatBytes(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
@@ -13450,74 +13531,6 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             videoCompressEstSizeText.textContent = formatBytes(estimatedBytes);
         }
 
-        // Custom Dropdown Helper
-        function initCustomDropdown(containerId, valueSpanId, selectId) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            const trigger = container.querySelector('.custom-dropdown-trigger');
-            const menu = container.querySelector('.custom-dropdown-menu');
-            const items = container.querySelectorAll('.custom-dropdown-item');
-            const valueSpan = document.getElementById(valueSpanId);
-            const selectEl = document.getElementById(selectId);
-
-            trigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Close other custom dropdowns
-                document.querySelectorAll('.custom-dropdown-menu').forEach(m => {
-                    if (m !== menu) m.classList.add('hidden');
-                });
-                menu.classList.toggle('hidden');
-            });
-
-            items.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const val = item.getAttribute('data-value');
-                    
-                    items.forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    
-                    valueSpan.textContent = item.textContent;
-                    
-                    if (selectEl) {
-                        selectEl.value = val;
-                        selectEl.dispatchEvent(new Event('change'));
-                    }
-                    menu.classList.add('hidden');
-                });
-            });
-        }
-
-        // Close dropdowns on window click
-        window.addEventListener('click', () => {
-            document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.classList.add('hidden'));
-        });
-
-        // Initialize custom dropdowns
-        initCustomDropdown('dropdown-resolution-container', 'dropdown-resolution-value', 'video-compress-resolution');
-        initCustomDropdown('dropdown-format-container', 'dropdown-format-value', 'video-compress-format');
-        initCustomDropdown('dropdown-speed-container', 'dropdown-speed-value', 'video-speed');
-
-        function resetCustomDropdownsUI() {
-            const resetMenu = (containerId, valueSpanId, defaultVal) => {
-                const container = document.getElementById(containerId);
-                if (!container) return;
-                const items = container.querySelectorAll('.custom-dropdown-item');
-                const valueSpan = document.getElementById(valueSpanId);
-                items.forEach(item => {
-                    if (item.getAttribute('data-value') === defaultVal) {
-                        item.classList.add('active');
-                        if (valueSpan) valueSpan.textContent = item.textContent;
-                    } else {
-                        item.classList.remove('active');
-                    }
-                });
-            };
-            resetMenu('dropdown-resolution-container', 'dropdown-resolution-value', 'original');
-            resetMenu('dropdown-format-container', 'dropdown-format-value', 'webm');
-            resetMenu('dropdown-speed-container', 'dropdown-speed-value', '1.0');
-        }
-
         // Drag and Drop Zone event listeners
         videoCompressDropZone.addEventListener('click', () => videoCompressInput.click());
         videoCompressInput.addEventListener('change', (e) => {
@@ -13564,26 +13577,22 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             stopVideoPlayback();
             videoFile = null;
             videoSource.src = '';
+            videoPreviewBox.style.aspectRatio = ''; // reset aspect ratio
             videoCompressDropZone.classList.remove('hidden');
             videoCompressPreviewContainer.classList.add('hidden');
             videoCompressProgressContainer.classList.add('hidden');
             videoCompressProgressBar.style.width = '0%';
             videoCompressPct.textContent = '0%';
             isCompressing = false;
-            resetCustomDropdownsUI();
         });
 
         // Comparison Slider Drag Logic
         function updateSliderPosition(clientX) {
-            const rect = videoPreviewCanvas.getBoundingClientRect();
+            const rect = videoPreviewBox.getBoundingClientRect();
             let pos = (clientX - rect.left) / rect.width;
             pos = Math.max(0, Math.min(1, pos));
             splitRatio = pos;
-            
-            const boxRect = videoPreviewBox.getBoundingClientRect();
-            const relativeLeft = ((rect.left - boxRect.left) + pos * rect.width) / boxRect.width;
-            videoComparisonSlider.style.left = `${relativeLeft * 100}%`;
-            
+            videoComparisonSlider.style.left = `${pos * 100}%`;
             renderComparisonFrame();
         }
 
@@ -13642,20 +13651,29 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             ctx.imageSmoothingEnabled = true;
             ctx.drawImage(offscreenCanvas, 0, 0, w, h);
             ctx.restore();
-            
-            // Sync slider line overlay position in case canvas resized
-            const rect = videoPreviewCanvas.getBoundingClientRect();
-            const boxRect = videoPreviewBox.getBoundingClientRect();
-            if (rect.width > 0 && boxRect.width > 0) {
-                const relativeLeft = ((rect.left - boxRect.left) + splitRatio * rect.width) / boxRect.width;
-                videoComparisonSlider.style.left = `${relativeLeft * 100}%`;
-            }
+
+            // Draw Divider Line
+            ctx.beginPath();
+            ctx.moveTo(splitX, 0);
+            ctx.lineTo(splitX, h);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = Math.max(3, w / 400); // Scale line thickness slightly with resolution
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctx.shadowBlur = 8;
+            ctx.stroke();
+            ctx.shadowBlur = 0; // Reset shadow
         }
 
         videoSource.addEventListener('loadedmetadata', () => {
             videoDurationText.textContent = formatDuration(videoSource.duration);
             videoTimeline.max = videoSource.duration;
             videoTimeline.value = 0;
+            
+            // Set dynamic aspect ratio to avoid letterbox discrepancy and perfectly align the sliding divider line
+            if (videoSource.videoWidth && videoSource.videoHeight) {
+                const aspect = videoSource.videoWidth / videoSource.videoHeight;
+                videoPreviewBox.style.aspectRatio = aspect;
+            }
             
             // Quality slider represents compression level percentage (0 to 90)
             videoCompressQualitySlider.min = 0;
