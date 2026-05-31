@@ -11148,7 +11148,7 @@ Configure your API key to get started.</p>
             return { valid: true };
         }
 
-        function showCustomConfirm(title, message) {
+        function showCustomRegenConfirm(title, message) {
             return new Promise((resolve) => {
                 const modal = document.createElement('div');
                 modal.id = 'custom-confirm-modal';
@@ -12414,7 +12414,7 @@ User Query: ${lastMsgContent}`;
                     if (isRemarksMode) {
                         const validation = validateRemarks(responseText);
                         if (!validation.valid && loopCount < maxLoops - 1) {
-                            const approve = await showCustomConfirm(
+                            const approve = await showCustomRegenConfirm(
                                 "Character Limit Check Failed",
                                 `The generated remarks do not meet the character limits.\n\nIssues:\n${validation.reason.replace(/Remark \d+ length is \d+/g, (m) => m + ' (target: 30-40, except Remark 1 which is 80-90)')}\n\nWould you like the AI to make a second attempt to correct them?`
                             );
