@@ -474,6 +474,17 @@
         }
 
 
+        @keyframes slideDownMobileSearch {
+            from {
+                transform: translateY(-8px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -1160,7 +1171,8 @@
         /* Hide mobile elements on desktop by default */
         .mobile-bottom-nav,
         .mobile-tool-selector,
-        .mobile-drawer-close-btn {
+        .mobile-drawer-close-btn,
+        .mobile-drawer-header {
             display: none !important;
         }
         .sidebar-backdrop {
@@ -1376,19 +1388,30 @@
         }
 
         /* Hide old sidebar search on mobile — replaced by new mobile search bar */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .sidebar-search-wrap {
                 display: none !important;
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .mobile-search-wrap {
-                display: flex;
-                align-items: center;
-                position: relative;
-                margin: 0.5rem 1rem 0.25rem 1rem;
-                z-index: 400;
+                display: none !important;
+            }
+
+            .mobile-search-wrap.active {
+                display: flex !important;
+                align-items: center !important;
+                position: absolute !important;
+                top: 66px !important;
+                left: 12px !important;
+                right: 12px !important;
+                z-index: 10000 !important;
+                margin: 0 !important;
+                background: var(--surface-color) !important;
+                border-radius: 14px !important;
+                box-shadow: var(--shadow-lg) !important;
+                animation: slideDownMobileSearch 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
             }
 
             .mobile-search-wrap .mobile-search-icon {
@@ -2947,14 +2970,28 @@
                 height: 16px !important;
             }
 
-            /* Responsive Mobile Drawer Close Button */
+            /* Responsive Mobile Drawer Header and Close Button */
+            .mobile-drawer-header {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 1rem 1.25rem 0.5rem 1.25rem !important;
+                border-bottom: 1px solid var(--border-color) !important;
+                flex-shrink: 0 !important;
+                position: relative !important;
+            }
+
+            .mobile-drawer-header h3 {
+                font-size: 1.05rem !important;
+                font-weight: 700 !important;
+                color: var(--text-primary) !important;
+                margin: 0 !important;
+            }
+
             .mobile-drawer-close-btn {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                position: absolute !important;
-                top: 10px !important;
-                right: 14px !important;
                 width: 28px !important;
                 height: 28px !important;
                 border-radius: 50% !important;
@@ -2962,7 +2999,6 @@
                 border: 1px solid var(--border-color) !important;
                 color: var(--text-primary) !important;
                 cursor: pointer !important;
-                z-index: 10000 !important;
                 padding: 0 !important;
                 box-shadow: var(--shadow) !important;
                 transition: opacity 0.2s ease !important;
@@ -3204,6 +3240,8 @@
         function switchTab(tabId) {
             // Close mobile menu if open
             toggleMobileMenu(false);
+            const searchWrap = document.getElementById('mobile-search-wrap');
+            if (searchWrap) searchWrap.classList.remove('active');
 
             if (tabId !== 'swift-assistant') {
                 lastActiveTabId = tabId;
@@ -3315,6 +3353,17 @@
                 document.body.style.overflow = '';
             }
         }
+
+        function toggleMobileSearch() {
+            const searchWrap = document.getElementById('mobile-search-wrap');
+            if (searchWrap) {
+                const isActive = searchWrap.classList.toggle('active');
+                if (isActive) {
+                    const input = document.getElementById('mobile-search-input');
+                    if (input) input.focus();
+                }
+            }
+        }
     </script>
 </head>
 
@@ -3328,7 +3377,10 @@
 
     <header>
         <div class="container header-content">
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button id="mobile-search-toggle-btn" class="icon-btn mobile-only-btn" onclick="toggleMobileSearch()" title="Search Tools">
+                    <i data-lucide="search"></i>
+                </button>
                 <div class="logo">
                     <img src="logo.png" alt="Swift File" class="logo-img">
                     <span>Swift File Tools</span>
@@ -3367,9 +3419,12 @@
             <!-- Resizable Left Sidebar Panel -->
             <div class="app-sidebar-panel" id="app-sidebar-panel">
                 <div class="bottom-drawer-handle" style="width: 40px; height: 4px; background: var(--border-color); border-radius: 2px; margin: 8px auto 0 auto; flex-shrink: 0; display: none;"></div>
-                <button class="mobile-drawer-close-btn" onclick="toggleMobileMenu(false)" title="Close Drawer">
-                    <i data-lucide="x"></i>
-                </button>
+                <div class="mobile-drawer-header">
+                    <h3>All Tools</h3>
+                    <button class="mobile-drawer-close-btn" onclick="toggleMobileMenu(false)" title="Close Drawer">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
                 <section class="hero">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                         <img src="logo.png" alt="Swift File" style="height: 24px; width: 24px; border-radius: 6px;">
