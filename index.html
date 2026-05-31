@@ -2911,33 +2911,107 @@
             .app-main-workspace {
                 width: 100% !important;
                 height: auto !important;
-                min-height: calc(100vh - 60px) !important;
-                padding: 1rem !important;
+                min-height: calc(100vh - 124px) !important;
+                padding: 1rem 1rem 80px 1rem !important; /* bottom padding clears bottom nav */
                 margin-top: 0 !important;
             }
 
-            /* Keep tab buttons list vertical in drawer */
+            /* Grid layout for all tools inside expanded bottom drawer */
             .app-sidebar-panel .converter-tabs {
-                display: flex !important;
-                flex-direction: column !important;
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 12px !important;
+                padding: 1.5rem 1rem !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
-                height: calc(100% - 60px) !important;
-                padding: 1.25rem 1rem !important;
-                gap: 8px !important;
+                height: calc(100% - 40px) !important;
             }
 
             .app-sidebar-panel .tab-btn {
-                width: 100% !important;
-                white-space: nowrap !important;
-                justify-content: flex-start !important;
-                flex-shrink: 0 !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+                padding: 0.85rem 0.5rem !important;
+                font-size: 0.75rem !important;
+                border-radius: 12px !important;
+                border: 1px solid var(--border-color) !important;
+                background: var(--input-bg) !important;
+                height: 80px !important;
+                width: auto !important;
+                gap: 6px !important;
+                white-space: normal !important;
                 display: flex !important;
+                color: var(--text-primary) !important;
             }
 
-            /* Show mobile menu button in header */
-            #mobile-menu-btn {
+            .app-sidebar-panel .tab-btn i {
+                width: 22px !important;
+                height: 22px !important;
+                margin: 0 !important;
+                color: var(--accent-color) !important;
+            }
+
+            .app-sidebar-panel .tab-btn.active {
+                background: var(--accent-color) !important;
+                color: white !important;
+            }
+
+            .app-sidebar-panel .tab-btn.active i {
+                color: white !important;
+            }
+
+            #swift-assistant.mobile-fullscreen {
+                height: calc(100vh - 124px) !important;
+                height: calc(100dvh - 124px) !important;
+            }
+
+            /* Bottom nav styles inside mobile query */
+            .mobile-bottom-nav {
                 display: flex !important;
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 64px !important;
+                background: var(--surface-color) !important;
+                border-top: 1px solid var(--border-color) !important;
+                justify-content: space-around !important;
+                align-items: center !important;
+                z-index: 9997 !important;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05) !important;
+                padding-bottom: env(safe-area-inset-bottom, 0) !important;
+            }
+
+            .mobile-bottom-nav .nav-item {
+                background: none !important;
+                border: none !important;
+                color: var(--text-secondary) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0.65rem !important;
+                font-weight: 600 !important;
+                gap: 4px !important;
+                cursor: pointer !important;
+                flex: 1 !important;
+                height: 100% !important;
+                transition: var(--transition) !important;
+                outline: none !important;
+            }
+
+            .mobile-bottom-nav .nav-item i {
+                width: 20px !important;
+                height: 20px !important;
+            }
+
+            .mobile-bottom-nav .nav-item.active {
+                color: var(--accent-color) !important;
+            }
+
+            .mobile-bottom-nav .nav-item.more-btn {
+                color: var(--accent-color) !important;
             }
         }
 
@@ -3138,9 +3212,15 @@
                 }, 100);
             } else {
                 if (window.innerWidth <= 1024) {
+                    document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             }
+
+            // Sync bottom navigation active class
+            document.querySelectorAll('#mobile-bottom-nav .nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+            });
         }
 
         // Mobile Tool Dropdown Logic removed as requested
@@ -3158,6 +3238,11 @@
             if (backdrop) {
                 backdrop.classList.toggle('visible', open);
             }
+            if (open) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
         }
     </script>
 </head>
@@ -3173,9 +3258,6 @@
     <header>
         <div class="container header-content">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <button id="mobile-menu-btn" class="icon-btn" style="display: none;" title="Open Menu">
-                    <i data-lucide="menu"></i>
-                </button>
                 <div class="logo">
                     <img src="logo.png" alt="Swift File" class="logo-img">
                     <span>Swift File Tools</span>
@@ -14824,6 +14906,30 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <div class="mobile-bottom-nav" id="mobile-bottom-nav">
+        <button class="nav-item" data-tab="swift-assistant" onclick="switchTab('swift-assistant')">
+            <i data-lucide="message-square"></i>
+            <span>Assistant</span>
+        </button>
+        <button class="nav-item" data-tab="img-to-pdf" onclick="switchTab('img-to-pdf')">
+            <i data-lucide="image"></i>
+            <span>Img to PDF</span>
+        </button>
+        <button class="nav-item" data-tab="pdf-to-img" onclick="switchTab('pdf-to-img')">
+            <i data-lucide="file-text"></i>
+            <span>PDF to Img</span>
+        </button>
+        <button class="nav-item" data-tab="video-compressor" onclick="switchTab('video-compressor')">
+            <i data-lucide="video"></i>
+            <span>Compressor</span>
+        </button>
+        <button class="nav-item more-btn" onclick="toggleMobileMenu(true)">
+            <i data-lucide="chevron-up"></i>
+            <span>More</span>
+        </button>
     </div>
 </body>
 
