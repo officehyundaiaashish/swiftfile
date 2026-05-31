@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#f0f4f8">
+    <meta name="theme-color" content="#ffffff">
     <title>Swift File Tools - PDF & Image Tools</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
@@ -207,7 +207,8 @@
         }
 
         #theme-toggle,
-        #history-btn {
+        #history-btn,
+        #mobile-search-toggle-btn {
             width: 44px;
             height: 44px;
             padding: 0 !important;
@@ -218,7 +219,8 @@
         }
 
         #theme-toggle i,
-        #history-btn i {
+        #history-btn i,
+        #mobile-search-toggle-btn i {
             width: 20px;
             height: 20px;
         }
@@ -264,17 +266,9 @@
         }
 
         @keyframes mobileLogoGradient {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .hero p {
@@ -487,7 +481,6 @@
                 transform: translateY(-8px);
                 opacity: 0;
             }
-
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -785,22 +778,18 @@
                 flex-direction: column !important;
                 gap: 1rem !important;
             }
-
-            .bg-tool-layout>div {
+            .bg-tool-layout > div {
                 width: 100% !important;
             }
-
             .collage-main-preview {
                 height: auto !important;
                 min-height: 300px !important;
             }
-
             #video-preview-box {
                 height: 250px !important;
                 min-height: 250px !important;
                 flex: none !important;
             }
-
             .bg-controls-panel {
                 height: auto !important;
                 overflow-y: visible !important;
@@ -1043,7 +1032,7 @@
             position: fixed;
             bottom: 2rem;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(0);
             background: var(--surface-color);
             backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border-color);
@@ -1051,7 +1040,18 @@
             border-radius: 16px;
             box-shadow: var(--shadow);
             z-index: 100;
-            transition: var(--transition);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.15s ease-out, visibility 0.15s ease-out, transform 0.15s ease-out;
+        }
+
+        .toast.hidden {
+            display: flex !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transform: translateX(-50%) translateY(10px) !important;
         }
 
         .toast-content {
@@ -1142,23 +1142,46 @@
             color: var(--accent-color);
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 1024px) {
             .notification-container {
-                top: auto;
-                bottom: 5rem;
-                right: 1rem;
-                left: 1rem;
-                align-items: center;
+                top: 76px !important;
+                bottom: auto !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
+                align-items: center !important;
+                width: 90% !important;
+                max-width: 400px !important;
+                gap: 6px !important;
             }
 
             .notification {
-                min-width: 0;
-                width: 100%;
-                transform: translateY(150%);
+                min-width: 0 !important;
+                width: 100% !important;
+                padding: 6px 12px !important;
+                border-radius: 8px !important;
+                font-size: 0.775rem !important;
+                gap: 8px !important;
+                transform: translateY(-10px) !important;
+                opacity: 0 !important;
+                transition: opacity 0.1s ease-out, transform 0.1s ease-out !important;
             }
 
             .notification.show {
-                transform: translateY(0);
+                transform: translateY(0) !important;
+                opacity: 1 !important;
+            }
+
+            .notification-icon {
+                width: 24px !important;
+                height: 24px !important;
+                border-radius: 6px !important;
+            }
+
+            .notification-icon i,
+            .notification-icon svg {
+                width: 14px !important;
+                height: 14px !important;
             }
         }
 
@@ -1188,7 +1211,6 @@
         .mobile-drawer-header {
             display: none !important;
         }
-
         .sidebar-backdrop {
             display: none !important;
             position: fixed;
@@ -1203,7 +1225,6 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
-
         .sidebar-backdrop.visible {
             opacity: 1;
             pointer-events: auto;
@@ -1319,7 +1340,7 @@
                 width: 100%;
             }
 
-            .header-content>div:last-child {
+            .header-content > div:last-child {
                 margin-left: auto;
                 z-index: 10;
             }
@@ -1345,7 +1366,8 @@
 
 
             #theme-toggle,
-            #history-btn {
+            #history-btn,
+            #mobile-search-toggle-btn {
                 padding: 0.5rem !important;
                 border-radius: 10px !important;
                 width: 36px !important;
@@ -1353,7 +1375,8 @@
             }
 
             #theme-toggle i,
-            #history-btn i {
+            #history-btn i,
+            #mobile-search-toggle-btn i {
                 width: 18px !important;
                 height: 18px !important;
             }
@@ -2172,7 +2195,7 @@
             display: none !important;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .mobile-only-btn {
                 display: flex !important;
             }
@@ -3030,16 +3053,14 @@
                 width: 100% !important;
                 height: auto !important;
                 min-height: calc(100vh - 124px) !important;
-                padding: 1rem 1rem 80px 1rem !important;
-                /* bottom padding clears bottom nav */
+                padding: 1rem 1rem 80px 1rem !important; /* bottom padding clears bottom nav */
                 margin-top: 0 !important;
             }
 
             /* Grid layout for all tools inside expanded bottom drawer */
             .app-sidebar-panel .converter-tabs {
                 display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important;
-                /* 2-column format */
+                grid-template-columns: repeat(2, 1fr) !important; /* 2-column format */
                 gap: 10px !important;
                 padding: 1.25rem 1rem !important;
                 overflow-y: auto !important;
@@ -3048,8 +3069,7 @@
             }
 
             .app-sidebar-panel .tab-btn {
-                flex-direction: row !important;
-                /* Premium side-by-side style */
+                flex-direction: row !important; /* Premium side-by-side style */
                 align-items: center !important;
                 justify-content: flex-start !important;
                 text-align: left !important;
@@ -3139,6 +3159,36 @@
 
             .mobile-bottom-nav .nav-item.more-btn {
                 color: var(--accent-color) !important;
+            }
+
+            /* Mobile Compact Top Toast */
+            .toast {
+                bottom: auto !important;
+                top: 76px !important;
+                left: 50% !important;
+                transform: translateX(-50%) translateY(0) !important;
+                padding: 6px 12px !important;
+                border-radius: 8px !important;
+                font-size: 0.775rem !important;
+                max-width: 90% !important;
+                width: max-content !important;
+                z-index: 200000 !important;
+                box-shadow: var(--shadow-lg) !important;
+                transition: opacity 0.1s ease-out, visibility 0.1s ease-out, transform 0.1s ease-out !important;
+            }
+            .toast.hidden {
+                display: flex !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+                transform: translateX(-50%) translateY(-10px) !important;
+            }
+            .toast-content {
+                gap: 8px !important;
+            }
+            .toast-content svg, .toast-content i {
+                width: 14px !important;
+                height: 14px !important;
             }
         }
 
@@ -3396,8 +3446,7 @@
     <header>
         <div class="container header-content">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <button id="mobile-search-toggle-btn" class="icon-btn mobile-only-btn" onclick="toggleMobileSearch()"
-                    title="Search Tools">
+                <button id="mobile-search-toggle-btn" class="icon-btn mobile-only-btn" onclick="toggleMobileSearch()" title="Search Tools">
                     <i data-lucide="search"></i>
                 </button>
                 <div class="logo">
@@ -3421,12 +3470,11 @@
         <!-- Mobile Search Bar (visible on mobile only) — shown on top of all tools -->
         <div class="mobile-search-wrap" id="mobile-search-wrap">
             <i data-lucide="search" class="mobile-search-icon"></i>
-            <input type="search" id="mobile-search-input" name="search-query" placeholder="Search tools…"
-                autocomplete="one-time-code" spellcheck="false" data-lpignore="true"
-                data-password-manager-ignore="true">
+            <input type="search" id="mobile-search-input" name="search-query" placeholder="Search tools…" autocomplete="one-time-code"
+                spellcheck="false" data-lpignore="true" data-password-manager-ignore="true">
             <button class="mobile-search-clear" id="mobile-search-clear" aria-label="Clear search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                    stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -3438,9 +3486,7 @@
         <div class="app-layout-wrapper">
             <!-- Resizable Left Sidebar Panel -->
             <div class="app-sidebar-panel" id="app-sidebar-panel">
-                <div class="bottom-drawer-handle"
-                    style="width: 40px; height: 4px; background: var(--border-color); border-radius: 2px; margin: 8px auto 0 auto; flex-shrink: 0; display: none;">
-                </div>
+                <div class="bottom-drawer-handle" style="width: 40px; height: 4px; background: var(--border-color); border-radius: 2px; margin: 8px auto 0 auto; flex-shrink: 0; display: none;"></div>
                 <div class="mobile-drawer-header">
                     <h3>All Tools</h3>
                     <button class="mobile-drawer-close-btn" onclick="toggleMobileMenu(false)" title="Close Drawer">
@@ -3450,7 +3496,8 @@
                 <section class="hero">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                         <img src="logo.png" alt="Swift File" style="height: 24px; width: 24px; border-radius: 6px;">
-                        <h1 class="gradient-animated-title" style="font-size: 1.25rem; font-weight: 800; margin: 0;">
+                        <h1 class="gradient-animated-title"
+                            style="font-size: 1.25rem; font-weight: 800; margin: 0;">
                             Swift File Tools</h1>
                     </div>
                     <p>Convert your documents securely in your browser.</p>
@@ -4671,8 +4718,7 @@
                         <div class="drop-zone" id="video-compress-drop-zone">
                             <input type="file" id="video-compress-input" accept="video/*" hidden>
                             <div class="drop-zone-content">
-                                <div class="icon-wrapper"
-                                    style="background: var(--accent-alpha); color: var(--accent-color); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <div class="icon-wrapper" style="background: var(--accent-alpha); color: var(--accent-color); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
                                     <i data-lucide="video" style="width: 32px; height: 32px;"></i>
                                 </div>
                                 <h3>Compress Videos</h3>
@@ -4686,7 +4732,6 @@
                                 position: relative;
                                 width: 100%;
                             }
-
                             .custom-dropdown-trigger {
                                 width: 100%;
                                 background: var(--input-bg);
@@ -4703,11 +4748,9 @@
                                 transition: var(--transition);
                                 user-select: none;
                             }
-
                             .custom-dropdown-trigger:hover {
                                 border-color: var(--accent-color);
                             }
-
                             .custom-dropdown-options {
                                 position: absolute;
                                 top: calc(100% + 4px);
@@ -4721,11 +4764,9 @@
                                 max-height: 200px;
                                 overflow-y: auto;
                             }
-
                             .custom-dropdown-options.hidden {
                                 display: none;
                             }
-
                             .custom-dropdown-option {
                                 padding: 8px 12px;
                                 font-size: 0.8rem;
@@ -4734,107 +4775,70 @@
                                 cursor: pointer;
                                 transition: background 0.15s;
                             }
-
                             .custom-dropdown-option:hover {
                                 background: var(--accent-alpha);
                                 color: var(--accent-color);
                             }
-
                             .custom-dropdown-option.selected {
                                 background: var(--accent-color);
                                 color: white;
                             }
                         </style>
 
-                        <div id="video-compress-preview-container" class="preview-container hidden"
-                            style="height: 100%; display: flex; flex-direction: column; min-height: 0; padding: 0.5rem 0;">
-                            <div class="preview-header"
-                                style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.75rem; flex-shrink: 0;">
-                                <span id="video-compress-filename"
-                                    style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary);">video.mp4</span>
-                                <button id="clear-video-compress" class="text-btn danger"
-                                    style="background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Clear
-                                    Video</button>
+                        <div id="video-compress-preview-container" class="preview-container hidden" style="height: 100%; display: flex; flex-direction: column; min-height: 0; padding: 0.5rem 0;">
+                            <div class="preview-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.75rem; flex-shrink: 0;">
+                                <span id="video-compress-filename" style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary);">video.mp4</span>
+                                <button id="clear-video-compress" class="text-btn danger" style="background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Clear Video</button>
                             </div>
 
-                            <div class="bg-tool-layout"
-                                style="display: grid; grid-template-columns: 1fr 310px; gap: 1.5rem; flex: 1; min-height: 0; height: calc(100% - 40px); align-items: stretch;">
+                            <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 310px; gap: 1.5rem; flex: 1; min-height: 0; height: calc(100% - 40px); align-items: stretch;">
                                 <!-- Left side: Preview Player -->
-                                <div class="collage-main-preview"
-                                    style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 0; height: 100%;">
-                                    <div class="large-preview-box" id="video-preview-box"
-                                        style="position: relative; background: #000; border-radius: 12px; overflow: hidden; flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+                                <div class="collage-main-preview" style="display: flex; flex-direction: column; gap: 0.75rem; min-height: 0; height: 100%;">
+                                    <div class="large-preview-box" id="video-preview-box" style="position: relative; background: #000; border-radius: 12px; overflow: hidden; flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
                                         <!-- Hidden original video element for streaming/rendering -->
-                                        <video id="video-source" style="display: none;" loop crossorigin="anonymous"
-                                            playsinline></video>
-
+                                        <video id="video-source" style="display: none;" loop crossorigin="anonymous" playsinline></video>
+                                        
                                         <!-- Interactive Canvas split-screen visual comparison -->
-                                        <canvas id="video-preview-canvas"
-                                            style="width: 100%; height: 100%; object-fit: contain; display: block; max-height: 100%;"></canvas>
-
+                                        <canvas id="video-preview-canvas" style="width: 100%; height: 100%; object-fit: contain; display: block; max-height: 100%;"></canvas>
+                                        
                                         <!-- Overlay comparison slider handle -->
-                                        <div id="video-comparison-slider"
-                                            style="position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor: ew-resize; z-index: 10; transform: translateX(-50%); transition: background 0.2s;">
-                                            <div
-                                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.25); color: #1e293b; font-size: 0.85rem; font-weight: 700; user-select: none;">
+                                        <div id="video-comparison-slider" style="position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor: ew-resize; z-index: 10; transform: translateX(-50%); transition: background 0.2s;">
+                                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.25); color: #1e293b; font-size: 0.85rem; font-weight: 700; user-select: none;">
                                                 ↔
                                             </div>
                                         </div>
 
                                         <!-- Badge labels for Original vs Compressed -->
-                                        <span
-                                            style="position: absolute; top: 10px; left: 10px; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 600; z-index: 5; pointer-events: none; border: 1px solid rgba(255,255,255,0.15);">Original</span>
-                                        <span
-                                            style="position: absolute; top: 10px; right: 10px; background: var(--accent-color); color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 600; z-index: 5; pointer-events: none; box-shadow: 0 2px 6px var(--accent-shadow);">Compressed
-                                            Preview</span>
+                                        <span style="position: absolute; top: 10px; left: 10px; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 600; z-index: 5; pointer-events: none; border: 1px solid rgba(255,255,255,0.15);">Original</span>
+                                        <span style="position: absolute; top: 10px; right: 10px; background: var(--accent-color); color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 600; z-index: 5; pointer-events: none; box-shadow: 0 2px 6px var(--accent-shadow);">Compressed Preview</span>
                                     </div>
 
                                     <!-- Premium Custom Player Controls -->
-                                    <div class="video-custom-controls"
-                                        style="background: var(--input-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); flex-shrink: 0;">
+                                    <div class="video-custom-controls" style="background: var(--input-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); flex-shrink: 0;">
                                         <!-- Timeline Slider -->
                                         <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
-                                            <span id="video-current-time"
-                                                style="font-size: 0.7rem; font-family: monospace; color: var(--text-secondary); min-width: 35px;">0:00</span>
-                                            <input type="range" id="video-timeline" min="0" max="100" value="0"
-                                                step="0.05"
-                                                style="flex: 1; height: 5px; background: var(--border-color); border-radius: 3px; appearance: none; outline: none; cursor: pointer; transition: background 0.2s;">
-                                            <span id="video-duration"
-                                                style="font-size: 0.7rem; font-family: monospace; color: var(--text-secondary); min-width: 35px;">0:00</span>
+                                            <span id="video-current-time" style="font-size: 0.7rem; font-family: monospace; color: var(--text-secondary); min-width: 35px;">0:00</span>
+                                            <input type="range" id="video-timeline" min="0" max="100" value="0" step="0.05" style="flex: 1; height: 5px; background: var(--border-color); border-radius: 3px; appearance: none; outline: none; cursor: pointer; transition: background 0.2s;">
+                                            <span id="video-duration" style="font-size: 0.7rem; font-family: monospace; color: var(--text-secondary); min-width: 35px;">0:00</span>
                                         </div>
 
                                         <!-- Buttons Row -->
-                                        <div
-                                            style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
                                             <div style="display: flex; align-items: center; gap: 6px;">
-                                                <button id="video-btn-play" class="icon-btn"
-                                                    style="width: 34px; height: 34px; border-radius: 8px; padding: 0;"
-                                                    title="Play/Pause">
+                                                <button id="video-btn-play" class="icon-btn" style="width: 34px; height: 34px; border-radius: 8px; padding: 0;" title="Play/Pause">
                                                     <i data-lucide="play" style="width: 16px; height: 16px;"></i>
                                                 </button>
-                                                <button id="video-btn-step-back" class="icon-btn"
-                                                    style="width: 34px; height: 34px; border-radius: 8px; padding: 0;"
-                                                    title="Step Back 5s">
-                                                    <i data-lucide="chevrons-left"
-                                                        style="width: 16px; height: 16px;"></i>
+                                                <button id="video-btn-step-back" class="icon-btn" style="width: 34px; height: 34px; border-radius: 8px; padding: 0;" title="Step Back 5s">
+                                                    <i data-lucide="chevrons-left" style="width: 16px; height: 16px;"></i>
                                                 </button>
-                                                <button id="video-btn-step-prev-frame" class="icon-btn"
-                                                    style="width: 34px; height: 34px; border-radius: 8px; padding: 0;"
-                                                    title="Previous Frame">
-                                                    <i data-lucide="chevron-left"
-                                                        style="width: 16px; height: 16px;"></i>
+                                                <button id="video-btn-step-prev-frame" class="icon-btn" style="width: 34px; height: 34px; border-radius: 8px; padding: 0;" title="Previous Frame">
+                                                    <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
                                                 </button>
-                                                <button id="video-btn-step-next-frame" class="icon-btn"
-                                                    style="width: 34px; height: 34px; border-radius: 8px; padding: 0;"
-                                                    title="Next Frame">
-                                                    <i data-lucide="chevron-right"
-                                                        style="width: 16px; height: 16px;"></i>
+                                                <button id="video-btn-step-next-frame" class="icon-btn" style="width: 34px; height: 34px; border-radius: 8px; padding: 0;" title="Next Frame">
+                                                    <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
                                                 </button>
-                                                <button id="video-btn-step-forward" class="icon-btn"
-                                                    style="width: 34px; height: 34px; border-radius: 8px; padding: 0;"
-                                                    title="Step Forward 5s">
-                                                    <i data-lucide="chevrons-right"
-                                                        style="width: 16px; height: 16px;"></i>
+                                                <button id="video-btn-step-forward" class="icon-btn" style="width: 34px; height: 34px; border-radius: 8px; padding: 0;" title="Step Forward 5s">
+                                                    <i data-lucide="chevrons-right" style="width: 16px; height: 16px;"></i>
                                                 </button>
                                             </div>
 
@@ -4842,31 +4846,21 @@
                                                 <!-- Speed control custom dropdown -->
                                                 <div class="custom-dropdown" id="dropdown-speed" style="width: 100px;">
                                                     <input type="hidden" id="video-speed" value="1.0">
-                                                    <div class="custom-dropdown-trigger"
-                                                        style="height: 34px; padding: 4px 8px; border-radius: 8px;">
+                                                    <div class="custom-dropdown-trigger" style="height: 34px; padding: 4px 8px; border-radius: 8px;">
                                                         <span class="custom-dropdown-value">1.0x Speed</span>
-                                                        <i data-lucide="chevron-down"
-                                                            style="width: 12px; height: 12px;"></i>
+                                                        <i data-lucide="chevron-down" style="width: 12px; height: 12px;"></i>
                                                     </div>
-                                                    <div class="custom-dropdown-options hidden"
-                                                        style="bottom: 100%; top: auto; margin-bottom: 4px; border-radius: 8px;">
-                                                        <div class="custom-dropdown-option" data-value="0.25">0.25x
-                                                            Speed</div>
-                                                        <div class="custom-dropdown-option" data-value="0.5">0.5x Speed
-                                                        </div>
-                                                        <div class="custom-dropdown-option selected" data-value="1.0">
-                                                            1.0x Speed</div>
-                                                        <div class="custom-dropdown-option" data-value="1.5">1.5x Speed
-                                                        </div>
-                                                        <div class="custom-dropdown-option" data-value="2.0">2.0x Speed
-                                                        </div>
+                                                    <div class="custom-dropdown-options hidden" style="bottom: 100%; top: auto; margin-bottom: 4px; border-radius: 8px;">
+                                                        <div class="custom-dropdown-option" data-value="0.25">0.25x Speed</div>
+                                                        <div class="custom-dropdown-option" data-value="0.5">0.5x Speed</div>
+                                                        <div class="custom-dropdown-option selected" data-value="1.0">1.0x Speed</div>
+                                                        <div class="custom-dropdown-option" data-value="1.5">1.5x Speed</div>
+                                                        <div class="custom-dropdown-option" data-value="2.0">2.0x Speed</div>
                                                     </div>
                                                 </div>
 
                                                 <!-- Mute/Volume -->
-                                                <button id="video-btn-mute" class="icon-btn"
-                                                    style="width: 34px; height: 34px; border-radius: 8px; padding: 0;"
-                                                    title="Mute/Unmute">
+                                                <button id="video-btn-mute" class="icon-btn" style="width: 34px; height: 34px; border-radius: 8px; padding: 0;" title="Mute/Unmute">
                                                     <i data-lucide="volume-2" style="width: 16px; height: 16px;"></i>
                                                 </button>
                                             </div>
@@ -4875,12 +4869,9 @@
                                 </div>
 
                                 <!-- Right side: Settings Panel -->
-                                <div class="bg-controls-panel"
-                                    style="background: var(--surface-color); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1rem; box-shadow: var(--shadow); height: 100%; overflow-y: auto; margin: 0;">
+                                <div class="bg-controls-panel" style="background: var(--surface-color); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1rem; box-shadow: var(--shadow); height: 100%; overflow-y: auto; margin: 0;">
                                     <div class="control-group">
-                                        <label
-                                            style="display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Resolution
-                                            Preset</label>
+                                        <label style="display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Resolution Preset</label>
                                         <div class="custom-dropdown" id="dropdown-resolution">
                                             <input type="hidden" id="video-compress-resolution" value="original">
                                             <div class="custom-dropdown-trigger">
@@ -4888,8 +4879,7 @@
                                                 <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
                                             </div>
                                             <div class="custom-dropdown-options hidden">
-                                                <div class="custom-dropdown-option selected" data-value="original">Keep
-                                                    Original Resolution</div>
+                                                <div class="custom-dropdown-option selected" data-value="original">Keep Original Resolution</div>
                                                 <div class="custom-dropdown-option" data-value="1080">1080p (FHD)</div>
                                                 <div class="custom-dropdown-option" data-value="720">720p (HD)</div>
                                                 <div class="custom-dropdown-option" data-value="480">480p (SD)</div>
@@ -4899,24 +4889,15 @@
                                     </div>
 
                                     <div class="control-group">
-                                        <div
-                                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                            <label
-                                                style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Compression
-                                                Level</label>
-                                            <span id="video-compress-quality-badge"
-                                                style="background: var(--accent-color); color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 700;">30%
-                                                (Medium Compression)</span>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                            <label style="font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Compression Level</label>
+                                            <span id="video-compress-quality-badge" style="background: var(--accent-color); color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 700;">30% (Medium Compression)</span>
                                         </div>
-                                        <input type="range" id="video-compress-quality-slider" min="0" max="90" step="5"
-                                            value="30"
-                                            style="width: 100%; height: 5px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+                                        <input type="range" id="video-compress-quality-slider" min="0" max="90" step="5" value="30" style="width: 100%; height: 5px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
                                     </div>
 
                                     <div class="control-group">
-                                        <label
-                                            style="display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Target
-                                            Format</label>
+                                        <label style="display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Target Format</label>
                                         <div class="custom-dropdown" id="dropdown-format">
                                             <input type="hidden" id="video-compress-format" value="webm">
                                             <div class="custom-dropdown-trigger">
@@ -4924,63 +4905,40 @@
                                                 <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
                                             </div>
                                             <div class="custom-dropdown-options hidden">
-                                                <div class="custom-dropdown-option selected" data-value="webm">WebM
-                                                    (Recommended)</div>
-                                                <div class="custom-dropdown-option" data-value="mp4">MP4 (Browser
-                                                    Native)</div>
+                                                <div class="custom-dropdown-option selected" data-value="webm">WebM (Recommended)</div>
+                                                <div class="custom-dropdown-option" data-value="mp4">MP4 (Browser Native)</div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="control-group"
-                                        style="margin-top: 0.25rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                                    <div class="control-group" style="margin-top: 0.25rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
                                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                                            <div
-                                                style="background: rgba(0, 0, 0, 0.01); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid var(--border-color);">
-                                                <div
-                                                    style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 2px;">
-                                                    Original Size</div>
-                                                <div id="video-compress-orig-size"
-                                                    style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">
-                                                    0.0 MB</div>
+                                            <div style="background: rgba(0, 0, 0, 0.01); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid var(--border-color);">
+                                                <div style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 2px;">Original Size</div>
+                                                <div id="video-compress-orig-size" style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">0.0 MB</div>
                                             </div>
-                                            <div
-                                                style="background: var(--accent-alpha); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid var(--accent-border-alpha);">
-                                                <div
-                                                    style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 2px;">
-                                                    Estimated Size</div>
-                                                <div id="video-compress-est-size"
-                                                    style="font-weight: 700; font-size: 0.85rem; color: var(--accent-color);">
-                                                    0.0 MB</div>
+                                            <div style="background: var(--accent-alpha); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid var(--accent-border-alpha);">
+                                                <div style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 2px;">Estimated Size</div>
+                                                <div id="video-compress-est-size" style="font-weight: 700; font-size: 0.85rem; color: var(--accent-color);">0.0 MB</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Progress indicator -->
-                                    <div id="video-compress-progress-container" class="hidden"
-                                        style="margin-top: 0.25rem; padding: 10px; background: var(--input-bg); border-radius: 10px; border: 1px dashed var(--border-color);">
-                                        <div
-                                            style="display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 600; margin-bottom: 4px;">
+                                    <div id="video-compress-progress-container" class="hidden" style="margin-top: 0.25rem; padding: 10px; background: var(--input-bg); border-radius: 10px; border: 1px dashed var(--border-color);">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 600; margin-bottom: 4px;">
                                             <span>Compressing Video...</span>
                                             <span id="video-compress-pct">0%</span>
                                         </div>
-                                        <div
-                                            style="width: 100%; height: 5px; background: var(--border-color); border-radius: 3px; overflow: hidden;">
-                                            <div id="video-compress-progress-bar"
-                                                style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.05s linear;">
-                                            </div>
+                                        <div style="width: 100%; height: 5px; background: var(--border-color); border-radius: 3px; overflow: hidden;">
+                                            <div id="video-compress-progress-bar" style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.05s linear;"></div>
                                         </div>
-                                        <div id="video-compress-eta"
-                                            style="font-size: 0.6rem; color: var(--text-secondary); text-align: right; margin-top: 4px; font-weight: 500;">
-                                            Remaining: Calculating...</div>
+                                        <div id="video-compress-eta" style="font-size: 0.6rem; color: var(--text-secondary); text-align: right; margin-top: 4px; font-weight: 500;">Remaining: Calculating...</div>
                                     </div>
 
                                     <div style="margin-top: auto; padding-top: 0.5rem;">
-                                        <button id="video-compress-btn" class="primary-btn btn-download-success"
-                                            style="width: 100%; justify-content: center; border-radius: 10px; height: 38px; font-weight: 700; font-size: 0.85rem; margin: 0;">
-                                            <i data-lucide="zap"
-                                                style="width: 14px; height: 14px; margin-right: 4px;"></i> Compress &
-                                            Download
+                                        <button id="video-compress-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center; border-radius: 10px; height: 38px; font-weight: 700; font-size: 0.85rem; margin: 0;">
+                                            <i data-lucide="zap" style="width: 14px; height: 14px; margin-right: 4px;"></i> Compress & Download
                                         </button>
                                     </div>
                                 </div>
@@ -5150,11 +5108,9 @@
                                     <!-- Default Welcome Message -->
                                     <div class="assistant-chat-bubble system"
                                         style="background: rgba(128,128,128,0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; align-self: center; width: 100%;">
-                                        <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am
-                                            Swift your AI Assistant.
-                                            I can help write professional emails, answer questions, explain concepts,
-                                            edit drafts, and write codes.
-                                            Configure your API key to get started.</p>
+                                        <p style="font-size: 0.9rem; margin-bottom: 0; text-align: center;">Hello! I am Swift your AI Assistant.
+I can help write professional emails, answer questions, explain concepts, edit drafts, and write codes.
+Configure your API key to get started.</p>
                                     </div>
 
                                     <!-- Special Remarks Output Workspace -->
@@ -5185,22 +5141,16 @@
                                         <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
                                             <!-- Remark 1 -->
                                             <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
-                                                <div
-                                                    style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                                    <span
-                                                        style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600;">Remark
-                                                        1 (Defect Description)</span>
-                                                    <span id="remark-count-1"
-                                                        style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">0
-                                                        / 80-90 chars</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                    <span style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600;">Remark 1 (Defect Description)</span>
+                                                    <span id="remark-count-1" style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">0 / 80-90 chars</span>
                                                 </div>
                                                 <div style="display: flex; gap: 6px; align-items: center; width: 100%;">
                                                     <textarea id="remark-field-1" readonly
                                                         placeholder="Awaiting generation..."
                                                         style="flex: 1; height: 34px; font-size: 0.8rem; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); padding: 6px 10px; resize: none; outline: none; font-family: inherit; line-height: 1.3; overflow-y: hidden;"></textarea>
                                                     <button class="remark-copy-btn" onclick="copyRemarkField(1)"
-                                                        title="Copy Remark 1"
-                                                        style="height: 34px; width: 34px; min-width: 34px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                                        title="Copy Remark 1" style="height: 34px; width: 34px; min-width: 34px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
                                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                             stroke-width="2" stroke-linecap="round"
@@ -5214,22 +5164,16 @@
                                             </div>
                                             <!-- Remark 2 -->
                                             <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
-                                                <div
-                                                    style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                                    <span
-                                                        style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600;">Remark
-                                                        2 (Customer Complaint)</span>
-                                                    <span id="remark-count-2"
-                                                        style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">0
-                                                        / 30-40 chars</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                    <span style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600;">Remark 2 (Customer Complaint)</span>
+                                                    <span id="remark-count-2" style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">0 / 30-40 chars</span>
                                                 </div>
                                                 <div style="display: flex; gap: 6px; align-items: center; width: 100%;">
                                                     <textarea id="remark-field-2" readonly
                                                         placeholder="Awaiting generation..."
                                                         style="flex: 1; height: 34px; font-size: 0.8rem; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); padding: 6px 10px; resize: none; outline: none; font-family: inherit; line-height: 1.3; overflow-y: hidden;"></textarea>
                                                     <button class="remark-copy-btn" onclick="copyRemarkField(2)"
-                                                        title="Copy Remark 2"
-                                                        style="height: 34px; width: 34px; min-width: 34px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                                        title="Copy Remark 2" style="height: 34px; width: 34px; min-width: 34px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
                                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                             stroke-width="2" stroke-linecap="round"
@@ -5243,22 +5187,16 @@
                                             </div>
                                             <!-- Remark 3 -->
                                             <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
-                                                <div
-                                                    style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                                    <span
-                                                        style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600;">Remark
-                                                        3 (Defective Confirmation)</span>
-                                                    <span id="remark-count-3"
-                                                        style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">0
-                                                        / 30-40 chars</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                    <span style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600;">Remark 3 (Defective Confirmation)</span>
+                                                    <span id="remark-count-3" style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">0 / 30-40 chars</span>
                                                 </div>
                                                 <div style="display: flex; gap: 6px; align-items: center; width: 100%;">
                                                     <textarea id="remark-field-3" readonly
                                                         placeholder="Awaiting generation..."
                                                         style="flex: 1; height: 34px; font-size: 0.8rem; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); padding: 6px 10px; resize: none; outline: none; font-family: inherit; line-height: 1.3; overflow-y: hidden;"></textarea>
                                                     <button class="remark-copy-btn" onclick="copyRemarkField(3)"
-                                                        title="Copy Remark 3"
-                                                        style="height: 34px; width: 34px; min-width: 34px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                                        title="Copy Remark 3" style="height: 34px; width: 34px; min-width: 34px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
                                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                             stroke-width="2" stroke-linecap="round"
@@ -5272,22 +5210,16 @@
                                             </div>
                                             <!-- Remark 4 -->
                                             <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
-                                                <div
-                                                    style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                                    <span
-                                                        style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600;">Remark
-                                                        4 (Corrective Action)</span>
-                                                    <span id="remark-count-4"
-                                                        style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">0
-                                                        / 30-40 chars</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                    <span style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600;">Remark 4 (Corrective Action)</span>
+                                                    <span id="remark-count-4" style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">0 / 30-40 chars</span>
                                                 </div>
                                                 <div style="display: flex; gap: 6px; align-items: center; width: 100%;">
                                                     <textarea id="remark-field-4" readonly
                                                         placeholder="Awaiting generation..."
                                                         style="flex: 1; height: 34px; font-size: 0.8rem; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); padding: 6px 10px; resize: none; outline: none; font-family: inherit; line-height: 1.3; overflow-y: hidden;"></textarea>
                                                     <button class="remark-copy-btn" onclick="copyRemarkField(4)"
-                                                        title="Copy Remark 4"
-                                                        style="height: 34px; width: 34px; min-width: 34px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                                        title="Copy Remark 4" style="height: 34px; width: 34px; min-width: 34px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
                                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                             stroke-width="2" stroke-linecap="round"
@@ -5432,7 +5364,7 @@
                 meta.setAttribute('name', 'theme-color');
                 document.head.appendChild(meta);
             }
-            meta.setAttribute('content', isDark ? '#0b1120' : '#f0f4f8');
+            meta.setAttribute('content', isDark ? '#1e293b' : '#ffffff');
         }
 
         // Load saved theme immediately
@@ -11866,7 +11798,7 @@
                 titleRow.style.color = '#ef4444';
                 titleRow.style.fontWeight = '700';
                 titleRow.style.fontSize = '1.05rem';
-
+                
                 titleRow.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     <span>${title}</span>
@@ -13821,34 +13753,34 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
         const videoCompressPreviewContainer = document.getElementById('video-compress-preview-container');
         const videoCompressFilename = document.getElementById('video-compress-filename');
         const clearVideoCompressBtn = document.getElementById('clear-video-compress');
-
+        
         const videoSource = document.getElementById('video-source');
         const videoPreviewCanvas = document.getElementById('video-preview-canvas');
         const videoComparisonSlider = document.getElementById('video-comparison-slider');
         const videoPreviewBox = document.getElementById('video-preview-box');
         const ctx = videoPreviewCanvas.getContext('2d');
-
+        
         const videoCurrentTimeText = document.getElementById('video-current-time');
         const videoDurationText = document.getElementById('video-duration');
         const videoTimeline = document.getElementById('video-timeline');
-
+        
         const videoBtnPlay = document.getElementById('video-btn-play');
         const videoBtnStepBack = document.getElementById('video-btn-step-back');
         const videoBtnStepPrevFrame = document.getElementById('video-btn-step-prev-frame');
         const videoBtnStepNextFrame = document.getElementById('video-btn-step-next-frame');
         const videoBtnStepForward = document.getElementById('video-btn-step-forward');
-
+        
         const videoBtnMute = document.getElementById('video-btn-mute');
         const videoSpeed = document.getElementById('video-speed');
-
+        
         const videoCompressResolution = document.getElementById('video-compress-resolution');
         const videoCompressQualitySlider = document.getElementById('video-compress-quality-slider');
         const videoCompressQualityBadge = document.getElementById('video-compress-quality-badge');
         const videoCompressFormat = document.getElementById('video-compress-format');
-
+        
         const videoCompressOrigSizeText = document.getElementById('video-compress-orig-size');
         const videoCompressEstSizeText = document.getElementById('video-compress-est-size');
-
+        
         const videoCompressProgressContainer = document.getElementById('video-compress-progress-container');
         const videoCompressProgressBar = document.getElementById('video-compress-progress-bar');
         const videoCompressPct = document.getElementById('video-compress-pct');
@@ -13941,7 +13873,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             const aspectRatio = origW / origH;
             let targetWidth = Math.round(targetHeight * aspectRatio);
             // Dimensions must be divisible by 2 for many codecs
-            targetWidth = targetWidth + (targetWidth % 2);
+            targetWidth = targetWidth + (targetWidth % 2); 
             return { w: targetWidth, h: targetHeight };
         }
 
@@ -13950,27 +13882,27 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             if (!videoFile) return;
             const duration = videoSource.duration || 0;
             const compressionPercent = parseInt(videoCompressQualitySlider.value);
-
+            
             // Calculate original bitrate
             const origBitrateKbps = duration ? Math.floor((videoFile.size * 8) / (duration * 1000)) : 2500;
-
+            
             // Target bitrate is original bitrate reduced by the compression percentage
             const targetBitrateKbps = Math.max(150, Math.round(origBitrateKbps * (1 - compressionPercent / 100)));
-
+            
             let qLabel = "Original / No Compression";
             if (compressionPercent > 0) {
                 if (compressionPercent < 30) qLabel = "Low Compression";
                 else if (compressionPercent < 60) qLabel = "Medium Compression";
                 else qLabel = "High Compression";
             }
-
-            videoCompressQualityBadge.textContent = compressionPercent === 0
-                ? `${qLabel}`
+            
+            videoCompressQualityBadge.textContent = compressionPercent === 0 
+                ? `${qLabel}` 
                 : `${compressionPercent}% (${qLabel} - ${targetBitrateKbps} kbps)`;
 
             const audioBitrateKbps = videoSource.muted ? 0 : 128;
             const totalBitrateKbps = targetBitrateKbps + audioBitrateKbps;
-
+            
             let estimatedBytes;
             if (compressionPercent === 0) {
                 estimatedBytes = videoFile.size;
@@ -13978,7 +13910,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 const sizeInBytes = (totalBitrateKbps * 1024 * duration) / 8;
                 estimatedBytes = Math.min(videoFile.size, sizeInBytes * 1.05); // cap at original size
             }
-
+            
             videoCompressEstSizeText.textContent = formatBytes(estimatedBytes);
         }
 
@@ -14014,11 +13946,11 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             videoFile = file;
             videoCompressFilename.textContent = file.name;
             videoCompressOrigSizeText.textContent = formatBytes(file.size);
-
+            
             const fileUrl = URL.createObjectURL(file);
             videoSource.src = fileUrl;
             videoSource.load();
-
+            
             videoCompressDropZone.classList.add('hidden');
             videoCompressPreviewContainer.classList.remove('hidden');
             notify('Video loaded successfully.', 'success');
@@ -14070,7 +14002,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
             const w = videoSource.videoWidth;
             const h = videoSource.videoHeight;
-
+            
             if (videoPreviewCanvas.width !== w || videoPreviewCanvas.height !== h) {
                 videoPreviewCanvas.width = w;
                 videoPreviewCanvas.height = h;
@@ -14094,10 +14026,10 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             // Render to small offscreen canvas to simulate target resolution downscale
             offscreenCanvas.width = targetDim.w;
             offscreenCanvas.height = targetDim.h;
-
+            
             // Draw original frame to offscreen
             offCtx.drawImage(videoSource, 0, 0, targetDim.w, targetDim.h);
-
+            
             // Draw offscreen back to main canvas (stretching shows downscaled look)
             ctx.imageSmoothingEnabled = true;
             ctx.drawImage(offscreenCanvas, 0, 0, w, h);
@@ -14119,20 +14051,20 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             videoDurationText.textContent = formatDuration(videoSource.duration);
             videoTimeline.max = videoSource.duration;
             videoTimeline.value = 0;
-
+            
             // Set dynamic aspect ratio to avoid letterbox discrepancy and perfectly align the sliding divider line
             if (videoSource.videoWidth && videoSource.videoHeight) {
                 const aspect = videoSource.videoWidth / videoSource.videoHeight;
                 videoPreviewBox.style.aspectRatio = aspect;
             }
-
+            
             // Quality slider represents compression level percentage (0 to 90)
             videoCompressQualitySlider.min = 0;
             videoCompressQualitySlider.max = 90;
             videoCompressQualitySlider.value = 30; // default 30% compression
-
+            
             updateVideoEstimations();
-
+            
             // Render first frame
             setTimeout(renderComparisonFrame, 150);
         });
@@ -14154,7 +14086,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
         // Start/Stop canvas rendering loop
         function startPlaybackRenderLoop() {
             if (renderLoopId) cancelAnimationFrame(renderLoopId);
-
+            
             const loop = () => {
                 if (!videoSource.paused && !videoSource.ended) {
                     renderComparisonFrame();
@@ -14187,8 +14119,8 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
         videoBtnMute.addEventListener('click', () => {
             videoSource.muted = !videoSource.muted;
-            videoBtnMute.innerHTML = videoSource.muted
-                ? '<i data-lucide="volume-x" style="width: 18px; height: 18px;"></i>'
+            videoBtnMute.innerHTML = videoSource.muted 
+                ? '<i data-lucide="volume-x" style="width: 18px; height: 18px;"></i>' 
                 : '<i data-lucide="volume-2" style="width: 18px; height: 18px;"></i>';
             lucide.createIcons({ root: videoBtnMute });
             updateVideoEstimations();
@@ -14296,7 +14228,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                     if (compressionAudioSource) {
                         compressionAudioSource.connect(compressionAudioCtx.destination);
                     }
-                } catch (e) { }
+                } catch(e) {}
             }
 
             // Recorder options
@@ -14313,7 +14245,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             };
 
             const chunks = [];
-
+            
             try {
                 compressionRecorder = new MediaRecorder(combinedStream, recorderOptions);
             } catch (e) {
@@ -14338,7 +14270,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
                 const blob = new Blob(chunks, { type: mimeType });
                 const blobUrl = URL.createObjectURL(blob);
-
+                
                 // Trigger Download
                 const a = document.createElement('a');
                 const ext = targetFormat === 'mp4' ? 'mp4' : 'webm';
@@ -14347,7 +14279,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-
+                
                 notify(`Video compressed to ${formatBytes(blob.size)} successfully!`, 'success');
                 videoCompressProgressContainer.classList.add('hidden');
                 videoSource.playbackRate = 1.0;
@@ -14367,11 +14299,11 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 if (!isCompressing) return;
 
                 compCtx.drawImage(videoSource, 0, 0, targetDim.w, targetDim.h);
-
+                
                 // Update Progress UI
                 const progress = videoSource.currentTime / videoSource.duration;
                 const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
-
+                
                 videoCompressProgressBar.style.width = `${pct}%`;
                 videoCompressPct.textContent = `${pct}%`;
 
@@ -14398,7 +14330,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
         // Toggle visibility and redraw layout when switching tabs
         const originalSwitchTab = window.switchTab;
-        window.switchTab = function (tabId) {
+        window.switchTab = function(tabId) {
             if (originalSwitchTab) originalSwitchTab(tabId);
             if (tabId === 'video-compressor') {
                 setTimeout(() => {
