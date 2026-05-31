@@ -1204,6 +1204,7 @@
 
             /* Sidebar Backdrop Overlay */
             .sidebar-backdrop {
+                display: none;
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -1219,6 +1220,10 @@
             .sidebar-backdrop.visible {
                 opacity: 1;
                 pointer-events: auto;
+            }
+
+            .mobile-bottom-nav {
+                display: none;
             }
 
             .mobile-tool-selector {
@@ -2827,6 +2832,10 @@
         }
 
         @media (max-width: 1024px) {
+            .sidebar-backdrop {
+                display: block !important;
+            }
+
             header {
                 position: fixed !important;
                 top: 0 !important;
@@ -14934,9 +14943,9 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             <i data-lucide="file-text"></i>
             <span>PDF to Img</span>
         </button>
-        <button class="nav-item" data-tab="video-compressor" onclick="switchTab('video-compressor')">
-            <i data-lucide="video"></i>
-            <span>Compressor</span>
+        <button class="nav-item" data-tab="merge-pdf" onclick="switchTab('merge-pdf')">
+            <i data-lucide="copy"></i>
+            <span>Merge PDF</span>
         </button>
         <button class="nav-item more-btn" onclick="toggleMobileMenu(true)">
             <i data-lucide="chevron-up"></i>
