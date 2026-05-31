@@ -41,6 +41,12 @@ class handler(BaseHTTPRequestHandler):
             'no_warnings': True,
             'skip_download': True,
             'cachedir': False,
+            'nocheckcertificate': True,
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'ios']
+                }
+            }
         }
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -108,6 +114,12 @@ class handler(BaseHTTPRequestHandler):
             'quiet': True,
             'no_warnings': True,
             'cachedir': False,
+            'nocheckcertificate': True,
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'ios']
+                }
+            }
         }
         if format_id:
             ydl_opts['format'] = format_id
@@ -184,4 +196,7 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode('utf-8'))
 
     def send_error_response(self, status, message):
-        self.send_json_response(status, {'error': message})
+        # Return 200 OK so Vercel doesn't intercept it with a default HTML 500 error page,
+        # but specify the actual internal status code and error message in the JSON body.
+        self.send_json_response(200, {'error': message, 'status': status})
+
