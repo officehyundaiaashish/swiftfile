@@ -4505,10 +4505,18 @@ Configure your API key to get started.</p>
                                         <div
                                             style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;">
                                             <div
-                                                style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #10b981; font-size: 0.85rem;">
-                                                <i data-lucide="sparkles"
-                                                    style="width: 14px; height: 14px; color: #10b981;"></i>
-                                                <span>Warranty Remarks Generator Active</span>
+                                                style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 700; color: #10b981; font-size: 0.85rem; width: 100%;">
+                                                <div style="display: flex; align-items: center; gap: 8px;">
+                                                    <i data-lucide="sparkles"
+                                                        style="width: 14px; height: 14px; color: #10b981;"></i>
+                                                    <span>Warranty Remarks Generator Active</span>
+                                                </div>
+                                                <button id="remarks-regenerate-btn" class="secondary-btn"
+                                                    style="padding: 4px 8px; font-size: 0.72rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; border-color: rgba(16, 185, 129, 0.3); color: #10b981; background: rgba(16, 185, 129, 0.05); font-weight: 600; cursor: pointer; margin-bottom: 0;"
+                                                    title="Regenerate Remarks for current Part Name & Nature">
+                                                    <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i>
+                                                    Regenerate
+                                                </button>
                                             </div>
                                             <p
                                                 style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
@@ -4519,9 +4527,10 @@ Configure your API key to get started.</p>
                                         <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
                                             <!-- Remark 1 -->
                                             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
-                                                <span
-                                                    style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark
-                                                    1 (Defect Description)</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                    <span style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark 1 (Defect Description)</span>
+                                                    <span id="remark-count-1" style="font-size: 0.68rem; color: var(--text-secondary); font-weight: 600;">0 / 80-90 chars</span>
+                                                </div>
                                                 <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
                                                     <textarea id="remark-field-1" readonly
                                                         placeholder="Awaiting generation..."
@@ -4541,9 +4550,10 @@ Configure your API key to get started.</p>
                                             </div>
                                             <!-- Remark 2 -->
                                             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
-                                                <span
-                                                    style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark
-                                                    2 (Customer Complaint)</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                    <span style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark 2 (Customer Complaint)</span>
+                                                    <span id="remark-count-2" style="font-size: 0.68rem; color: var(--text-secondary); font-weight: 600;">0 / 30-40 chars</span>
+                                                </div>
                                                 <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
                                                     <textarea id="remark-field-2" readonly
                                                         placeholder="Awaiting generation..."
@@ -4563,9 +4573,10 @@ Configure your API key to get started.</p>
                                             </div>
                                             <!-- Remark 3 -->
                                             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
-                                                <span
-                                                    style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark
-                                                    3 (Defective Confirmation)</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                    <span style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark 3 (Defective Confirmation)</span>
+                                                    <span id="remark-count-3" style="font-size: 0.68rem; color: var(--text-secondary); font-weight: 600;">0 / 30-40 chars</span>
+                                                </div>
                                                 <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
                                                     <textarea id="remark-field-3" readonly
                                                         placeholder="Awaiting generation..."
@@ -4585,9 +4596,10 @@ Configure your API key to get started.</p>
                                             </div>
                                             <!-- Remark 4 -->
                                             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
-                                                <span
-                                                    style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark
-                                                    4 (Corrective Action)</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                    <span style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">Remark 4 (Corrective Action)</span>
+                                                    <span id="remark-count-4" style="font-size: 0.68rem; color: var(--text-secondary); font-weight: 600;">0 / 30-40 chars</span>
+                                                </div>
                                                 <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
                                                     <textarea id="remark-field-4" readonly
                                                         placeholder="Awaiting generation..."
@@ -9582,6 +9594,8 @@ Configure your API key to get started.</p>
         const assistantNewChatBtn = document.getElementById('assistant-new-chat-btn');
 
         let remarksModeActive = false;
+        let lastRemarksPartName = '';
+        let lastRemarksNature = '';
         const remarksToggleBtn = document.getElementById('remarks-toggle-btn');
         const remarksInputsContainer = document.getElementById('remarks-inputs-container');
         const remarksPartName = document.getElementById('remarks-part-name');
@@ -11040,10 +11054,41 @@ Configure your API key to get started.</p>
                 }
             });
 
+            // Limits
+            const limits = [
+                { min: 80, max: 90 }, // Remark 1
+                { min: 30, max: 40 }, // Remark 2
+                { min: 30, max: 40 }, // Remark 3
+                { min: 30, max: 40 }  // Remark 4
+            ];
+
+            const cleanedRemarks = [];
+            for (let i = 0; i < 4; i++) {
+                let remark = remarksList[i] || '';
+                remark = remark.replace(/\s+/g, ' ').trim();
+                cleanedRemarks.push(remark);
+            }
+
             for (let i = 1; i <= 4; i++) {
                 const f = document.getElementById(`remark-field-${i}`);
+                const countSpan = document.getElementById(`remark-count-${i}`);
+                const val = cleanedRemarks[i - 1] || '';
                 if (f) {
-                    f.value = remarksList[i - 1] || '';
+                    f.value = val;
+                }
+                if (countSpan) {
+                    const limit = limits[i - 1];
+                    if (val) {
+                        countSpan.textContent = `${val.length} / ${limit.min}-${limit.max} chars`;
+                        if (val.length >= limit.min && val.length <= limit.max) {
+                            countSpan.style.color = '#10b981'; // Green if correct
+                        } else {
+                            countSpan.style.color = '#ef4444'; // Red if incorrect
+                        }
+                    } else {
+                        countSpan.textContent = `0 / ${limit.min}-${limit.max} chars`;
+                        countSpan.style.color = 'var(--text-secondary)';
+                    }
                 }
             }
         };
@@ -11063,6 +11108,45 @@ Configure your API key to get started.</p>
                 }
             }
         };
+
+        function validateRemarks(text) {
+            const remarksList = [];
+            const rawLines = text.split('\n');
+            rawLines.forEach(line => {
+                const trimmed = line.trim();
+                if (trimmed) {
+                    const cleaned = trimmed.replace(/^(Remark\s*\d+[:\-]?|Remark\s*[:\-]?|\d+[:\.\-]?\s*)/i, '').trim();
+                    if (cleaned) {
+                        remarksList.push(cleaned);
+                    }
+                }
+            });
+
+            if (remarksList.length < 4) {
+                return { valid: false, reason: `Generated ${remarksList.length} remarks instead of 4.` };
+            }
+
+            const limits = [
+                { min: 80, max: 90 },
+                { min: 30, max: 40 },
+                { min: 30, max: 40 },
+                { min: 30, max: 40 }
+            ];
+
+            const errors = [];
+            for (let i = 0; i < 4; i++) {
+                const len = remarksList[i].replace(/\s+/g, ' ').trim().length;
+                const { min, max } = limits[i];
+                if (len < min || len > max) {
+                    errors.push(`Remark ${i + 1} length is ${len}`);
+                }
+            }
+
+            if (errors.length > 0) {
+                return { valid: false, reason: errors.join(', ') };
+            }
+            return { valid: true };
+        }
 
         function renderChatHistory() {
             // Remove all bubbles except system welcome bubble and remarks workspace
@@ -11162,6 +11246,19 @@ Configure your API key to get started.</p>
                     if (assistantInput) assistantInput.focus();
                 }
                 renderChatHistory();
+            });
+        }
+
+        const remarksRegenerateBtn = document.getElementById('remarks-regenerate-btn');
+        if (remarksRegenerateBtn) {
+            remarksRegenerateBtn.addEventListener('click', () => {
+                if (!lastRemarksPartName) {
+                    notify('No previous remarks generated to regenerate.', 'warning');
+                    return;
+                }
+                if (remarksPartName) remarksPartName.value = lastRemarksPartName;
+                if (remarksNature) remarksNature.value = lastRemarksNature;
+                sendAssistantMessage();
             });
         }
 
@@ -11663,6 +11760,8 @@ Configure your API key to get started.</p>
                     notify('Please enter a Part Name.', 'warning');
                     return;
                 }
+                lastRemarksPartName = partVal;
+                lastRemarksNature = natureVal;
                 prompt = `Part Name: ${partVal}\nNature of problem: ${natureVal}`;
             } else {
                 prompt = assistantInput.value.trim();
@@ -11682,6 +11781,11 @@ Configure your API key to get started.</p>
                 for (let i = 1; i <= 4; i++) {
                     const f = document.getElementById(`remark-field-${i}`);
                     if (f) f.value = 'Generating...';
+                    const countSpan = document.getElementById(`remark-count-${i}`);
+                    if (countSpan) {
+                        countSpan.textContent = '...';
+                        countSpan.style.color = 'var(--text-secondary)';
+                    }
                 }
             }
             updateSendButtonState();
@@ -11853,20 +11957,20 @@ Remark 1:
 * Describe the actual defect/failure in the part.
 
 Remark 2:
-* Minimum 55 characters 
-* Maximum 60 characters
+* Minimum 30 characters 
+* Maximum 40 characters
 * Describe the customer complaint, symptom, or concern.
 * Explain what problem the customer experienced and reported.
 
 Remark 3:
-* Minimum 55 characters 
-* Maximum 60 characters
+* Minimum 30 characters 
+* Maximum 40 characters
 * State that the specified part was found defective during inspection.
 * Clearly mention the defective part name.
 
 Remark 4:
-* Minimum 55 characters 
-* Maximum 60 characters
+* Minimum 30 characters 
+* Maximum 40 characters
 * State the corrective action taken.
 * Clearly mention repair or replacement of the defective part.
 
@@ -12210,6 +12314,57 @@ User Query: ${lastMsgContent}`;
 
                         // Loop back to fetch new response from model
                         continue;
+                    }
+
+                    if (isRemarksMode) {
+                        const validation = validateRemarks(responseText);
+                        if (!validation.valid && loopCount < maxLoops - 1) {
+                            const approve = confirm(`The generated remarks do not meet the character limits.\n\nIssues:\n${validation.reason.replace(/Remark \d+ length is \d+/g, (m) => m + ' (target: 30-40, except Remark 1 which is 80-90)')}\n\nWould you like the AI to make a second attempt to correct them?`);
+                            if (approve) {
+                                loopCount++;
+                                chatHistory.push({
+                                    role: 'assistant',
+                                    content: responseText,
+                                    isRemarks: true,
+                                    timestamp: new Date().toISOString()
+                                });
+                                chatHistory.push({
+                                    role: 'user',
+                                    content: `The remarks you generated do not follow the strict character limits. Reason: ${validation.reason}
+Please rewrite all 4 remarks to strictly follow the character limit rules:
+Remark 1: 80-90 characters
+Remark 2: 30-40 characters
+Remark 3: 30-40 characters
+Remark 4: 30-40 characters
+Do not include headings, numbering, or explanation. Output only the 4 raw remarks on separate lines.`,
+                                    isRemarks: true,
+                                    timestamp: new Date().toISOString()
+                                });
+
+                                // Re-add thinking bubble for next iteration
+                                thinkingBubble.innerHTML = `
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <i data-lucide="loader-2" class="spin" style="width:16px; color:var(--accent-color);"></i>
+                                        <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Correcting character limits (Attempt ${loopCount + 1})...</span>
+                                    </div>
+                                `;
+                                lucide.createIcons();
+                                scrollChatToBottom();
+                                continue;
+                            }
+                        }
+
+                        // Clean up correction exchanges from chatHistory to keep history pristine
+                        let firstUserIndex = -1;
+                        for (let i = chatHistory.length - 1; i >= 0; i--) {
+                            if (chatHistory[i].role === 'user' && chatHistory[i].isRemarks && !chatHistory[i].content.includes('do not follow the strict character limits')) {
+                                firstUserIndex = i;
+                                break;
+                            }
+                        }
+                        if (firstUserIndex !== -1) {
+                            chatHistory = chatHistory.slice(0, firstUserIndex + 1);
+                        }
                     }
 
                     // Remove thinking bubble
