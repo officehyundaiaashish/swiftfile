@@ -1,3 +1,26 @@
+async function getActiveCobaltAPIs() {
+  try {
+    const res = await fetch('https://cobalt.directory/');
+    if (!res.ok) return ['https://apicobalt.mgytr.top'];
+    const html = await res.text();
+    
+    const regex = /<tr[^>]*><td>.*?<\/td><td>([^<]+)<\/td>/g;
+    let match;
+    const apis = [];
+    while ((match = regex.exec(html)) !== null) {
+      const host = match[1].trim();
+      if (host && !host.includes('Offline') && !host.includes('—')) {
+        apis.push(`https://${host}`);
+      }
+    }
+    // Prioritize apicobalt.mgytr.top as we know it works, and fall back to others
+    const finalApis = ['https://apicobalt.mgytr.top', ...apis.filter(a => a !== 'https://apicobalt.mgytr.top')];
+    return finalApis;
+  } catch (e) {
+    return ['https://apicobalt.mgytr.top'];
+  }
+}
+
 export default async function handler(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,7 +39,7 @@ export default async function handler(req, res) {
 
   try {
     if (action === 'info') {
-      // Use YouTube Oembed to fetch video title and thumbnail safely (bypasses any blocking)
+      // Use YouTube Oembed to fetch video title and thumbnail safely
       const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
       const oembedRes = await fetch(oembedUrl);
       
@@ -37,7 +60,6 @@ export default async function handler(req, res) {
         }
       }
 
-      // Return a structured response matching what index.html expects
       const responseData = {
         title: title,
         thumbnail: thumbnail,
@@ -92,39 +114,52 @@ export default async function handler(req, res) {
       const isAudio = format_id === 'audio';
       const quality = isAudio ? 'max' : (format_id || '720');
 
-      // Request to Cobalt API
-      const cobaltResponse = await fetch('https://api.cobalt.tools/api/json', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          url: url,
-          videoQuality: quality,
-          isAudioOnly: isAudio,
-          filenamePattern: 'basic'
-        })
-      });
-
-      if (!cobaltResponse.ok) {
-        const errText = await cobaltResponse.text();
-        return res.status(200).json({ error: `Downloader API error: ${errText || cobaltResponse.statusText}` });
-      }
-
-      const cobaltData = await cobaltResponse.json();
+      const cobaltApis = await getActiveCobaltAPIs();
+      let lastError = 'No working download server found.';
       
-      if (cobaltData.status === 'error') {
-        return res.status(200).json({ error: cobaltData.text || 'Error from downloader API.' });
+      // Attempt to fetch from active public Cobalt instances sequentially until one succeeds
+      for (const apiEndpoint of cobaltApis) {
+        try {
+          const cobaltResponse = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              url: url,
+              videoQuality: quality,
+              isAudioOnly: isAudio,
+              filenamePattern: 'basic'
+            })
+          });
+
+          if (!cobaltResponse.ok) {
+            continue;
+          }
+
+          const cobaltData = await cobaltResponse.json();
+          
+          if (cobaltData.status === 'error' || cobaltData.error) {
+            lastError = cobaltData.text || cobaltData.error?.code || 'Instance error';
+            continue;
+          }
+
+          const directUrl = cobaltData.url;
+          if (directUrl) {
+            // Successfully retrieved direct URL, perform 302 redirect
+            res.writeHead(302, { Location: directUrl });
+            return res.end();
+          }
+        } catch (e) {
+          lastError = e.message;
+          continue;
+        }
       }
 
-      const directUrl = cobaltData.url;
-      if (!directUrl) {
-        return res.status(200).json({ error: 'No download URL returned from API.' });
-      }
+      // If all servers fail, return error JSON
+      return res.status(200).json({ error: `Downloader Error: ${lastError}` });
 
-      res.writeHead(302, { Location: directUrl });
-      res.end();
     } else {
       return res.status(200).json({ error: `Unknown action: ${action}` });
     }
