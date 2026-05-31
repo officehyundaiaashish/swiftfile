@@ -2920,11 +2920,17 @@
             .app-sidebar-panel .converter-tabs {
                 display: grid !important;
                 grid-template-columns: repeat(3, 1fr) !important;
-                gap: 12px !important;
-                padding: 1.5rem 1rem !important;
+                gap: 8px !important;
+                padding: 1.25rem 0.75rem !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
                 height: calc(100% - 40px) !important;
+            }
+
+            @media (max-width: 360px) {
+                .app-sidebar-panel .converter-tabs {
+                    grid-template-columns: repeat(2, 1fr) !important;
+                }
             }
 
             .app-sidebar-panel .tab-btn {
@@ -2932,22 +2938,25 @@
                 align-items: center !important;
                 justify-content: center !important;
                 text-align: center !important;
-                padding: 0.85rem 0.5rem !important;
-                font-size: 0.75rem !important;
+                padding: 0.5rem 0.25rem !important;
+                font-size: 0.7rem !important;
                 border-radius: 12px !important;
                 border: 1px solid var(--border-color) !important;
                 background: var(--input-bg) !important;
-                height: 80px !important;
+                height: auto !important;
+                min-height: 72px !important;
                 width: auto !important;
-                gap: 6px !important;
+                gap: 4px !important;
                 white-space: normal !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
                 display: flex !important;
                 color: var(--text-primary) !important;
             }
 
             .app-sidebar-panel .tab-btn i {
-                width: 22px !important;
-                height: 22px !important;
+                width: 20px !important;
+                height: 20px !important;
                 margin: 0 !important;
                 color: var(--accent-color) !important;
             }
@@ -14489,6 +14498,9 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
 
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
+            // Render Lucide icons for bottom nav
+            lucide.createIcons();
+
             setTimeout(handleReceivedShare, 500);
             if (window.innerWidth <= 1024) {
                 switchTab('swift-assistant');
