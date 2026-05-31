@@ -123,34 +123,8 @@ export default async function handler(req, res) {
         return res.status(200).json({ error: 'No download URL returned from API.' });
       }
 
-      // Fetch the file stream from Cobalt to proxy it (bypassing CORS)
-      const fileRes = await fetch(directUrl);
-      if (!fileRes.ok) {
-        return res.status(200).json({ error: 'Failed to fetch the stream from video source.' });
-      }
-
-      // Forward headers
-      const contentType = fileRes.headers.get('Content-Type') || (isAudio ? 'audio/mpeg' : 'video/mp4');
-      const contentLength = fileRes.headers.get('Content-Length');
-
-      res.setHeader('Content-Type', contentType);
-      if (contentLength) {
-        res.setHeader('Content-Length', contentLength);
-      }
-      res.setHeader('Content-Disposition', `attachment; filename="download.${isAudio ? 'mp3' : 'mp4'}"`);
-
-      // Pipe the body stream directly to client response
-      const readableStream = fileRes.body;
-      if (readableStream.pipe) {
-        readableStream.pipe(res);
-      } else {
-        // Node-fetch body in newer versions might be a Web ReadableStream
-        for await (const chunk of readableStream) {
-          res.write(chunk);
-        }
-        res.end();
-      }
-
+      res.writeHead(302, { Location: directUrl });
+      res.end();
     } else {
       return res.status(200).json({ error: `Unknown action: ${action}` });
     }
