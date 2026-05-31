@@ -3011,6 +3011,7 @@
                 'webpage-to-pdf': 'Webpage to PDF',
                 'redact-pdf': 'Redact PDF',
                 'watermark-tool': 'Watermark',
+                'video-compressor': 'Video Compressor',
                 'swift-assistant': 'Swift Assistant'
             };
             const toolIcons = {
@@ -3029,6 +3030,7 @@
                 'webpage-to-pdf': 'globe',
                 'redact-pdf': 'eye-off',
                 'watermark-tool': 'stamp',
+                'video-compressor': 'video',
                 'swift-assistant': 'message-square'
             };
 
@@ -3180,6 +3182,9 @@
                     </button>
                     <button class="tab-btn" data-tab="watermark-tool" onclick="switchTab('watermark-tool')">
                         <i data-lucide="stamp"></i> Watermark
+                    </button>
+                    <button class="tab-btn" data-tab="video-compressor" onclick="switchTab('video-compressor')">
+                        <i data-lucide="video"></i> Video Compressor
                     </button>
                 </div>
 
@@ -4327,6 +4332,160 @@
                                         <button id="wm-apply-btn" class="primary-btn btn-download-success"
                                             style="width: 100%; justify-content: center;">
                                             <i data-lucide="download"></i> Apply & Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Compressor Section -->
+                    <div id="video-compressor" class="tab-content">
+                        <div class="drop-zone" id="video-compress-drop-zone">
+                            <input type="file" id="video-compress-input" accept="video/*" hidden>
+                            <div class="drop-zone-content">
+                                <div class="icon-wrapper" style="background: var(--accent-alpha); color: var(--accent-color); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                    <i data-lucide="video" style="width: 32px; height: 32px;"></i>
+                                </div>
+                                <h3>Compress Videos</h3>
+                                <p>Reduce video file size client-side while maintaining high visual quality</p>
+                                <span class="file-info">Supports MP4, WebM, MOV, AVI, MKV, FLV, and more</span>
+                            </div>
+                        </div>
+
+                        <div id="video-compress-preview-container" class="preview-container hidden">
+                            <div class="preview-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                                <span id="video-compress-filename" style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">video.mp4</span>
+                                <button id="clear-video-compress" class="text-btn danger" style="background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 0.9rem;">Clear Video</button>
+                            </div>
+
+                            <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 340px; gap: 2rem; margin-top: 1rem; align-items: start;">
+                                <!-- Left side: Preview Player -->
+                                <div class="collage-main-preview" style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <div class="large-preview-box" id="video-preview-box" style="position: relative; background: #000; border-radius: 16px; overflow: hidden; aspect-ratio: 16/9; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+                                        <!-- Hidden original video element for streaming/rendering -->
+                                        <video id="video-source" style="display: none;" loop crossorigin="anonymous" playsinline></video>
+                                        
+                                        <!-- Interactive Canvas split-screen visual comparison -->
+                                        <canvas id="video-preview-canvas" style="width: 100%; height: 100%; object-fit: contain; display: block;"></canvas>
+                                        
+                                        <!-- Overlay comparison slider handle -->
+                                        <div id="video-comparison-slider" style="position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor: ew-resize; z-index: 10; transform: translateX(-50%); transition: background 0.2s;">
+                                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 36px; height: 36px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.25); color: #1e293b; font-size: 1rem; font-weight: 700; user-select: none;">
+                                                ↔
+                                            </div>
+                                        </div>
+
+                                        <!-- Badge labels for Original vs Compressed -->
+                                        <span style="position: absolute; top: 12px; left: 12px; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; z-index: 5; pointer-events: none; border: 1px solid rgba(255,255,255,0.15);">Original</span>
+                                        <span style="position: absolute; top: 12px; right: 12px; background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; z-index: 5; pointer-events: none; box-shadow: 0 2px 8px var(--accent-shadow);">Compressed Preview</span>
+                                    </div>
+
+                                    <!-- Premium Custom Player Controls -->
+                                    <div class="video-custom-controls" style="background: var(--input-bg); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow);">
+                                        <!-- Timeline Slider -->
+                                        <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                                            <span id="video-current-time" style="font-size: 0.75rem; font-family: monospace; color: var(--text-secondary); min-width: 40px;">0:00</span>
+                                            <input type="range" id="video-timeline" min="0" max="100" value="0" step="0.05" style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; appearance: none; outline: none; cursor: pointer; transition: background 0.2s;">
+                                            <span id="video-duration" style="font-size: 0.75rem; font-family: monospace; color: var(--text-secondary); min-width: 40px;">0:00</span>
+                                        </div>
+
+                                        <!-- Buttons Row -->
+                                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <button id="video-btn-play" class="icon-btn" style="width: 38px; height: 38px; border-radius: 10px; padding: 0;" title="Play/Pause">
+                                                    <i data-lucide="play" style="width: 18px; height: 18px;"></i>
+                                                </button>
+                                                <button id="video-btn-step-back" class="icon-btn" style="width: 38px; height: 38px; border-radius: 10px; padding: 0;" title="Step Back 5s">
+                                                    <i data-lucide="chevrons-left" style="width: 18px; height: 18px;"></i>
+                                                </button>
+                                                <button id="video-btn-step-prev-frame" class="icon-btn" style="width: 38px; height: 38px; border-radius: 10px; padding: 0;" title="Previous Frame">
+                                                    <i data-lucide="chevron-left" style="width: 18px; height: 18px;"></i>
+                                                </button>
+                                                <button id="video-btn-step-next-frame" class="icon-btn" style="width: 38px; height: 38px; border-radius: 10px; padding: 0;" title="Next Frame">
+                                                    <i data-lucide="chevron-right" style="width: 18px; height: 18px;"></i>
+                                                </button>
+                                                <button id="video-btn-step-forward" class="icon-btn" style="width: 38px; height: 38px; border-radius: 10px; padding: 0;" title="Step Forward 5s">
+                                                    <i data-lucide="chevrons-right" style="width: 18px; height: 18px;"></i>
+                                                </button>
+                                            </div>
+
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <!-- Speed control -->
+                                                <select id="video-speed" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 6px 12px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer; outline: none; height: 38px;">
+                                                    <option value="0.25">0.25x Speed</option>
+                                                    <option value="0.5">0.5x Speed</option>
+                                                    <option value="1.0" selected>1.0x Speed</option>
+                                                    <option value="1.5">1.5x Speed</option>
+                                                    <option value="2.0">2.0x Speed</option>
+                                                </select>
+
+                                                <!-- Mute/Volume -->
+                                                <button id="video-btn-mute" class="icon-btn" style="width: 38px; height: 38px; border-radius: 10px; padding: 0;" title="Mute/Unmute">
+                                                    <i data-lucide="volume-2" style="width: 18px; height: 18px;"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right side: Settings Panel -->
+                                <div class="bg-controls-panel" style="background: var(--surface-color); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1.25rem; box-shadow: var(--shadow);">
+                                    <div class="control-group">
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Resolution Preset</label>
+                                        <select id="video-compress-resolution" style="width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); cursor: pointer; outline: none;">
+                                            <option value="original" selected>Keep Original Resolution</option>
+                                            <option value="1080">1080p (FHD - 1920x1080)</option>
+                                            <option value="720">720p (HD - 1280x720)</option>
+                                            <option value="480">480p (SD - 854x480)</option>
+                                            <option value="360">360p (Low - 640x360)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                            <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Video Quality (Bitrate)</label>
+                                            <span id="video-compress-quality-badge" style="background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">Medium (2500 kbps)</span>
+                                        </div>
+                                        <input type="range" id="video-compress-quality-slider" min="300" max="10000" step="100" value="2500" style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Target Format</label>
+                                        <select id="video-compress-format" style="width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); cursor: pointer; outline: none;">
+                                            <option value="webm" selected>WebM (Recommended, Fast)</option>
+                                            <option value="mp4">MP4 (Requires Browser Support)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="control-group" style="margin-top: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                            <div style="background: rgba(0, 0, 0, 0.02); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid var(--border-color);">
+                                                <div style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 2px;">Original Size</div>
+                                                <div id="video-compress-orig-size" style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">0.0 MB</div>
+                                            </div>
+                                            <div style="background: var(--accent-alpha); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid var(--accent-border-alpha);">
+                                                <div style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 2px;">Estimated Size</div>
+                                                <div id="video-compress-est-size" style="font-weight: 700; font-size: 1rem; color: var(--accent-color);">0.0 MB</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Progress indicator -->
+                                    <div id="video-compress-progress-container" class="hidden" style="margin-top: 0.5rem; padding: 12px; background: var(--input-bg); border-radius: 12px; border: 1px dashed var(--border-color);">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; margin-bottom: 6px;">
+                                            <span>Compressing Video...</span>
+                                            <span id="video-compress-pct">0%</span>
+                                        </div>
+                                        <div style="width: 100%; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden;">
+                                            <div id="video-compress-progress-bar" style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.05s linear;"></div>
+                                        </div>
+                                        <div id="video-compress-eta" style="font-size: 0.65rem; color: var(--text-secondary); text-align: right; margin-top: 6px; font-weight: 500;">Remaining: Calculating...</div>
+                                    </div>
+
+                                    <div style="margin-top: 0.5rem;">
+                                        <button id="video-compress-btn" class="primary-btn btn-download-success" style="width: 100%; justify-content: center; border-radius: 12px; height: 44px; font-weight: 700;">
+                                            <i data-lucide="zap" style="width: 16px; height: 16px; margin-right: 6px;"></i> Compress & Download
                                         </button>
                                     </div>
                                 </div>
@@ -13115,7 +13274,534 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             }
         }
 
-        // Check for shared items on load & auto focus chat input on desktop
+        // ==========================================
+        // VIDEO COMPRESSOR TOOL LOGIC
+        // ==========================================
+        let videoFile = null;
+        let splitRatio = 0.5;
+        let isDraggingSlider = false;
+        let isCompressing = false;
+        let compressionRecorder = null;
+        let compressionAudioCtx = null;
+        let compressionAudioSource = null;
+        let renderLoopId = null;
+
+        const videoCompressInput = document.getElementById('video-compress-input');
+        const videoCompressDropZone = document.getElementById('video-compress-drop-zone');
+        const videoCompressPreviewContainer = document.getElementById('video-compress-preview-container');
+        const videoCompressFilename = document.getElementById('video-compress-filename');
+        const clearVideoCompressBtn = document.getElementById('clear-video-compress');
+        
+        const videoSource = document.getElementById('video-source');
+        const videoPreviewCanvas = document.getElementById('video-preview-canvas');
+        const videoComparisonSlider = document.getElementById('video-comparison-slider');
+        const videoPreviewBox = document.getElementById('video-preview-box');
+        const ctx = videoPreviewCanvas.getContext('2d');
+        
+        const videoCurrentTimeText = document.getElementById('video-current-time');
+        const videoDurationText = document.getElementById('video-duration');
+        const videoTimeline = document.getElementById('video-timeline');
+        
+        const videoBtnPlay = document.getElementById('video-btn-play');
+        const videoBtnStepBack = document.getElementById('video-btn-step-back');
+        const videoBtnStepPrevFrame = document.getElementById('video-btn-step-prev-frame');
+        const videoBtnStepNextFrame = document.getElementById('video-btn-step-next-frame');
+        const videoBtnStepForward = document.getElementById('video-btn-step-forward');
+        
+        const videoBtnMute = document.getElementById('video-btn-mute');
+        const videoSpeed = document.getElementById('video-speed');
+        
+        const videoCompressResolution = document.getElementById('video-compress-resolution');
+        const videoCompressQualitySlider = document.getElementById('video-compress-quality-slider');
+        const videoCompressQualityBadge = document.getElementById('video-compress-quality-badge');
+        const videoCompressFormat = document.getElementById('video-compress-format');
+        
+        const videoCompressOrigSizeText = document.getElementById('video-compress-orig-size');
+        const videoCompressEstSizeText = document.getElementById('video-compress-est-size');
+        
+        const videoCompressProgressContainer = document.getElementById('video-compress-progress-container');
+        const videoCompressProgressBar = document.getElementById('video-compress-progress-bar');
+        const videoCompressPct = document.getElementById('video-compress-pct');
+        const videoCompressEta = document.getElementById('video-compress-eta');
+        const videoCompressBtn = document.getElementById('video-compress-btn');
+
+        // Offscreen canvas for rendering compressed preview side
+        const offscreenCanvas = document.createElement('canvas');
+        const offCtx = offscreenCanvas.getContext('2d');
+
+        // Helpers
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function formatDuration(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Target Resolution Calculations
+        function getTargetDimensions() {
+            if (!videoSource.videoWidth) return { w: 640, h: 360 };
+            const origW = videoSource.videoWidth;
+            const origH = videoSource.videoHeight;
+            const preset = videoCompressResolution.value;
+
+            if (preset === 'original') return { w: origW, h: origH };
+
+            const targetHeight = parseInt(preset);
+            const aspectRatio = origW / origH;
+            let targetWidth = Math.round(targetHeight * aspectRatio);
+            // Dimensions must be divisible by 2 for many codecs
+            targetWidth = targetWidth + (targetWidth % 2); 
+            return { w: targetWidth, h: targetHeight };
+        }
+
+        // Estimator
+        function updateVideoEstimations() {
+            if (!videoFile) return;
+            const duration = videoSource.duration || 0;
+            const targetBitrateKbps = parseInt(videoCompressQualitySlider.value);
+            
+            let qLabel = "Medium Quality";
+            if (targetBitrateKbps < 1000) qLabel = "Low Quality";
+            else if (targetBitrateKbps > 4500) qLabel = "High Quality";
+            videoCompressQualityBadge.textContent = `${qLabel} (${targetBitrateKbps} kbps)`;
+
+            const audioBitrateKbps = videoSource.muted ? 0 : 128;
+            const totalBitrateKbps = targetBitrateKbps + audioBitrateKbps;
+            const sizeInBytes = (totalBitrateKbps * 1024 * duration) / 8;
+            const estimatedBytes = sizeInBytes * 1.05; // 5% container overhead
+            
+            videoCompressEstSizeText.textContent = formatBytes(estimatedBytes);
+        }
+
+        // Drag and Drop Zone event listeners
+        videoCompressDropZone.addEventListener('click', () => videoCompressInput.click());
+        videoCompressInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                loadVideoFile(e.target.files[0]);
+            }
+        });
+
+        videoCompressDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            videoCompressDropZone.classList.add('drag-over');
+        });
+        videoCompressDropZone.addEventListener('dragleave', () => {
+            videoCompressDropZone.classList.remove('drag-over');
+        });
+        videoCompressDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            videoCompressDropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if (file.type.startsWith('video/')) {
+                    loadVideoFile(file);
+                } else {
+                    notify('Please select a valid video file.', 'warning');
+                }
+            }
+        });
+
+        function loadVideoFile(file) {
+            videoFile = file;
+            videoCompressFilename.textContent = file.name;
+            videoCompressOrigSizeText.textContent = formatBytes(file.size);
+            
+            const fileUrl = URL.createObjectURL(file);
+            videoSource.src = fileUrl;
+            videoSource.load();
+            
+            videoCompressDropZone.classList.add('hidden');
+            videoCompressPreviewContainer.classList.remove('hidden');
+            notify('Video loaded successfully.', 'success');
+        }
+
+        clearVideoCompressBtn.addEventListener('click', () => {
+            stopVideoPlayback();
+            videoFile = null;
+            videoSource.src = '';
+            videoCompressDropZone.classList.remove('hidden');
+            videoCompressPreviewContainer.classList.add('hidden');
+            videoCompressProgressContainer.classList.add('hidden');
+            videoCompressProgressBar.style.width = '0%';
+            videoCompressPct.textContent = '0%';
+            isCompressing = false;
+        });
+
+        // Comparison Slider Drag Logic
+        function updateSliderPosition(clientX) {
+            const rect = videoPreviewBox.getBoundingClientRect();
+            let pos = (clientX - rect.left) / rect.width;
+            pos = Math.max(0, Math.min(1, pos));
+            splitRatio = pos;
+            videoComparisonSlider.style.left = `${pos * 100}%`;
+            renderComparisonFrame();
+        }
+
+        videoComparisonSlider.addEventListener('mousedown', () => { isDraggingSlider = true; });
+        window.addEventListener('mouseup', () => { isDraggingSlider = false; });
+        window.addEventListener('mousemove', (e) => {
+            if (isDraggingSlider) {
+                updateSliderPosition(e.clientX);
+            }
+        });
+
+        // Touch support
+        videoComparisonSlider.addEventListener('touchstart', () => { isDraggingSlider = true; });
+        window.addEventListener('touchend', () => { isDraggingSlider = false; });
+        window.addEventListener('touchmove', (e) => {
+            if (isDraggingSlider && e.touches.length > 0) {
+                updateSliderPosition(e.touches[0].clientX);
+            }
+        });
+
+        // Canvas Frame Rendering
+        function renderComparisonFrame() {
+            if (!videoSource.videoWidth || !videoSource.readyState) return;
+
+            const w = videoSource.videoWidth;
+            const h = videoSource.videoHeight;
+            
+            if (videoPreviewCanvas.width !== w || videoPreviewCanvas.height !== h) {
+                videoPreviewCanvas.width = w;
+                videoPreviewCanvas.height = h;
+            }
+
+            const splitX = splitRatio * w;
+            const targetDim = getTargetDimensions();
+
+            // Clear canvas
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw Original Video on whole canvas
+            ctx.drawImage(videoSource, 0, 0, w, h);
+
+            // Draw degraded/compressed side on the right side
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(splitX, 0, w - splitX, h);
+            ctx.clip();
+
+            // Render to small offscreen canvas to simulate target resolution downscale
+            offscreenCanvas.width = targetDim.w;
+            offscreenCanvas.height = targetDim.h;
+            
+            // Draw original frame to offscreen
+            offCtx.drawImage(videoSource, 0, 0, targetDim.w, targetDim.h);
+            
+            // Draw offscreen back to main canvas (stretching shows downscaled look)
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(offscreenCanvas, 0, 0, w, h);
+            ctx.restore();
+
+            // Draw Divider Line
+            ctx.beginPath();
+            ctx.moveTo(splitX, 0);
+            ctx.lineTo(splitX, h);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = Math.max(3, w / 400); // Scale line thickness slightly with resolution
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctx.shadowBlur = 8;
+            ctx.stroke();
+            ctx.shadowBlur = 0; // Reset shadow
+        }
+
+        // Custom video controls setup
+        videoSource.addEventListener('loadedmetadata', () => {
+            videoDurationText.textContent = formatDuration(videoSource.duration);
+            videoTimeline.max = videoSource.duration;
+            videoTimeline.value = 0;
+            updateVideoEstimations();
+            
+            // Render first frame
+            setTimeout(renderComparisonFrame, 150);
+        });
+
+        videoSource.addEventListener('timeupdate', () => {
+            if (!isCompressing) {
+                videoTimeline.value = videoSource.currentTime;
+                videoCurrentTimeText.textContent = formatDuration(videoSource.currentTime);
+                renderComparisonFrame();
+            }
+        });
+
+        videoTimeline.addEventListener('input', () => {
+            videoSource.currentTime = videoTimeline.value;
+            videoCurrentTimeText.textContent = formatDuration(videoSource.currentTime);
+            renderComparisonFrame();
+        });
+
+        // Start/Stop canvas rendering loop
+        function startPlaybackRenderLoop() {
+            if (renderLoopId) cancelAnimationFrame(renderLoopId);
+            
+            const loop = () => {
+                if (!videoSource.paused && !videoSource.ended) {
+                    renderComparisonFrame();
+                    renderLoopId = requestAnimationFrame(loop);
+                }
+            };
+            renderLoopId = requestAnimationFrame(loop);
+        }
+
+        function stopVideoPlayback() {
+            videoSource.pause();
+            if (renderLoopId) {
+                cancelAnimationFrame(renderLoopId);
+                renderLoopId = null;
+            }
+            videoBtnPlay.innerHTML = '<i data-lucide="play" style="width: 18px; height: 18px;"></i>';
+            lucide.createIcons({ root: videoBtnPlay });
+        }
+
+        videoBtnPlay.addEventListener('click', () => {
+            if (videoSource.paused || videoSource.ended) {
+                videoSource.play();
+                videoBtnPlay.innerHTML = '<i data-lucide="pause" style="width: 18px; height: 18px;"></i>';
+                startPlaybackRenderLoop();
+            } else {
+                stopVideoPlayback();
+            }
+            lucide.createIcons({ root: videoBtnPlay });
+        });
+
+        videoBtnMute.addEventListener('click', () => {
+            videoSource.muted = !videoSource.muted;
+            videoBtnMute.innerHTML = videoSource.muted 
+                ? '<i data-lucide="volume-x" style="width: 18px; height: 18px;"></i>' 
+                : '<i data-lucide="volume-2" style="width: 18px; height: 18px;"></i>';
+            lucide.createIcons({ root: videoBtnMute });
+            updateVideoEstimations();
+        });
+
+        videoSpeed.addEventListener('change', () => {
+            videoSource.playbackRate = parseFloat(videoSpeed.value);
+        });
+
+        // Steps Controls
+        videoBtnStepBack.addEventListener('click', () => {
+            videoSource.currentTime = Math.max(0, videoSource.currentTime - 5);
+        });
+
+        videoBtnStepForward.addEventListener('click', () => {
+            videoSource.currentTime = Math.min(videoSource.duration, videoSource.currentTime + 5);
+        });
+
+        videoBtnStepPrevFrame.addEventListener('click', () => {
+            videoSource.currentTime = Math.max(0, videoSource.currentTime - 0.04); // ~25fps step
+        });
+
+        videoBtnStepNextFrame.addEventListener('click', () => {
+            videoSource.currentTime = Math.min(videoSource.duration, videoSource.currentTime + 0.04);
+        });
+
+        // Settings updates
+        videoCompressResolution.addEventListener('change', () => {
+            updateVideoEstimations();
+            renderComparisonFrame();
+        });
+
+        videoCompressQualitySlider.addEventListener('input', () => {
+            updateVideoEstimations();
+            renderComparisonFrame();
+        });
+
+        // Real-time Canvas + Audio Recording Compression Engine
+        videoCompressBtn.addEventListener('click', async () => {
+            if (isCompressing) {
+                // Abort
+                isCompressing = false;
+                if (compressionRecorder) compressionRecorder.stop();
+                return;
+            }
+
+            if (!videoFile) return;
+
+            isCompressing = true;
+            stopVideoPlayback();
+            videoCompressBtn.innerHTML = '<i data-lucide="square" style="width: 16px; height: 16px; margin-right: 6px;"></i> Abort Compression';
+            lucide.createIcons({ root: videoCompressBtn });
+            videoCompressProgressContainer.classList.remove('hidden');
+
+            const targetDim = getTargetDimensions();
+            const targetQualitySliderVal = parseInt(videoCompressQualitySlider.value);
+            const targetFormat = videoCompressFormat.value;
+
+            // Setup compression Canvas
+            const compCanvas = document.createElement('canvas');
+            compCanvas.width = targetDim.w;
+            compCanvas.height = targetDim.h;
+            const compCtx = compCanvas.getContext('2d');
+
+            // Grab video canvas stream at 30 fps
+            const stream = compCanvas.captureStream(30);
+
+            // Audio track routing
+            let combinedStream = new MediaStream();
+            stream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
+
+            // Audio Context Setup
+            try {
+                if (!compressionAudioCtx) {
+                    compressionAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (compressionAudioCtx.state === 'suspended') {
+                    await compressionAudioCtx.resume();
+                }
+
+                // If not already connected, connect audio source
+                if (!compressionAudioSource) {
+                    compressionAudioSource = compressionAudioCtx.createMediaElementSource(videoSource);
+                }
+
+                const destNode = compressionAudioCtx.createMediaStreamAudioDestination();
+                compressionAudioSource.connect(destNode);
+
+                // Connect to destination speakers so audio works, but mute if videoSource.muted is true
+                const gainNode = compressionAudioCtx.createGain();
+                gainNode.gain.value = videoSource.muted ? 0 : 1;
+                compressionAudioSource.connect(gainNode);
+                gainNode.connect(compressionAudioCtx.destination);
+
+                destNode.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+            } catch (err) {
+                console.warn('Audio capture could not be initialized (might be silent or no audio tracks):', err);
+                // Mute and continue with pure video capture
+                try {
+                    // Fallback local speaker routing if media source already connected
+                    if (compressionAudioSource) {
+                        compressionAudioSource.connect(compressionAudioCtx.destination);
+                    }
+                } catch(e) {}
+            }
+
+            // Recorder options
+            let mimeType = 'video/webm;codecs=vp8';
+            if (targetFormat === 'mp4' && MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')) {
+                mimeType = 'video/mp4;codecs=avc1';
+            } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+                mimeType = 'video/webm;codecs=vp9';
+            }
+
+            const recorderOptions = {
+                mimeType: mimeType,
+                videoBitsPerSecond: targetQualitySliderVal * 1024
+            };
+
+            const chunks = [];
+            
+            try {
+                compressionRecorder = new MediaRecorder(combinedStream, recorderOptions);
+            } catch (e) {
+                // Fallback to standard recorder options
+                console.warn('Custom recorder parameters failed, falling back to browser defaults.', e);
+                compressionRecorder = new MediaRecorder(combinedStream);
+            }
+
+            compressionRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) chunks.push(e.data);
+            };
+
+            compressionRecorder.onstop = () => {
+                isCompressing = false;
+                videoCompressBtn.innerHTML = '<i data-lucide="zap" style="width: 16px; height: 16px; margin-right: 6px;"></i> Compress & Download';
+                lucide.createIcons({ root: videoCompressBtn });
+
+                if (chunks.length === 0) {
+                    notify('Compression aborted or failed.', 'error');
+                    return;
+                }
+
+                const blob = new Blob(chunks, { type: mimeType });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                // Trigger Download
+                const a = document.createElement('a');
+                const ext = targetFormat === 'mp4' ? 'mp4' : 'webm';
+                a.href = blobUrl;
+                a.download = `compressed_${videoFile.name.substring(0, videoFile.name.lastIndexOf('.'))}.${ext}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                notify(`Video compressed to ${formatBytes(blob.size)} successfully!`, 'success');
+                videoCompressProgressContainer.classList.add('hidden');
+                videoSource.playbackRate = 1.0;
+                videoSpeed.value = "1.0";
+            };
+
+            // Run compression playback loop
+            videoSource.currentTime = 0;
+            videoSource.playbackRate = 1.5; // Compress 1.5x faster than real-time
+
+            videoSource.play();
+            compressionRecorder.start();
+
+            const startTime = Date.now();
+
+            const recordFrame = () => {
+                if (!isCompressing) return;
+
+                compCtx.drawImage(videoSource, 0, 0, targetDim.w, targetDim.h);
+                
+                // Update Progress UI
+                const progress = videoSource.currentTime / videoSource.duration;
+                const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
+                
+                videoCompressProgressBar.style.width = `${pct}%`;
+                videoCompressPct.textContent = `${pct}%`;
+
+                // Calculate ETA
+                const elapsed = (Date.now() - startTime) / 1000;
+                if (pct > 5) {
+                    const totalTime = elapsed / (pct / 100);
+                    const remaining = Math.max(0, Math.round(totalTime - elapsed));
+                    videoCompressEta.textContent = `Remaining: ~${remaining}s`;
+                } else {
+                    videoCompressEta.textContent = `Remaining: Calculating...`;
+                }
+
+                if (videoSource.ended || videoSource.currentTime >= videoSource.duration - 0.05) {
+                    compressionRecorder.stop();
+                    stopVideoPlayback();
+                } else {
+                    requestAnimationFrame(recordFrame);
+                }
+            };
+
+            requestAnimationFrame(recordFrame);
+        });
+
+        // Toggle visibility and redraw layout when switching tabs
+        const originalSwitchTab = window.switchTab;
+        window.switchTab = function(tabId) {
+            if (originalSwitchTab) originalSwitchTab(tabId);
+            if (tabId === 'video-compressor') {
+                setTimeout(() => {
+                    lucide.createIcons();
+                    renderComparisonFrame();
+                }, 100);
+            } else {
+                stopVideoPlayback();
+            }
+        };
+
+        // Sync desktop sidebar toggle to trigger redraws
+        const desktopHistoryBtn = document.getElementById('desktop-history-btn');
+        if (desktopHistoryBtn) {
+            desktopHistoryBtn.addEventListener('click', () => {
+                if (videoFile) setTimeout(renderComparisonFrame, 200);
+            });
+        }
+
+        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(handleReceivedShare, 500);
             if (window.innerWidth > 1024) {
