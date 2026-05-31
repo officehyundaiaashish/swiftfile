@@ -11872,30 +11872,29 @@ Configure your API key to get started.</p>
 
 When I provide only a Part Name, generate 4 warranty claim remarks.
 
-Character Limit Rules (Mandatory)
+Character Limit Rules (Mandatory):
+* Remark 1: 80 to 90 characters
+* Remark 2: 30 to 40 characters
+* Remark 3: 30 to 40 characters
+* Remark 4: 30 to 40 characters
 
-Remark 1:
-* Minimum 80 characters
-* Maximum 90 characters
-* Describe the actual defect/failure in the part.
+Few-Shot Examples (Follow these exact lengths, spaces count as characters):
 
-Remark 2:
-* Minimum 30 characters 
-* Maximum 40 characters
-* Describe the customer complaint, symptom, or concern.
-* Explain what problem the customer experienced and reported.
+Example 1:
+Part Name: Front Brake Pads
+Nature of problem: Squealing noise when braking
+Remark 1: Front brake pads worn down to 2mm metal indicators causing scoring on brake rotors. (83 characters)
+Remark 2: Customer reports squealing noise. (33 characters)
+Remark 3: Front brake pads found defective. (33 characters)
+Remark 4: Replaced front brake pads assembly. (35 characters)
 
-Remark 3:
-* Minimum 30 characters 
-* Maximum 40 characters
-* State that the specified part was found defective during inspection.
-* Clearly mention the defective part name.
-
-Remark 4:
-* Minimum 30 characters 
-* Maximum 40 characters
-* State the corrective action taken.
-* Clearly mention repair or replacement of the defective part.
+Example 2:
+Part Name: Alternator
+Nature of problem: Battery warning light on dash
+Remark 1: Alternator internal regulator failed resulting in low charging voltage to car battery. (86 characters)
+Remark 2: Battery indicator light is on. (30 characters)
+Remark 3: The alternator was found defective. (35 characters)
+Remark 4: Replaced defective alternator. (30 characters)
 
 Important Rules:
 * Very Strictly follow the minimum and maximum character limits.
@@ -11912,7 +11911,6 @@ Important Rules:
 * Output only the 4 remarks.
 * Do not show character counts.
 * Do not add explanations or headings.
-Very Strictly follow the minimum and maximum character limits for all remarks.
 * Return the remarks separated by newlines, with each remark on its own line. Do not prefix them with "Remark 1:" or "1." or any indicators. Just return the raw remarks, one per line.`;
             } else {
                 systemPromptContent = `You are Swift Assistant, the smart AI companion for Swift File Tools. You help users manage, convert, and edit their PDF and image files.
@@ -11949,30 +11947,29 @@ CRITICAL RULES:
 
 When I provide only a Part Name, generate 4 warranty claim remarks.
 
-Character Limit Rules (Mandatory)
+Character Limit Rules (Mandatory):
+* Remark 1: 80 to 90 characters
+* Remark 2: 30 to 40 characters
+* Remark 3: 30 to 40 characters
+* Remark 4: 30 to 40 characters
 
-Remark 1:
-* Minimum 80 characters
-* Maximum 90 characters
-* Describe the actual defect/failure in the part.
+Few-Shot Examples (Follow these exact lengths, spaces count as characters):
 
-Remark 2:
-* Minimum 30 characters 
-* Maximum 40 characters
-* Describe the customer complaint, symptom, or concern.
-* Explain what problem the customer experienced and reported.
+Example 1:
+Part Name: Front Brake Pads
+Nature of problem: Squealing noise when braking
+Remark 1: Front brake pads worn down to 2mm metal indicators causing scoring on brake rotors. (83 characters)
+Remark 2: Customer reports squealing noise. (33 characters)
+Remark 3: Front brake pads found defective. (33 characters)
+Remark 4: Replaced front brake pads assembly. (35 characters)
 
-Remark 3:
-* Minimum 30 characters 
-* Maximum 40 characters
-* State that the specified part was found defective during inspection.
-* Clearly mention the defective part name.
-
-Remark 4:
-* Minimum 30 characters 
-* Maximum 40 characters
-* State the corrective action taken.
-* Clearly mention repair or replacement of the defective part.
+Example 2:
+Part Name: Alternator
+Nature of problem: Battery warning light on dash
+Remark 1: Alternator internal regulator failed resulting in low charging voltage to car battery. (86 characters)
+Remark 2: Battery indicator light is on. (30 characters)
+Remark 3: The alternator was found defective. (35 characters)
+Remark 4: Replaced defective alternator. (30 characters)
 
 Important Rules:
 * Strictly follow the minimum and maximum character limits.
