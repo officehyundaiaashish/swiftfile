@@ -3625,6 +3625,384 @@
                 transform: translateY(0);
             }
         }
+
+        /* Image Editor Stylesheet */
+        .image-editor-layout {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+            min-height: 580px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            position: relative;
+        }
+        .editor-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        .editor-action-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .editor-action-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .editor-action-btn:hover:not(:disabled) {
+            border-color: var(--accent-color);
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+        }
+        .editor-action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .editor-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        .editor-canvas-workspace {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: auto;
+            min-height: 250px;
+        }
+        .editor-canvas-container {
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .editor-canvas-container canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .editor-sidebar {
+            width: 320px;
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .editor-category-tabs {
+            display: flex;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            scrollbar-width: none;
+        }
+        .editor-category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .editor-tab-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 12px 6px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .editor-tab-btn:hover {
+            color: var(--text-primary);
+        }
+        .editor-tab-btn.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+            background: var(--bg-primary);
+        }
+        .editor-tab-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        .editor-control-panel {
+            flex: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        .editor-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .editor-slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .editor-slider-val {
+            color: var(--accent-color);
+            font-family: monospace;
+        }
+        .editor-slider {
+            width: 100%;
+            height: 5px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .editor-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+            transition: transform 0.1s ease;
+        }
+        .editor-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Filter Thumbnails */
+        .filter-previews-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .filter-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+        .filter-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        .filter-card.active {
+            border-color: var(--accent-color);
+            background: var(--accent-alpha);
+        }
+        .filter-thumbnail-canvas {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            background: #e2e8f0;
+            object-fit: cover;
+            display: block;
+        }
+        .filter-name {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+        .filter-card.active .filter-name {
+            color: var(--accent-color);
+        }
+
+        /* Crop Layout */
+        .crop-aspect-ratios {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .crop-ratio-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+        .crop-ratio-btn:hover {
+            border-color: var(--accent-color);
+        }
+        .crop-ratio-btn.active {
+            background: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        /* Brush controls for BG remover */
+        .brush-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .brush-type-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .brush-type-btn.active {
+            background: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        /* Text Tool Styling */
+        .text-fonts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .font-option {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .font-option:hover {
+            border-color: var(--accent-color);
+        }
+        .font-option.active {
+            border-color: var(--accent-color);
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+        }
+
+        /* Custom Text Overlay Box in Workspace */
+        .canvas-text-overlay {
+            position: absolute;
+            border: 1px dashed #6366f1;
+            padding: 4px 8px;
+            background: rgba(99, 102, 241, 0.15);
+            color: #ffffff;
+            cursor: move;
+            user-select: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .canvas-text-overlay-delete {
+            background: #ef4444;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            cursor: pointer;
+        }
+
+        /* Responsive Mobile Layout */
+        @media (max-width: 1024px) {
+            .image-editor-layout {
+                height: calc(100vh - 130px);
+            }
+            .editor-body {
+                flex-direction: column;
+            }
+            .editor-canvas-workspace {
+                height: 55%;
+                flex: none;
+            }
+            .editor-sidebar {
+                width: 100%;
+                height: 45%;
+                flex: none;
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+            }
+        }
+        @media (max-width: 640px) {
+            .editor-action-btn span {
+                display: none;
+            }
+            .editor-action-btn {
+                padding: 6px;
+            }
+            .filter-previews-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .hidden {
+            display: none !important;
+        }
     </style>
     <script>
         let lastActiveTabId = 'swift-assistant';
@@ -3663,6 +4041,7 @@
                 'redact-pdf': 'Redact PDF',
                 'watermark-tool': 'Watermark',
                 'video-compressor': 'Video Compressor',
+                'image-editor': 'Image Editor',
                 'swift-assistant': 'Swift Assistant'
             };
             const toolIcons = {
@@ -3682,6 +4061,7 @@
                 'redact-pdf': 'eye-off',
                 'watermark-tool': 'stamp',
                 'video-compressor': 'video',
+                'image-editor': 'pen-tool',
                 'swift-assistant': 'message-square'
             };
 
@@ -3885,6 +4265,9 @@
                     </button>
                     <button class="tab-btn" data-tab="video-compressor" onclick="switchTab('video-compressor')">
                         <i data-lucide="video"></i> Video Compressor
+                    </button>
+                    <button class="tab-btn" data-tab="image-editor" onclick="switchTab('image-editor')">
+                        <i data-lucide="pen-tool"></i> Image Editor
                     </button>
                 </div>
 
@@ -5686,6 +6069,349 @@ Configure your API key to get started.</p>
                                             style="padding: 0; width: 42px; height: 42px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-bottom: 0;">
                                             <i data-lucide="send" style="width: 18px; height: 18px;"></i>
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Premium Image Editor Section -->
+                    <div id="image-editor" class="tab-content">
+                        <!-- Initial Drop Zone for Image Import -->
+                        <div class="drop-zone" id="editor-drop-zone">
+                            <input type="file" id="editor-file-input" accept="image/*" hidden>
+                            <div class="drop-zone-content">
+                                <div class="icon-wrapper" style="background: var(--accent-alpha); color: var(--accent-color); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                    <i data-lucide="image" style="width: 32px; height: 32px;"></i>
+                                </div>
+                                <h3>Load Image to Edit</h3>
+                                <p>Enhance, filter, retouch, crop, add text, or remove backgrounds client-side</p>
+                                <span class="file-info">Supports JPEG, PNG, WebP, SVG, BMP, and GIF</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Editor Workspace Container -->
+                        <div id="editor-workspace-container" class="image-editor-layout hidden">
+                            <!-- Top Action Bar -->
+                            <div class="editor-top-bar">
+                                <div class="editor-action-group">
+                                    <button id="editor-undo-btn" class="editor-action-btn" title="Undo" disabled>
+                                        <i data-lucide="undo" style="width: 15px; height: 15px;"></i>
+                                        <span>Undo</span>
+                                    </button>
+                                    <button id="editor-redo-btn" class="editor-action-btn" title="Redo" disabled>
+                                        <i data-lucide="redo" style="width: 15px; height: 15px;"></i>
+                                        <span>Redo</span>
+                                    </button>
+                                    <button id="editor-clear-btn" class="editor-action-btn" title="Reset Image">
+                                        <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                                        <span>Reset</span>
+                                    </button>
+                                </div>
+                                <div class="editor-action-group">
+                                    <select id="editor-export-format" class="editor-action-btn" style="padding: 5px 8px; border-radius: 8px;">
+                                        <option value="image/jpeg">JPEG (Quality 90%)</option>
+                                        <option value="image/png">PNG (Lossless)</option>
+                                        <option value="image/webp">WebP (Compressed)</option>
+                                    </select>
+                                    <button id="editor-download-btn" class="editor-action-btn" style="background: var(--accent-color); color: #ffffff; border-color: var(--accent-color);">
+                                        <i data-lucide="download" style="width: 15px; height: 15px;"></i>
+                                        <span>Download</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Main Workspace Body -->
+                            <div class="editor-body">
+                                <!-- Canvas Drawing Area -->
+                                <div class="editor-canvas-workspace">
+                                    <div class="editor-canvas-container" id="editor-canvas-container">
+                                        <canvas id="editor-canvas"></canvas>
+                                        <!-- Overlay Container for Interactive Text Labels -->
+                                        <div id="editor-text-overlays-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Control Sidebar -->
+                                <div class="editor-sidebar">
+                                    <!-- Category Selector Tabs -->
+                                    <div class="editor-category-tabs">
+                                        <button class="editor-tab-btn active" data-editor-tab="adjust">
+                                            <i data-lucide="sliders"></i>
+                                            <span>Adjust</span>
+                                        </button>
+                                        <button class="editor-tab-btn" data-editor-tab="filters">
+                                            <i data-lucide="palette"></i>
+                                            <span>Filters</span>
+                                        </button>
+                                        <button class="editor-tab-btn" data-editor-tab="crop">
+                                            <i data-lucide="crop"></i>
+                                            <span>Crop</span>
+                                        </button>
+                                        <button class="editor-tab-btn" data-editor-tab="retouch">
+                                            <i data-lucide="sparkles"></i>
+                                            <span>Retouch</span>
+                                        </button>
+                                        <button class="editor-tab-btn" data-editor-tab="effects">
+                                            <i data-lucide="sun"></i>
+                                            <span>Effects</span>
+                                        </button>
+                                        <button class="editor-tab-btn" data-editor-tab="text-ai">
+                                            <i data-lucide="type"></i>
+                                            <span>Text / AI</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Category Panels -->
+                                    <div class="editor-control-panel">
+                                        <!-- 1. Adjust Panel -->
+                                        <div id="panel-adjust" class="editor-panel-section">
+                                            <div class="editor-control-group">
+                                                <div class="editor-slider-header">
+                                                    <span>Tone / Exposure</span>
+                                                    <span class="editor-slider-val" id="val-exposure">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-exposure" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Brightness</span>
+                                                    <span class="editor-slider-val" id="val-brightness">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-brightness" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Contrast</span>
+                                                    <span class="editor-slider-val" id="val-contrast">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-contrast" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Highlights</span>
+                                                    <span class="editor-slider-val" id="val-highlights">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-highlights" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>White Point</span>
+                                                    <span class="editor-slider-val" id="val-whitepoint">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-whitepoint" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Black Point</span>
+                                                    <span class="editor-slider-val" id="val-blackpoint">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-blackpoint" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Saturation</span>
+                                                    <span class="editor-slider-val" id="val-saturation">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-saturation" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Warmth (Temperature)</span>
+                                                    <span class="editor-slider-val" id="val-warmth">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-warmth" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Blue Tone</span>
+                                                    <span class="editor-slider-val" id="val-bluetone">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-bluetone" min="-100" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Tint</span>
+                                                    <span class="editor-slider-val" id="val-tint">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-tint" min="-100" max="100" value="0">
+                                            </div>
+                                        </div>
+
+                                        <!-- 2. Filters Panel -->
+                                        <div id="panel-filters" class="editor-panel-section hidden">
+                                            <div class="filter-previews-grid" id="filter-previews-grid">
+                                                <!-- Dynamic generated via JS -->
+                                            </div>
+                                        </div>
+
+                                        <!-- 3. Crop & Rotate Panel -->
+                                        <div id="panel-crop" class="editor-panel-section hidden">
+                                            <div class="editor-control-group">
+                                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Aspect Ratio</label>
+                                                <div class="crop-aspect-ratios">
+                                                    <button class="crop-ratio-btn active" data-ratio="NaN">Free</button>
+                                                    <button class="crop-ratio-btn" data-ratio="1">1:1 Square</button>
+                                                    <button class="crop-ratio-btn" data-ratio="1.3333">4:3 Standard</button>
+                                                    <button class="crop-ratio-btn" data-ratio="1.7777">16:9 Cinema</button>
+                                                </div>
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1.25rem;">
+                                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Transformations</label>
+                                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 4px;">
+                                                    <button id="crop-rotate-left-btn" class="crop-ratio-btn">
+                                                        <i data-lucide="rotate-ccw"></i> -90°
+                                                    </button>
+                                                    <button id="crop-rotate-right-btn" class="crop-ratio-btn">
+                                                        <i data-lucide="rotate-cw"></i> +90°
+                                                    </button>
+                                                    <button id="crop-flip-h-btn" class="crop-ratio-btn">
+                                                        <i data-lucide="flip-horizontal"></i> Flip H
+                                                    </button>
+                                                    <button id="crop-flip-v-btn" class="crop-ratio-btn">
+                                                        <i data-lucide="flip-vertical"></i> Flip V
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div style="margin-top: 1.5rem; display: flex; gap: 8px;">
+                                                <button id="crop-cancel-btn" class="secondary-btn" style="flex: 1; margin-bottom: 0;">Cancel</button>
+                                                <button id="crop-apply-btn" class="primary-btn" style="flex: 1; margin-bottom: 0; background: var(--accent-color);">Apply Crop</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- 4. Retouch Panel -->
+                                        <div id="panel-retouch" class="editor-panel-section hidden">
+                                            <div class="editor-control-group">
+                                                <div class="editor-slider-header">
+                                                    <span>Skin Softening (Glow)</span>
+                                                    <span class="editor-slider-val" id="val-skinsoft">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-skinsoft" min="0" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Portrait Light</span>
+                                                    <span class="editor-slider-val" id="val-portraitlight">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-portraitlight" min="0" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Sharpness</span>
+                                                    <span class="editor-slider-val" id="val-sharpness">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-sharpness" min="0" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Denoise</span>
+                                                    <span class="editor-slider-val" id="val-denoise">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-denoise" min="0" max="100" value="0">
+                                            </div>
+                                        </div>
+
+                                        <!-- 5. Effects Panel -->
+                                        <div id="panel-effects" class="editor-panel-section hidden">
+                                            <div class="editor-control-group">
+                                                <div class="editor-slider-header">
+                                                    <span>Vignette</span>
+                                                    <span class="editor-slider-val" id="val-vignette">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-vignette" min="0" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Portrait Radial Blur</span>
+                                                    <span class="editor-slider-val" id="val-portraitblur">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-portraitblur" min="0" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>Background Blur</span>
+                                                    <span class="editor-slider-val" id="val-bgblur">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-bgblur" min="0" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>AI Drop Shadow Opacity</span>
+                                                    <span class="editor-slider-val" id="val-shadow-opacity">0</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-shadow-opacity" min="0" max="100" value="0">
+                                            </div>
+                                            <div class="editor-control-group" style="margin-top: 1rem;">
+                                                <div class="editor-slider-header">
+                                                    <span>AI Drop Shadow Offset</span>
+                                                    <span class="editor-slider-val" id="val-shadow-offset">10</span>
+                                                </div>
+                                                <input type="range" class="editor-slider" id="slider-shadow-offset" min="1" max="50" value="10">
+                                            </div>
+                                        </div>
+
+                                        <!-- 6. Text & AI Panel -->
+                                        <div id="panel-text-ai" class="editor-panel-section hidden">
+                                            <!-- Sub-category A: Background Remover Brush tools -->
+                                            <div class="editor-control-group">
+                                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Background Cutout</label>
+                                                <button id="editor-ai-cutout-btn" class="primary-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; border: none;">
+                                                    <i data-lucide="sparkles"></i> Automatic AI Cutout
+                                                </button>
+                                                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                                    <button id="brush-erase-btn" class="brush-type-btn">
+                                                        <i data-lucide="eraser"></i> Erase
+                                                    </button>
+                                                    <button id="brush-restore-btn" class="brush-type-btn">
+                                                        <i data-lucide="brush"></i> Restore
+                                                    </button>
+                                                </div>
+                                                <div id="brush-size-group" class="editor-control-group hidden" style="margin-top: 8px;">
+                                                    <div class="editor-slider-header">
+                                                        <span>Brush Size</span>
+                                                        <span class="editor-slider-val" id="val-brush-size">20px</span>
+                                                    </div>
+                                                    <input type="range" class="editor-slider" id="slider-brush-size" min="5" max="80" value="20">
+                                                </div>
+                                            </div>
+
+                                            <div style="border-top: 1px solid var(--border-color); margin: 1rem 0;"></div>
+
+                                            <!-- Sub-category B: Text tool -->
+                                            <div class="editor-control-group">
+                                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Add Text Overlay</label>
+                                                <input type="text" id="editor-add-text-input" placeholder="Type text here..." style="width:100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.8rem; margin-top: 4px;">
+                                                
+                                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px;">
+                                                    <div>
+                                                        <label style="font-size: 0.65rem; font-weight:700; color:var(--text-secondary);">FONT FAMILY</label>
+                                                        <select id="editor-text-font" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                                                            <option value="Inter">Sans-Serif (Inter)</option>
+                                                            <option value="Great Vibes">Calligraphy (Great Vibes)</option>
+                                                            <option value="Playfair Display">Serif (Playfair)</option>
+                                                            <option value="Courier Prime">Monospace (Courier)</option>
+                                                            <option value="Outfit">Modern (Outfit)</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label style="font-size: 0.65rem; font-weight:700; color:var(--text-secondary);">TEXT COLOR</label>
+                                                        <input type="color" id="editor-text-color" value="#ffffff" style="width: 100%; height: 30px; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; padding: 0;">
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="editor-control-group" style="margin-top: 8px;">
+                                                    <div class="editor-slider-header">
+                                                        <span>Font Size</span>
+                                                        <span class="editor-slider-val" id="val-font-size">24px</span>
+                                                    </div>
+                                                    <input type="range" class="editor-slider" id="slider-font-size" min="12" max="100" value="24">
+                                                </div>
+
+                                                <button id="editor-add-text-btn" class="secondary-btn" style="width:100%; margin-top: 12px; margin-bottom: 0; display:flex; align-items:center; justify-content:center; gap:6px;">
+                                                    <i data-lucide="plus"></i> Insert Text
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -10655,6 +11381,1179 @@ Configure your API key to get started.</p>
             }
         });
 
+                    notify('PDF watermarked successfully.', 'success');
+                }
+            } catch (err) {
+                console.error(err);
+                notify('Watermark failed.', 'error');
+                hideStatus();
+            }
+        });
+
+        // ==========================================
+        // PREMIUM IMAGE EDITOR ENGINE
+        // ==========================================
+        const editorFileInput = document.getElementById('editor-file-input');
+        const editorDropZone = document.getElementById('editor-drop-zone');
+        const editorWorkspaceContainer = document.getElementById('editor-workspace-container');
+        const editorCanvas = document.getElementById('editor-canvas');
+        const ctx = editorCanvas.getContext('2d', { willReadFrequently: true });
+        
+        // Element Controls
+        const editorUndoBtn = document.getElementById('editor-undo-btn');
+        const editorRedoBtn = document.getElementById('editor-redo-btn');
+        const editorClearBtn = document.getElementById('editor-clear-btn');
+        const editorExportFormat = document.getElementById('editor-export-format');
+        const editorDownloadBtn = document.getElementById('editor-download-btn');
+        const editorCanvasContainer = document.getElementById('editor-canvas-container');
+        const textOverlaysContainer = document.getElementById('editor-text-overlays-container');
+
+        // State stacks for undo/redo
+        let undoStack = [];
+        let redoStack = [];
+        let originalImgData = null; // Unmodified base image
+        
+        // Workspace status properties
+        let originalImage = null;
+        let originalWidth = 0;
+        let originalHeight = 0;
+        let currentWidth = 0;
+        let currentHeight = 0;
+        
+        let currentRotation = 0;
+        let currentFlipH = false;
+        let currentFlipV = false;
+        
+        let cropperInstance = null;
+        let isCroppingMode = false;
+        let activeFilter = 'normal';
+        let textsList = [];
+        
+        // Background Remover Brush mask canvas
+        let maskCanvas = null;
+        let maskCtx = null;
+        let isBrushDrawing = false;
+        let activeBrushType = null; // 'erase' | 'restore'
+        let brushSize = 20;
+
+        // Active slider adjustments
+        let currentAdjustments = {
+            exposure: 0,
+            brightness: 0,
+            contrast: 0,
+            highlights: 0,
+            whitepoint: 0,
+            blackpoint: 0,
+            saturation: 0,
+            warmth: 0,
+            bluetone: 0,
+            tint: 0,
+            skinsoft: 0,
+            portraitlight: 0,
+            sharpness: 0,
+            denoise: 0,
+            vignette: 0,
+            portraitblur: 0,
+            bgblur: 0,
+            shadowOpacity: 0,
+            shadowOffset: 10
+        };
+
+        // File loading triggers
+        editorDropZone.addEventListener('click', () => editorFileInput.click());
+        editorFileInput.addEventListener('change', handleEditorFileSelect);
+        
+        // Drag and drop
+        editorDropZone.addEventListener('dragover', (e) => { e.preventDefault(); editorDropZone.classList.add('drag-over'); });
+        editorDropZone.addEventListener('dragleave', () => editorDropZone.classList.remove('drag-over'));
+        editorDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            editorDropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) {
+                editorFileInput.files = e.dataTransfer.files;
+                handleEditorFileSelect();
+            }
+        });
+
+        function handleEditorFileSelect() {
+            if (editorFileInput.files.length === 0) return;
+            const file = editorFileInput.files[0];
+            loadImageIntoEditor(file);
+        }
+
+        function loadImageIntoEditor(file) {
+            showStatus('Loading image...');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    originalWidth = img.width;
+                    originalHeight = img.height;
+                    currentWidth = img.width;
+                    currentHeight = img.height;
+                    
+                    // Reset tool variables
+                    currentRotation = 0;
+                    currentFlipH = false;
+                    currentFlipV = false;
+                    activeFilter = 'normal';
+                    textsList = [];
+                    undoStack = [];
+                    redoStack = [];
+                    
+                    resetSliderControls();
+                    initMaskCanvas();
+                    
+                    // Update layout visibility
+                    editorDropZone.classList.add('hidden');
+                    editorWorkspaceContainer.classList.remove('hidden');
+                    
+                    // Initial draw
+                    drawEditorCanvas();
+                    
+                    // Save base state
+                    saveEditorState();
+                    
+                    // Generate filters preview list
+                    generateFiltersPreviewList();
+                    
+                    hideStatus();
+                    notify('Image loaded successfully.', 'success');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Mask Canvas for BG eraser
+        function initMaskCanvas() {
+            maskCanvas = document.createElement('canvas');
+            maskCanvas.width = currentWidth;
+            maskCanvas.height = currentHeight;
+            maskCtx = maskCanvas.getContext('2d');
+            // Start with solid white (keep everything visible)
+            maskCtx.fillStyle = '#ffffff';
+            maskCtx.fillRect(0, 0, currentWidth, currentHeight);
+        }
+
+        function resetSliderControls() {
+            currentAdjustments = {
+                exposure: 0, brightness: 0, contrast: 0, highlights: 0, whitepoint: 0,
+                blackpoint: 0, saturation: 0, warmth: 0, bluetone: 0, tint: 0,
+                skinsoft: 0, portraitlight: 0, sharpness: 0, denoise: 0,
+                vignette: 0, portraitblur: 0, bgblur: 0, shadowOpacity: 0, shadowOffset: 10
+            };
+            
+            // Sync slider inputs and indicator values
+            Object.keys(currentAdjustments).forEach(key => {
+                const slider = document.getElementById(`slider-${key}`);
+                const valIndicator = document.getElementById(`val-${key}`);
+                if (slider) {
+                    slider.value = currentAdjustments[key];
+                }
+                if (valIndicator) {
+                    valIndicator.textContent = key === 'brush-size' || key === 'font-size' ? `${currentAdjustments[key]}px` : currentAdjustments[key];
+                }
+            });
+            
+            // Reset active category panel highlights
+            switchEditorPanel('adjust');
+        }
+
+        // Category Menu Tabs switching
+        const editorTabBtns = document.querySelectorAll('.editor-tab-btn');
+        editorTabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-editor-tab');
+                switchEditorPanel(tabId);
+            });
+        });
+
+        function switchEditorPanel(tabId) {
+            editorTabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-editor-tab') === tabId));
+            
+            // Show corresponding panel section
+            const panels = document.querySelectorAll('.editor-panel-section');
+            panels.forEach(p => {
+                p.classList.toggle('hidden', p.id !== `panel-${tabId}`);
+            });
+
+            // Handle Cropper activation when entering 'crop' panel
+            if (tabId === 'crop') {
+                startCropperMode();
+            } else {
+                stopCropperMode(false); // Destroy without applying unless clicked 'Apply'
+            }
+
+            // Brush tools display helper
+            if (tabId === 'text-ai') {
+                const brushActive = activeBrushType !== null;
+                document.getElementById('brush-size-group').classList.toggle('hidden', !brushActive);
+            } else {
+                disableBrushListener();
+            }
+        }
+
+        // --- Cropper.js controls ---
+        function startCropperMode() {
+            if (isCroppingMode || !originalImage) return;
+            isCroppingMode = true;
+            
+            // Render clean canvas image state to destroy dynamic overlays during crop select
+            drawEditorCanvas();
+
+            cropperInstance = new Cropper(editorCanvas, {
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+                restore: false,
+                modal: true,
+                guides: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        }
+
+        function stopCropperMode(apply = false) {
+            if (!isCroppingMode || !cropperInstance) return;
+            
+            if (apply) {
+                const croppedCanvas = cropperInstance.getCroppedCanvas();
+                if (croppedCanvas) {
+                    // Load cropped image back as our new original image
+                    const croppedImg = new Image();
+                    croppedImg.onload = () => {
+                        originalImage = croppedImg;
+                        originalWidth = croppedImg.width;
+                        originalHeight = croppedImg.height;
+                        currentWidth = croppedImg.width;
+                        currentHeight = croppedImg.height;
+                        
+                        // Recalibrate mask canvas dimensions
+                        initMaskCanvas();
+                        
+                        // Redraw and save to undo history
+                        drawEditorCanvas();
+                        saveEditorState();
+                        generateFiltersPreviewList();
+                    };
+                    croppedImg.src = croppedCanvas.toDataURL();
+                }
+            }
+
+            cropperInstance.destroy();
+            cropperInstance = null;
+            isCroppingMode = false;
+            
+            // Sync UI active ratio button back to free
+            document.querySelectorAll('.crop-ratio-btn').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-ratio') === 'NaN');
+            });
+        }
+
+        // Aspect ratio selectors
+        document.querySelectorAll('.crop-ratio-btn[data-ratio]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.crop-ratio-btn[data-ratio]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const ratio = parseFloat(btn.getAttribute('data-ratio'));
+                if (cropperInstance) {
+                    cropperInstance.setAspectRatio(isNaN(ratio) ? NaN : ratio);
+                }
+            });
+        });
+
+        // Rotate & Flip buttons in Crop Panel
+        document.getElementById('crop-rotate-left-btn').addEventListener('click', () => {
+            if (cropperInstance) cropperInstance.rotate(-90);
+            else {
+                currentRotation = (currentRotation - 90) % 360;
+                drawEditorCanvas();
+                saveEditorState();
+            }
+        });
+        document.getElementById('crop-rotate-right-btn').addEventListener('click', () => {
+            if (cropperInstance) cropperInstance.rotate(90);
+            else {
+                currentRotation = (currentRotation + 90) % 360;
+                drawEditorCanvas();
+                saveEditorState();
+            }
+        });
+        document.getElementById('crop-flip-h-btn').addEventListener('click', () => {
+            if (cropperInstance) cropperInstance.scaleX(cropperInstance.getData().scaleX * -1);
+            else {
+                currentFlipH = !currentFlipH;
+                drawEditorCanvas();
+                saveEditorState();
+            }
+        });
+        document.getElementById('crop-flip-v-btn').addEventListener('click', () => {
+            if (cropperInstance) cropperInstance.scaleY(cropperInstance.getData().scaleY * -1);
+            else {
+                currentFlipV = !currentFlipV;
+                drawEditorCanvas();
+                saveEditorState();
+            }
+        });
+
+        document.getElementById('crop-apply-btn').addEventListener('click', () => {
+            stopCropperMode(true);
+            switchEditorPanel('adjust');
+        });
+        document.getElementById('crop-cancel-btn').addEventListener('click', () => {
+            stopCropperMode(false);
+            switchEditorPanel('adjust');
+            drawEditorCanvas();
+        });
+
+        // --- Render Pipeline ---
+        function drawEditorCanvas() {
+            if (!originalImage) return;
+
+            // Update canvas dimensions
+            editorCanvas.width = currentWidth;
+            editorCanvas.height = currentHeight;
+
+            ctx.clearRect(0, 0, currentWidth, currentHeight);
+
+            // 1. Build and apply Context CSS filter matrix (high performance hardware rendering)
+            let filterString = '';
+
+            // Exposure / Tone
+            if (currentAdjustments.exposure !== 0) {
+                filterString += ` brightness(${1 + currentAdjustments.exposure / 100})`;
+            }
+            // Brightness
+            if (currentAdjustments.brightness !== 0) {
+                filterString += ` brightness(${1 + currentAdjustments.brightness / 150})`;
+            }
+            // Contrast
+            if (currentAdjustments.contrast !== 0) {
+                filterString += ` contrast(${1 + currentAdjustments.contrast / 100})`;
+            }
+            // Saturation
+            if (currentAdjustments.saturation !== 0) {
+                filterString += ` saturate(${1 + currentAdjustments.saturation / 100})`;
+            }
+
+            // Append filter presets string
+            if (activeFilter !== 'normal') {
+                filterString += ` ${getFilterCSSPreset(activeFilter)}`;
+            }
+
+            ctx.filter = filterString.trim() || 'none';
+
+            // 2. Draw base Image content with orientations/transforms
+            ctx.save();
+            ctx.translate(currentWidth / 2, currentHeight / 2);
+            ctx.rotate((currentRotation * Math.PI) / 180);
+            ctx.scale(currentFlipH ? -1 : 1, currentFlipV ? -1 : 1);
+            ctx.drawImage(originalImage, -currentWidth / 2, -currentHeight / 2, currentWidth, currentHeight);
+            ctx.restore();
+
+            // Clear CSS filter context so overlays are unaffected
+            ctx.filter = 'none';
+
+            // 3. Apply custom color grading parameters (Warmth, Blue tone, Tint, Highlights, Black/White point)
+            applyColorGrading();
+
+            // 4. Retouch modifications (Skin softening/Glow, Denoise blur, Sharpness)
+            applyRetouching();
+
+            // 5. Effects overlays (Vignette, Radial Depth blur, Drop shadow)
+            if (currentAdjustments.vignette > 0) applyVignetteEffect();
+            if (currentAdjustments.portraitblur > 0) applyPortraitRadialBlur();
+            if (currentAdjustments.shadowOpacity > 0) applyDropShadowEffect();
+
+            // 6. Draw background transparent mask (if eraser brushes was applied)
+            applyTransparencyMask();
+        }
+
+        // Helper to maps filter labels to CSS presets
+        function getFilterCSSPreset(filterId) {
+            switch(filterId) {
+                case 'vivid': return 'contrast(1.2) saturate(1.35)';
+                case 'dramatic': return 'contrast(1.35) saturate(0.6)';
+                case 'mono': return 'grayscale(1) contrast(1.1)';
+                case 'silvertone': return 'grayscale(1) contrast(1.4) brightness(1.05)';
+                case 'vintage': return 'sepia(0.35) contrast(0.9) brightness(1.05)';
+                case 'chrome': return 'contrast(1.2) saturate(1.4)';
+                case 'instant': return 'sepia(0.2) contrast(0.85) saturate(1.1) brightness(1.05)';
+                case 'noir': return 'grayscale(1) contrast(1.7) brightness(0.85)';
+                case 'fade': return 'contrast(0.8) brightness(1.08) saturate(0.9)';
+                case 'process': return 'contrast(1.15) hue-rotate(10deg) saturate(1.25)';
+                case 'transfer': return 'sepia(0.15) contrast(1.1) saturate(0.95)';
+                case 'sepia': return 'sepia(1)';
+                case 'lomo': return 'saturate(1.4) contrast(1.1)';
+                case 'clarendon': return 'contrast(1.2) saturate(1.1) brightness(1.05)';
+                case 'gingham': return 'contrast(0.9) saturate(0.85) brightness(1.05) sepia(0.05)';
+                case 'juno': return 'saturate(1.25) contrast(1.1) hue-rotate(-5deg)';
+                case 'lark': return 'saturate(0.95) contrast(1.05) brightness(1.05)';
+                case 'moon': return 'grayscale(1) contrast(0.95) brightness(1.05)';
+                case 'crema': return 'sepia(0.1) saturate(0.9) contrast(0.95) brightness(1.05)';
+                case 'ludwig': return 'saturate(1.05) contrast(1.05) brightness(1.02)';
+                case 'aden': return 'sepia(0.08) saturate(0.85) contrast(0.9) brightness(1.08)';
+                case 'perpetua': return 'saturate(1.1) contrast(1.02) hue-rotate(-10deg)';
+                case 'reyes': return 'sepia(0.2) saturate(0.75) contrast(0.85) brightness(1.1)';
+                case 'hudson': return 'contrast(1.15) saturate(1.1) hue-rotate(5deg)';
+                case 'slumber': return 'saturate(0.8) contrast(0.9) brightness(1.05)';
+                case 'hefe': return 'contrast(1.3) saturate(1.3) hue-rotate(-5deg)';
+                case 'nashville': return 'sepia(0.2) saturate(1.1) contrast(0.95) brightness(1.08) hue-rotate(-10deg)';
+                default: return '';
+            }
+        }
+
+        // 30 Visual filters dynamic grid builder
+        const filterIds = [
+            'normal', 'vivid', 'dramatic', 'mono', 'silvertone', 'vintage', 'chrome', 'instant',
+            'noir', 'fade', 'process', 'transfer', 'sepia', 'lomo', 'clarendon', 'gingham',
+            'juno', 'lark', 'moon', 'crema', 'ludwig', 'aden', 'perpetua', 'reyes', 'hudson',
+            'slumber', 'hefe', 'nashville'
+        ];
+
+        function generateFiltersPreviewList() {
+            const grid = document.getElementById('filter-previews-grid');
+            grid.innerHTML = '';
+            
+            // Create a small scaling canvas to render thumbnail previews
+            const thumbCanvas = document.createElement('canvas');
+            const thumbCtx = thumbCanvas.getContext('2d');
+            thumbCanvas.width = 80;
+            thumbCanvas.height = 80;
+            
+            // Draw thumbnail image
+            thumbCtx.drawImage(originalImage, 0, 0, 80, 80);
+
+            filterIds.forEach(fid => {
+                const card = document.createElement('div');
+                card.className = `filter-card ${activeFilter === fid ? 'active' : ''}`;
+                
+                const c = document.createElement('canvas');
+                c.className = 'filter-thumbnail-canvas';
+                c.width = 80;
+                c.height = 80;
+                const cCtx = c.getContext('2d');
+                
+                cCtx.filter = getFilterCSSPreset(fid) || 'none';
+                cCtx.drawImage(thumbCanvas, 0, 0);
+                
+                const name = document.createElement('span');
+                name.className = 'filter-name';
+                name.textContent = fid.charAt(0).toUpperCase() + fid.slice(1);
+                
+                card.appendChild(c);
+                card.appendChild(name);
+                
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-card').forEach(x => x.classList.remove('active'));
+                    card.classList.add('active');
+                    activeFilter = fid;
+                    drawEditorCanvas();
+                    saveEditorState();
+                });
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Tone adjustments coloring overlay methods
+        function applyColorGrading() {
+            // Warmth / Blue Tone (via overlay blends)
+            if (currentAdjustments.warmth !== 0 || currentAdjustments.bluetone !== 0) {
+                const diff = currentAdjustments.warmth - currentAdjustments.bluetone;
+                ctx.save();
+                if (diff > 0) {
+                    ctx.fillStyle = `rgba(245, 158, 11, ${diff / 250})`; // Golden warmth
+                } else {
+                    ctx.fillStyle = `rgba(59, 130, 246, ${Math.abs(diff) / 250})`; // Cool blue tone
+                }
+                ctx.globalCompositeOperation = 'color';
+                ctx.fillRect(0, 0, currentWidth, currentHeight);
+                ctx.restore();
+            }
+
+            // Tint grading (Green / Magenta offset)
+            if (currentAdjustments.tint !== 0) {
+                ctx.save();
+                if (currentAdjustments.tint > 0) {
+                    ctx.fillStyle = `rgba(236, 72, 153, ${currentAdjustments.tint / 300})`; // Magenta tint
+                } else {
+                    ctx.fillStyle = `rgba(16, 185, 129, ${Math.abs(currentAdjustments.tint) / 300})`; // Green tint
+                }
+                ctx.globalCompositeOperation = 'soft-light';
+                ctx.fillRect(0, 0, currentWidth, currentHeight);
+                ctx.restore();
+            }
+
+            // Black Point / Highlights (Contrast curves approximation)
+            if (currentAdjustments.blackpoint !== 0 || currentAdjustments.highlights !== 0 || currentAdjustments.whitepoint !== 0) {
+                const imgData = ctx.getImageData(0, 0, currentWidth, currentHeight);
+                const d = imgData.data;
+                const bp = currentAdjustments.blackpoint / 100;
+                const hl = currentAdjustments.highlights / 100;
+                const wp = currentAdjustments.whitepoint / 100;
+
+                for (let i = 0; i < d.length; i += 4) {
+                    // Highlights / Black Point custom curve shift
+                    for (let c = 0; c < 3; c++) {
+                        let val = d[i + c] / 255;
+                        if (bp !== 0) {
+                            val = val < 0.25 ? val * (1 + bp) : val;
+                        }
+                        if (hl !== 0) {
+                            val = val > 0.75 ? val + (1 - val) * hl : val;
+                        }
+                        if (wp !== 0) {
+                            val = val * (1 + wp);
+                        }
+                        d[i + c] = Math.min(255, Math.max(0, val * 255));
+                    }
+                }
+                ctx.putImageData(imgData, 0, 0);
+            }
+        }
+
+        function applyRetouching() {
+            // Skin Softening (Bilateral Blur Approximation)
+            if (currentAdjustments.skinsoft > 0) {
+                ctx.save();
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = currentWidth;
+                tempCanvas.height = currentHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(editorCanvas, 0, 0);
+                
+                // Draw soft glow copy over original
+                ctx.filter = `blur(${Math.round(currentAdjustments.skinsoft / 10)}px) brightness(1.02)`;
+                ctx.globalAlpha = currentAdjustments.skinsoft / 200; // Blend opacity
+                ctx.drawImage(tempCanvas, 0, 0);
+                ctx.restore();
+            }
+
+            // Portrait Light (boost highlights and skin-like warm midtones)
+            if (currentAdjustments.portraitlight > 0) {
+                ctx.save();
+                // Screen composite of highlights
+                ctx.globalCompositeOperation = 'screen';
+                ctx.globalAlpha = currentAdjustments.portraitlight / 250;
+                ctx.drawImage(editorCanvas, 0, 0);
+                ctx.restore();
+            }
+
+            // Sharpness (High-Pass Unsharp Masking)
+            if (currentAdjustments.sharpness > 0) {
+                const imgData = ctx.getImageData(0, 0, currentWidth, currentHeight);
+                const d = imgData.data;
+                const w = currentWidth;
+                const sh = currentAdjustments.sharpness / 50;
+
+                // Simple Laplacian sharpen filter
+                const weights = [
+                    0, -1, 0,
+                    -1, 5, -1,
+                    0, -1, 0
+                ];
+                
+                const dCopy = new Uint8ClampedArray(d);
+                for (let y = 1; y < currentHeight - 1; y++) {
+                    for (let x = 1; x < w - 1; x++) {
+                        const idx = (y * w + x) * 4;
+                        for (let c = 0; c < 3; c++) {
+                            let sum = 0;
+                            for (let ky = -1; ky <= 1; ky++) {
+                                for (let kx = -1; kx <= 1; kx++) {
+                                    const cIdx = ((y + ky) * w + (x + kx)) * 4;
+                                    sum += dCopy[cIdx + c] * weights[(ky + 1) * 3 + (kx + 1)];
+                                }
+                            }
+                            // Blend sharpened value
+                            const orig = dCopy[idx + c];
+                            d[idx + c] = Math.min(255, Math.max(0, orig + (sum - orig) * sh));
+                        }
+                    }
+                }
+                ctx.putImageData(imgData, 0, 0);
+            }
+
+            // Denoise (Smooth Neighbor Box Filter)
+            if (currentAdjustments.denoise > 0) {
+                ctx.save();
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = currentWidth;
+                tempCanvas.height = currentHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(editorCanvas, 0, 0);
+
+                ctx.filter = `blur(${Math.max(1, Math.round(currentAdjustments.denoise / 20))}px)`;
+                ctx.globalAlpha = currentAdjustments.denoise / 150;
+                ctx.drawImage(tempCanvas, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        // Vignette effect drawing
+        function applyVignetteEffect() {
+            ctx.save();
+            const grad = ctx.createRadialGradient(
+                currentWidth / 2, currentHeight / 2, Math.max(currentWidth, currentHeight) * 0.2,
+                currentWidth / 2, currentHeight / 2, Math.max(currentWidth, currentHeight) * 0.8
+            );
+            const intensity = currentAdjustments.vignette / 100;
+            grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            grad.addColorStop(1, `rgba(0, 0, 0, ${intensity * 0.85})`);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, currentWidth, currentHeight);
+            ctx.restore();
+        }
+
+        // Portrait radial blur depth masking
+        function applyPortraitRadialBlur() {
+            ctx.save();
+            
+            // Create blurred copy on offscreen canvas
+            const blurCanvas = document.createElement('canvas');
+            blurCanvas.width = currentWidth;
+            blurCanvas.height = currentHeight;
+            const bCtx = blurCanvas.getContext('2d');
+            bCtx.filter = `blur(${Math.round(currentAdjustments.portraitblur / 4)}px)`;
+            bCtx.drawImage(editorCanvas, 0, 0);
+
+            // Draw radial mask (clear in center, opaque at edge)
+            const mask = document.createElement('canvas');
+            mask.width = currentWidth;
+            mask.height = currentHeight;
+            const mCtx = mask.getContext('2d');
+            const grad = mCtx.createRadialGradient(
+                currentWidth / 2, currentHeight / 2, Math.min(currentWidth, currentHeight) * 0.25,
+                currentWidth / 2, currentHeight / 2, Math.max(currentWidth, currentHeight) * 0.7
+            );
+            grad.addColorStop(0, 'rgba(0,0,0,0)');
+            grad.addColorStop(1, 'rgba(0,0,0,1)');
+            mCtx.fillStyle = grad;
+            mCtx.fillRect(0, 0, currentWidth, currentHeight);
+
+            // Composite blurred copy using the mask
+            ctx.drawImage(blurCanvas, 0, 0);
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.drawImage(mask, 0, 0);
+            ctx.restore();
+        }
+
+        // Drop shadow generation
+        function applyDropShadowEffect() {
+            ctx.save();
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = currentWidth;
+            tempCanvas.height = currentHeight;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.drawImage(editorCanvas, 0, 0);
+
+            ctx.clearRect(0, 0, currentWidth, currentHeight);
+
+            // Draw shadow base (offset and blur)
+            ctx.shadowColor = `rgba(15, 23, 42, ${currentAdjustments.shadowOpacity / 100})`;
+            ctx.shadowBlur = currentAdjustments.shadowOffset;
+            ctx.shadowOffsetX = currentAdjustments.shadowOffset;
+            ctx.shadowOffsetY = currentAdjustments.shadowOffset;
+            
+            ctx.drawImage(tempCanvas, 0, 0);
+            
+            // Draw clean layer on top of shadow
+            ctx.shadowColor = 'transparent';
+            ctx.drawImage(tempCanvas, 0, 0);
+            ctx.restore();
+        }
+
+        // Transparency mask (Erase / Restore mask composite)
+        function applyTransparencyMask() {
+            if (!maskCanvas) return;
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.drawImage(maskCanvas, 0, 0);
+            ctx.restore();
+        }
+
+        // --- Slider values listener sync ---
+        const editorSliders = document.querySelectorAll('.editor-slider');
+        editorSliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const key = e.target.id.replace('slider-', '');
+                const val = parseInt(e.target.value);
+                currentAdjustments[key] = val;
+                
+                const valEl = document.getElementById(`val-${key}`);
+                if (valEl) {
+                    valEl.textContent = key === 'brush-size' || key === 'font-size' ? `${val}px` : val;
+                }
+                
+                // Live rendering adjustments
+                drawEditorCanvas();
+            });
+
+            // Push undo state when user releases slider
+            slider.addEventListener('change', () => {
+                saveEditorState();
+            });
+        });
+
+        // --- Background Eraser Brushes logic ---
+        const brushEraseBtn = document.getElementById('brush-erase-btn');
+        const brushRestoreBtn = document.getElementById('brush-restore-btn');
+        const editorAiCutoutBtn = document.getElementById('editor-ai-cutout-btn');
+        const brushSizeSlider = document.getElementById('slider-brush-size');
+
+        brushEraseBtn.addEventListener('click', () => toggleBrushTool('erase'));
+        brushRestoreBtn.addEventListener('click', () => toggleBrushTool('restore'));
+
+        function toggleBrushTool(type) {
+            if (activeBrushType === type) {
+                // Deactivate
+                activeBrushType = null;
+                brushEraseBtn.classList.remove('active');
+                brushRestoreBtn.classList.remove('active');
+                document.getElementById('brush-size-group').classList.add('hidden');
+                disableBrushListener();
+            } else {
+                activeBrushType = type;
+                brushEraseBtn.classList.toggle('active', type === 'erase');
+                brushRestoreBtn.classList.toggle('active', type === 'restore');
+                document.getElementById('brush-size-group').classList.remove('hidden');
+                enableBrushListener();
+            }
+        }
+
+        function enableBrushListener() {
+            editorCanvas.style.cursor = 'crosshair';
+            
+            // Remove existing to avoid double bind
+            editorCanvas.removeEventListener('mousedown', startBrushStroke);
+            editorCanvas.removeEventListener('mousemove', drawBrushStroke);
+            editorCanvas.removeEventListener('mouseup', endBrushStroke);
+            editorCanvas.removeEventListener('mouseleave', endBrushStroke);
+
+            // Add new listeners
+            editorCanvas.addEventListener('mousedown', startBrushStroke);
+            editorCanvas.addEventListener('mousemove', drawBrushStroke);
+            editorCanvas.addEventListener('mouseup', endBrushStroke);
+            editorCanvas.addEventListener('mouseleave', endBrushStroke);
+
+            // Touch events for mobile
+            editorCanvas.addEventListener('touchstart', startBrushStrokeTouch, { passive: false });
+            editorCanvas.addEventListener('touchmove', drawBrushStrokeTouch, { passive: false });
+            editorCanvas.addEventListener('touchend', endBrushStroke);
+        }
+
+        function disableBrushListener() {
+            editorCanvas.style.cursor = 'default';
+            editorCanvas.removeEventListener('mousedown', startBrushStroke);
+            editorCanvas.removeEventListener('mousemove', drawBrushStroke);
+            editorCanvas.removeEventListener('mouseup', endBrushStroke);
+            editorCanvas.removeEventListener('mouseleave', endBrushStroke);
+
+            editorCanvas.removeEventListener('touchstart', startBrushStrokeTouch);
+            editorCanvas.removeEventListener('touchmove', drawBrushStrokeTouch);
+            editorCanvas.removeEventListener('touchend', endBrushStroke);
+            
+            activeBrushType = null;
+            brushEraseBtn.classList.remove('active');
+            brushRestoreBtn.classList.remove('active');
+            const sizeGroup = document.getElementById('brush-size-group');
+            if (sizeGroup) sizeGroup.classList.add('hidden');
+        }
+
+        function getCanvasMouseCoords(e) {
+            const rect = editorCanvas.getBoundingClientRect();
+            const scaleX = currentWidth / rect.width;
+            const scaleY = currentHeight / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        function startBrushStroke(e) {
+            if (!activeBrushType || !maskCtx) return;
+            isBrushDrawing = true;
+            drawBrushPoint(getCanvasMouseCoords(e));
+        }
+
+        function drawBrushStroke(e) {
+            if (!isBrushDrawing) return;
+            drawBrushPoint(getCanvasMouseCoords(e));
+        }
+
+        function endBrushStroke() {
+            if (isBrushDrawing) {
+                isBrushDrawing = false;
+                saveEditorState();
+            }
+        }
+
+        // Touch events coordinates mapper
+        function startBrushStrokeTouch(e) {
+            if (!activeBrushType || !maskCtx) return;
+            e.preventDefault();
+            isBrushDrawing = true;
+            const touch = e.touches[0];
+            drawBrushPoint(getCanvasMouseCoords(touch));
+        }
+
+        function drawBrushStrokeTouch(e) {
+            if (!isBrushDrawing) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            drawBrushPoint(getCanvasMouseCoords(touch));
+        }
+
+        function drawBrushPoint(coords) {
+            const size = parseInt(brushSizeSlider.value);
+            maskCtx.save();
+            maskCtx.beginPath();
+            maskCtx.arc(coords.x, coords.y, size, 0, Math.PI * 2);
+            
+            if (activeBrushType === 'erase') {
+                maskCtx.fillStyle = 'rgba(0,0,0,1)';
+                maskCtx.globalCompositeOperation = 'destination-out';
+            } else {
+                maskCtx.fillStyle = 'rgba(255,255,255,1)';
+                maskCtx.globalCompositeOperation = 'source-over';
+            }
+            
+            maskCtx.fill();
+            maskCtx.restore();
+            
+            // Render updates live
+            drawEditorCanvas();
+        }
+
+        // Automatic Background detection cutout fallback
+        editorAiCutoutBtn.addEventListener('click', () => {
+            showStatus('Processing AI cutout...');
+            setTimeout(() => {
+                try {
+                    const imgData = ctx.getImageData(0, 0, currentWidth, currentHeight);
+                    const d = imgData.data;
+                    
+                    // Sample corner pixel as background color reference
+                    const rRef = d[0], gRef = d[1], bRef = d[2];
+                    const tolerance = 45; // Match tolerance
+
+                    maskCtx.clearRect(0, 0, currentWidth, currentHeight);
+                    const maskData = maskCtx.getImageData(0, 0, currentWidth, currentHeight);
+                    const m = maskData.data;
+
+                    for (let i = 0; i < d.length; i += 4) {
+                        const r = d[i], g = d[i+1], b = d[i+2];
+                        const diff = Math.sqrt(
+                            Math.pow(r - rRef, 2) + 
+                            Math.pow(g - gRef, 2) + 
+                            Math.pow(b - bRef, 2)
+                        );
+                        
+                        if (diff < tolerance) {
+                            m[i+3] = 0; // Cutout transparent background
+                        } else {
+                            m[i] = 255;
+                            m[i+1] = 255;
+                            m[i+2] = 255;
+                            m[i+3] = 255;
+                        }
+                    }
+                    maskCtx.putImageData(maskData, 0, 0);
+                    
+                    drawEditorCanvas();
+                    saveEditorState();
+                    hideStatus();
+                    notify('Background cutout finished.', 'success');
+                } catch (e) {
+                    console.error("Cutout failed", e);
+                    hideStatus();
+                    notify('Cutout failed.', 'error');
+                }
+            }, 300);
+        });
+
+        // --- Text Overlays Engine ---
+        const editorAddTextInput = document.getElementById('editor-add-text-input');
+        const editorTextFont = document.getElementById('editor-text-font');
+        const editorTextColor = document.getElementById('editor-text-color');
+        const editorFontSizeSlider = document.getElementById('slider-font-size');
+        const editorAddTextBtn = document.getElementById('editor-add-text-btn');
+
+        editorAddTextBtn.addEventListener('click', () => {
+            const val = editorAddTextInput.value.trim();
+            if (!val) {
+                notify('Please type some text.', 'info');
+                return;
+            }
+
+            const font = editorTextFont.value;
+            const size = parseInt(editorFontSizeSlider.value);
+            const color = editorTextColor.value;
+
+            const textObj = {
+                id: Math.random().toString(36).substr(2, 9),
+                text: val,
+                font: font,
+                size: size,
+                color: color,
+                x: 50, // Coordinates in percentage for responsive scaling
+                y: 50
+            };
+
+            textsList.push(textObj);
+            renderTextOverlaysDOM();
+            editorAddTextInput.value = '';
+            saveEditorState();
+        });
+
+        function renderTextOverlaysDOM() {
+            textOverlaysContainer.innerHTML = '';
+            
+            textsList.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'canvas-text-overlay';
+                el.style.left = `${item.x}%`;
+                el.style.top = `${item.y}%`;
+                el.style.fontSize = `${item.size}px`;
+                el.style.fontFamily = `'${item.font}', sans-serif`;
+                el.style.color = item.color;
+                el.style.pointerEvents = 'auto'; // Enable drag pointer
+                
+                el.innerHTML = `
+                    <span>${item.text}</span>
+                    <button class="canvas-text-overlay-delete" title="Delete">×</button>
+                `;
+
+                // Handle text drag positioning
+                let isDragging = false;
+                let startX = 0, startY = 0;
+
+                el.addEventListener('mousedown', (e) => {
+                    if (e.target.classList.contains('canvas-text-overlay-delete')) return;
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    el.style.zIndex = 1000;
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    const diffX = e.clientX - startX;
+                    const diffY = e.clientY - startY;
+
+                    const containerRect = textOverlaysContainer.getBoundingClientRect();
+                    const newX = parseFloat(el.style.left) + (diffX / containerRect.width) * 100;
+                    const newY = parseFloat(el.style.top) + (diffY / containerRect.height) * 100;
+
+                    // Constrain bounds
+                    item.x = Math.max(0, Math.min(95, newX));
+                    item.y = Math.max(0, Math.min(95, newY));
+
+                    el.style.left = `${item.x}%`;
+                    el.style.top = `${item.y}%`;
+
+                    startX = e.clientX;
+                    startY = e.clientY;
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        el.style.zIndex = '';
+                        saveEditorState();
+                    }
+                });
+
+                // Delete text button action
+                el.querySelector('.canvas-text-overlay-delete').addEventListener('click', () => {
+                    textsList = textsList.filter(t => t.id !== item.id);
+                    renderTextOverlaysDOM();
+                    saveEditorState();
+                });
+
+                textOverlaysContainer.appendChild(el);
+            });
+        }
+
+        // Draw text layers onto output canvas during save/export
+        function drawTextsList() {
+            textsList.forEach(item => {
+                ctx.save();
+                ctx.fillStyle = item.color;
+                ctx.font = `bold ${item.size}px '${item.font}', sans-serif`;
+                
+                // Map percentage coordinates back to canvas scale pixels
+                const xPx = (item.x / 100) * currentWidth;
+                const yPx = (item.y / 100) * currentHeight;
+                
+                ctx.fillText(item.text, xPx, yPx + item.size);
+                ctx.restore();
+            });
+        }
+
+        // --- Undo / Redo history engine ---
+        function saveEditorState() {
+            // Cap history state stack size at 12 records to limit browser memory usage
+            if (undoStack.length >= 12) {
+                undoStack.shift();
+            }
+            
+            // Serialize and push full configuration state
+            const state = {
+                adjustments: JSON.parse(JSON.stringify(currentAdjustments)),
+                filter: activeFilter,
+                rotation: currentRotation,
+                flipH: currentFlipH,
+                flipV: currentFlipV,
+                texts: JSON.parse(JSON.stringify(textsList)),
+                // Cache mask canvas content
+                maskData: maskCanvas ? maskCtx.getImageData(0, 0, currentWidth, currentHeight) : null
+            };
+            
+            undoStack.push(state);
+            redoStack = []; // Reset redo
+            
+            updateUndoRedoButtons();
+        }
+
+        function updateUndoRedoButtons() {
+            editorUndoBtn.disabled = undoStack.length <= 1;
+            editorRedoBtn.disabled = redoStack.length === 0;
+        }
+
+        editorUndoBtn.addEventListener('click', () => {
+            if (undoStack.length <= 1) return;
+            const currentState = undoStack.pop();
+            redoStack.push(currentState);
+            
+            const prevState = undoStack[undoStack.length - 1];
+            restoreEditorState(prevState);
+        });
+
+        editorRedoBtn.addEventListener('click', () => {
+            if (redoStack.length === 0) return;
+            const nextState = redoStack.pop();
+            undoStack.push(nextState);
+            
+            restoreEditorState(nextState);
+        });
+
+        function restoreEditorState(state) {
+            currentAdjustments = JSON.parse(JSON.stringify(state.adjustments));
+            activeFilter = state.filter;
+            currentRotation = state.rotation;
+            currentFlipH = state.flipH;
+            currentFlipV = state.flipV;
+            textsList = JSON.parse(JSON.stringify(state.texts));
+
+            // Sync sliders
+            Object.keys(currentAdjustments).forEach(key => {
+                const slider = document.getElementById(`slider-${key}`);
+                const valEl = document.getElementById(`val-${key}`);
+                if (slider) slider.value = currentAdjustments[key];
+                if (valEl) valEl.textContent = key === 'brush-size' || key === 'font-size' ? `${currentAdjustments[key]}px` : currentAdjustments[key];
+            });
+
+            // Restore eraser mask
+            if (state.maskData && maskCtx) {
+                maskCtx.putImageData(state.maskData, 0, 0);
+            }
+
+            renderTextOverlaysDOM();
+            drawEditorCanvas();
+            updateUndoRedoButtons();
+        }
+
+        // Reset workspace to original loaded image state
+        editorClearBtn.addEventListener('click', () => {
+            if (!originalImage) return;
+            showStatus('Resetting changes...');
+            setTimeout(() => {
+                resetSliderControls();
+                initMaskCanvas();
+                currentRotation = 0;
+                currentFlipH = false;
+                currentFlipV = false;
+                activeFilter = 'normal';
+                textsList = [];
+                undoStack = [];
+                redoStack = [];
+                
+                renderTextOverlaysDOM();
+                drawEditorCanvas();
+                saveEditorState();
+                
+                hideStatus();
+                notify('Editor parameters reset.', 'info');
+            }, 250);
+        });
+
+        // Download / Export finalized image file
+        editorDownloadBtn.addEventListener('click', () => {
+            if (!originalImage) return;
+            showStatus('Exporting image...');
+            
+            setTimeout(() => {
+                try {
+                    // Final draw incorporating text layers and masks
+                    drawEditorCanvas();
+                    
+                    const format = editorExportFormat.value;
+                    const ext = format === 'image/png' ? 'png' : format === 'image/webp' ? 'webp' : 'jpg';
+                    
+                    const url = editorCanvas.toDataURL(format, format === 'image/png' ? undefined : 0.9);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `SwiftFile_Edited.${ext}`;
+                    link.click();
+                    
+                    hideStatus();
+                    notify('Image exported successfully.', 'success');
+                } catch (e) {
+                    console.error("Export failed", e);
+                    hideStatus();
+                    notify('Export failed.', 'error');
+                }
+            }, 300);
+        });
+
+        // Register Image Editor shared receiver router link
+        const origRouteFileToTool = routeFileToTool;
+        routeFileToTool = function(file, toolId) {
+            if (toolId === 'image-editor') {
+                switchTab('image-editor');
+                loadImageIntoEditor(file);
+            } else {
+                origRouteFileToTool(file, toolId);
+            }
+        };
+
+        // Add Image Editor tab receiver to Share targets lists
+        const origGetMatchingToolsForFile = getMatchingToolsForFile;
+        getMatchingToolsForFile = function(file) {
+            const list = origGetMatchingToolsForFile(file);
+            const type = file.type || '';
+            const name = (file.name || '').toLowerCase();
+            
+            if (type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(name)) {
+                // Insert Image Editor as the recommended tool at the start
+                list.unshift({
+                    id: 'image-editor',
+                    name: 'Image Editor',
+                    desc: 'Enhance colors, add text, crop, rotate or retouch image with 30 filters',
+                    icon: 'pen-tool'
+                });
+            }
+            return list;
+        };
+
         // --- Swift Assistant Logic ---
         const assistantSettingsToggleBtn = document.getElementById('assistant-settings-toggle-btn');
         const assistantSettingsPopover = document.getElementById('assistant-settings-popover');
@@ -15141,7 +17040,8 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             'scanner': ['scanner', 'camera scan', 'scan document', 'crop scanner', 'scan page', 'ocr', 'extract text from image', 'digitize', 'image ocr', 'read text'],
             'webpage-to-pdf': ['webpage to pdf', 'url to pdf', 'website scan', 'save website', 'html to pdf', 'convert url', 'link to pdf', 'download site'],
             'redact-pdf': ['redact pdf', 'censor pdf', 'blackout text', 'hide sensitive info', 'erase text from pdf', 'cover up content', 'blur information', 'whiteout text', 'privacy tool'],
-            'watermark-tool': ['watermark', 'stamp pdf', 'add logo to pdf', 'add text overlay', 'signature', 'brand pdf', 'sign document', 'watermark image', 'overlay brand']
+            'watermark-tool': ['watermark', 'stamp pdf', 'add logo to pdf', 'add text overlay', 'signature', 'brand pdf', 'sign document', 'watermark image', 'overlay brand'],
+            'image-editor': ['image editor', 'edit photo', 'photo editor', 'adjust color', 'filters', 'crop image', 'rotate', 'add text to image', 'vignette', 'blur', 'skin tone', 'sharpness', 'soften skin', 'retouch', 'shadows']
         };
 
         // Shared filter function used by both inputs
