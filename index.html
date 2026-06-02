@@ -3315,135 +3315,134 @@
         .custom-select-option.active .option-icon {
             color: white;
         }
-
-        .custom-select-option:not(.active):hover .option-icon {
-            color: var(--accent-color);
-        }
-    </style>
-    <script>
-        let lastActiveTabId = 'swift-assistant';
-        function switchTab(tabId) {
-            // Close mobile menu if open
-            toggleMobileMenu(false);
-            const searchWrap = document.getElementById('mobile-search-wrap');
-            if (searchWrap) searchWrap.classList.remove('active');
-
-            if (tabId !== 'swift-assistant') {
-                lastActiveTabId = tabId;
+            .app-sidebar-panel .tab-btn.active i {
+                color: white !important;
             }
 
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
-            });
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.toggle('active', content.id === tabId);
-            });
-
-            // Sync Mobile Dropdown Label if needed
-            const toolLabels = {
-                'img-to-pdf': 'Image to PDF',
-                'pdf-to-img': 'PDF to Image',
-                'merge-pdf': 'Merge PDF',
-                'split-pdf': 'Split PDF',
-                'compress-pdf': 'Compress PDF',
-                'compress-image': 'Compress Image',
-                'unlock-pdf': 'Unlock PDF',
-                'protect-pdf': 'Protect PDF',
-                'bg-remover': 'Remove BG',
-                'collage-maker': 'Collage Maker',
-                'word-to-pdf': 'Word to PDF',
-                'scanner': 'Scanner',
-                'webpage-to-pdf': 'Webpage to PDF',
-                'redact-pdf': 'Redact PDF',
-                'watermark-tool': 'Watermark',
-                'video-compressor': 'Video Compressor',
-                'swift-assistant': 'Swift Assistant'
-            };
-            const toolIcons = {
-                'img-to-pdf': 'image',
-                'pdf-to-img': 'file-image',
-                'merge-pdf': 'copy',
-                'split-pdf': 'scissors',
-                'compress-pdf': 'shrink',
-                'compress-image': 'image-plus',
-                'unlock-pdf': 'unlock',
-                'protect-pdf': 'lock',
-                'bg-remover': 'eraser',
-                'collage-maker': 'layout',
-                'word-to-pdf': 'file-up',
-                'scanner': 'scan',
-                'webpage-to-pdf': 'globe',
-                'redact-pdf': 'eye-off',
-                'watermark-tool': 'stamp',
-                'video-compressor': 'video',
-                'swift-assistant': 'message-square'
-            };
-
-            const label = document.getElementById('current-tool-label');
-            const icon = document.getElementById('current-tool-icon');
-            if (label && toolLabels[tabId]) {
-                label.textContent = toolLabels[tabId];
-                if (icon) {
-                    icon.setAttribute('data-lucide', toolIcons[tabId]);
-                }
+            #swift-assistant.mobile-fullscreen {
+                height: calc(100vh - 124px) !important;
+                height: calc(100dvh - 124px) !important;
             }
 
-            if (tabId === 'swift-assistant') {
-                if (window.innerWidth <= 1024) {
-                    document.getElementById('swift-assistant').classList.add('mobile-fullscreen');
-                    if (window.history.state?.panel !== 'assistant') {
-                        window.history.pushState({ panel: 'assistant' }, '');
-                    }
-                }
-                setTimeout(() => {
-                    const inputField = document.getElementById('assistant-input');
-                    if (inputField) {
-                        if (window.innerWidth <= 1024) {
-                            inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                        inputField.focus();
-                    }
-                }, 100);
-            } else {
-                if (window.innerWidth <= 1024) {
-                    document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+            /* Bottom nav styles inside mobile query */
+            .mobile-bottom-nav {
+                display: flex !important;
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 64px !important;
+                background: var(--surface-color) !important;
+                border-top: 1px solid var(--border-color) !important;
+                justify-content: space-around !important;
+                align-items: center !important;
+                z-index: 9997 !important;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05) !important;
+                padding-bottom: env(safe-area-inset-bottom, 0) !important;
             }
 
-            // Sync bottom navigation active class
-            document.querySelectorAll('#mobile-bottom-nav .nav-item').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
-            });
-        }
-
-        // Mobile Tool Dropdown Logic removed as requested
-
-        function handleMobileToolSelect(tabId, labelText, iconName) {
-            switchTab(tabId);
-        }
-
-        function toggleMobileMenu(open) {
-            const sidebar = document.getElementById('app-sidebar-panel');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            if (sidebar) {
-                sidebar.classList.toggle('open', open);
+            .mobile-bottom-nav .nav-item {
+                background: none !important;
+                border: none !important;
+                color: var(--text-secondary) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0.65rem !important;
+                font-weight: 600 !important;
+                gap: 4px !important;
+                cursor: pointer !important;
+                flex: 1 !important;
+                height: 100% !important;
+                transition: var(--transition) !important;
+                outline: none !important;
             }
-            if (backdrop) {
-                backdrop.classList.toggle('visible', open);
+
+            .mobile-bottom-nav .nav-item i {
+                width: 20px !important;
+                height: 20px !important;
             }
-            if (open) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
+
+            .mobile-bottom-nav .nav-item.active {
+                color: var(--accent-color) !important;
+            }
+
+            .mobile-bottom-nav .nav-item.more-btn {
+                color: var(--accent-color) !important;
+            }
+
+            /* Mobile Compact Top Toast */
+            .toast {
+                bottom: auto !important;
+                top: 76px !important;
+                left: 50% !important;
+                transform: translateX(-50%) translateY(0) !important;
+                padding: 6px 12px !important;
+                border-radius: 8px !important;
+                font-size: 0.775rem !important;
+                max-width: 90% !important;
+                width: max-content !important;
+                z-index: 200000 !important;
+                box-shadow: var(--shadow-lg) !important;
+                transition: opacity 0.1s ease-out, visibility 0.1s ease-out, transform 0.1s ease-out !important;
+            }
+            .toast.hidden {
+                display: flex !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+                transform: translateX(-50%) translateY(-10px) !important;
+            }
+            .toast-content {
+                gap: 8px !important;
+            }
+            .toast-content svg, .toast-content i {
+                width: 14px !important;
+                height: 14px !important;
             }
         }
 
-        function toggleMobileSearch() {
-            const searchWrap = document.getElementById('mobile-search-wrap');
-            if (searchWrap) {
-                const isActive = searchWrap.classList.toggle('active');
-                if (isActive) {
+        /* Beautiful Custom Dropdown Select */
+        .custom-select-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 6px 10px;
+            height: 32px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .custom-select-trigger:hover {
+            border-color: var(--accent-color);
+        }
+
+        .custom-select-trigger .trigger-arrow {
+            width: 14px;
+            height: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.3s ease;
+        }
+
+        .custom-select-container.open .trigger-arrow {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
             position: absolute;
             top: calc(100% + 6px);
             left: 0;
@@ -3515,136 +3514,7 @@
             color: var(--accent-color);
         }
     </style>
-    <script>
-        let lastActiveTabId = 'swift-assistant';
-        function switchTab(tabId) {
-            // Close mobile menu if open
-            toggleMobileMenu(false);
-            const searchWrap = document.getElementById('mobile-search-wrap');
-            if (searchWrap) searchWrap.classList.remove('active');
-
-            if (tabId !== 'swift-assistant') {
-                lastActiveTabId = tabId;
-            }
-
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
-            });
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.toggle('active', content.id === tabId);
-            });
-
-            // Sync Mobile Dropdown Label if needed
-            const toolLabels = {
-                'img-to-pdf': 'Image to PDF',
-                'pdf-to-img': 'PDF to Image',
-                'merge-pdf': 'Merge PDF',
-                'split-pdf': 'Split PDF',
-                'compress-pdf': 'Compress PDF',
-                'compress-image': 'Compress Image',
-                'unlock-pdf': 'Unlock PDF',
-                'protect-pdf': 'Protect PDF',
-                'bg-remover': 'Remove BG',
-                'collage-maker': 'Collage Maker',
-                'word-to-pdf': 'Word to PDF',
-                'scanner': 'Scanner',
-                'webpage-to-pdf': 'Webpage to PDF',
-                'redact-pdf': 'Redact PDF',
-                'watermark-tool': 'Watermark',
-                'video-compressor': 'Video Compressor',
-                'swift-assistant': 'Swift Assistant'
-            };
-            const toolIcons = {
-                'img-to-pdf': 'image',
-                'pdf-to-img': 'file-image',
-                'merge-pdf': 'copy',
-                'split-pdf': 'scissors',
-                'compress-pdf': 'shrink',
-                'compress-image': 'image-plus',
-                'unlock-pdf': 'unlock',
-                'protect-pdf': 'lock',
-                'bg-remover': 'eraser',
-                'collage-maker': 'layout',
-                'word-to-pdf': 'file-up',
-                'scanner': 'scan',
-                'webpage-to-pdf': 'globe',
-                'redact-pdf': 'eye-off',
-                'watermark-tool': 'stamp',
-                'video-compressor': 'video',
-                'swift-assistant': 'message-square'
-            };
-
-            const label = document.getElementById('current-tool-label');
-            const icon = document.getElementById('current-tool-icon');
-            if (label && toolLabels[tabId]) {
-                label.textContent = toolLabels[tabId];
-                if (icon) {
-                    icon.setAttribute('data-lucide', toolIcons[tabId]);
-                }
-            }
-
-            if (tabId === 'swift-assistant') {
-                if (window.innerWidth <= 1024) {
-                    document.getElementById('swift-assistant').classList.add('mobile-fullscreen');
-                    if (window.history.state?.panel !== 'assistant') {
-                        window.history.pushState({ panel: 'assistant' }, '');
-                    }
-                }
-                setTimeout(() => {
-                    const inputField = document.getElementById('assistant-input');
-                    if (inputField) {
-                        if (window.innerWidth <= 1024) {
-                            inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                        inputField.focus();
-                    }
-                }, 100);
-            } else {
-                if (window.innerWidth <= 1024) {
-                    document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            }
-
-            // Sync bottom navigation active class
-            document.querySelectorAll('#mobile-bottom-nav .nav-item').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
-            });
-        }
-
-        // Mobile Tool Dropdown Logic removed as requested
-
-        function handleMobileToolSelect(tabId, labelText, iconName) {
-            switchTab(tabId);
-        }
-
-        function toggleMobileMenu(open) {
-            const sidebar = document.getElementById('app-sidebar-panel');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            if (sidebar) {
-                sidebar.classList.toggle('open', open);
-            }
-            if (backdrop) {
-                backdrop.classList.toggle('visible', open);
-            }
-            if (open) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
-        }
-
-        function toggleMobileSearch() {
-            const searchWrap = document.getElementById('mobile-search-wrap');
-            if (searchWrap) {
-                const isActive = searchWrap.classList.toggle('active');
-                if (isActive) {
-                    const input = document.getElementById('mobile-search-input');
-                    if (input) input.focus();
-                }
-            }
-        }
-    </script>
+    <!-- Navigation logic is in api/navigation.js -->
 
     <!-- Inline Lucide Icon Renderer (no CDN needed) -->
     <script>
