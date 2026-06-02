@@ -5998,7 +5998,10 @@ Configure your API key to get started.</p>
                     const displayWidth = isPortrait ? img.width : img.height;
                     const displayHeight = isPortrait ? img.height : img.width;
 
-                    const ratio = Math.min(pageWidth / displayWidth, pageHeight / displayHeight);
+                    const margin = 20; // 20pt safety margin
+                    const safeWidth = pageWidth - (margin * 2);
+                    const safeHeight = pageHeight - (margin * 2);
+                    const ratio = Math.min(safeWidth / displayWidth, safeHeight / displayHeight);
                     const imgWidth = displayWidth * ratio;
                     const imgHeight = displayHeight * ratio;
 
@@ -6032,8 +6035,8 @@ Configure your API key to get started.</p>
                     pdf.addImage(
                         finalImgData,
                         finalFormat,
-                        (pageWidth - imgWidth) / 2,
-                        (pageHeight - imgHeight) / 2,
+                        margin + (safeWidth - imgWidth) / 2,
+                        margin + (safeHeight - imgHeight) / 2,
                         imgWidth,
                         imgHeight,
                         undefined,
@@ -6173,7 +6176,8 @@ Configure your API key to get started.</p>
                     mergedPdf.addPage(copiedPage);
                 }
 
-                const pdfBytes = await mergedPdf.save();
+                let pdfBytes = await mergedPdf.save();
+                pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const firstFileName = mergeItems[0].file.name.replace(/\.[^/.]+$/, "");
@@ -6295,7 +6299,8 @@ Configure your API key to get started.</p>
                     copiedPage.setRotation(degrees(currentRotation + (item.rotation || 0)));
                     newPdf.addPage(copiedPage);
 
-                    const pdfBytes = await newPdf.save();
+                    let pdfBytes = await newPdf.save();
+                    pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
                     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                     const url = URL.createObjectURL(blob);
                     const sourceName = splitFiles[item.fileIndex].name.replace(/\.[^/.]+$/, "");
@@ -6669,6 +6674,7 @@ Configure your API key to get started.</p>
                     pdfBytes = await pdfDoc.save();
                 }
 
+                pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const sourceName = unlockFile.name.replace(/\.[^/.]+$/, "");
@@ -6787,8 +6793,24 @@ Configure your API key to get started.</p>
             try {
                 const arrayBuffer = await protectFile.arrayBuffer();
 
+                let arrayBufferToEncrypt = arrayBuffer;
+                try {
+                    const { PDFDocument } = PDFLib;
+                    let doc;
+                    if (isFileAlreadyProtected && currentPassword) {
+                        doc = await PDFDocument.load(arrayBuffer, { password: currentPassword });
+                    } else {
+                        doc = await PDFDocument.load(arrayBuffer);
+                    }
+                    const originalBytes = await doc.save();
+                    const scaledBytes = await applyPrintMarginsToPdf(originalBytes);
+                    arrayBufferToEncrypt = scaledBytes.buffer;
+                } catch (e) {
+                    console.warn("Could not apply margins before protecting PDF:", e);
+                }
+
                 // Use the new PDFEncryption engine instead of pdf-lib's save
-                const pdfBytes = await PDFEncryption.encrypt(arrayBuffer, newPassword, newPassword);
+                const pdfBytes = await PDFEncryption.encrypt(arrayBufferToEncrypt, newPassword, newPassword);
 
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
@@ -8387,22 +8409,25 @@ Configure your API key to get started.</p>
                         logging: false
                     });
 
+                    const margin = 20;
+                    const safeWidth = imgWidth - (margin * 2);
+                    const safeHeight = pageHeight - (margin * 2);
                     const canvasWidth = canvas.width;
                     const canvasHeight = canvas.height;
-                    const imgHeight = (canvasHeight * imgWidth) / canvasWidth;
+                    const imgHeight = (canvasHeight * safeWidth) / canvasWidth;
 
                     const pdfFallback = new jsPDF(isLandscape ? 'l' : 'p', 'pt', pageSize);
                     let heightLeft = imgHeight;
-                    let position = 0;
+                    let position = margin;
 
-                    pdfFallback.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+                    pdfFallback.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, position, safeWidth, imgHeight);
+                    heightLeft -= safeHeight;
 
                     while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
+                        position = margin - (imgHeight - heightLeft);
                         pdfFallback.addPage();
-                        pdfFallback.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
+                        pdfFallback.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, position, safeWidth, imgHeight);
+                        heightLeft -= safeHeight;
                     }
 
                     const _fbBlob = pdfFallback.output('blob');
@@ -8424,6 +8449,43 @@ Configure your API key to get started.</p>
                     item.el.style.breakInside = item.breakInside;
                     item.el.style.pageBreakInside = item.pageBreakInside;
                 });
+            }
+        }
+
+        async function applyPrintMarginsToPdf(pdfBytes) {
+            try {
+                const { PDFDocument } = PDFLib;
+                const srcDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+                const dstDoc = await PDFDocument.create();
+                const pages = srcDoc.getPages();
+                
+                for (let i = 0; i < pages.length; i++) {
+                    const srcPage = pages[i];
+                    const { width, height } = srcPage.getSize();
+                    
+                    // Embed page
+                    const [embeddedPage] = await dstDoc.embedPages([srcPage]);
+                    const newPage = dstDoc.addPage([width, height]);
+                    
+                    const margin = 20; // 20pt margin
+                    const scaleX = (width - (margin * 2)) / width;
+                    const scaleY = (height - (margin * 2)) / height;
+                    const scale = Math.min(scaleX, scaleY);
+                    
+                    const newWidth = width * scale;
+                    const newHeight = height * scale;
+                    
+                    newPage.drawPage(embeddedPage, {
+                        x: margin + (width - (margin * 2) - newWidth) / 2,
+                        y: margin + (height - (margin * 2) - newHeight) / 2,
+                        width: newWidth,
+                        height: newHeight
+                    });
+                }
+                return await dstDoc.save();
+            } catch (e) {
+                console.warn("Failed to apply safety margins to PDF:", e);
+                return pdfBytes;
             }
         }
 
@@ -9307,12 +9369,15 @@ Configure your API key to get started.</p>
             const pdf = new jsPDF('p', 'pt', 'a4');
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 20; // 20pt safety margin
+            const safeWidth = pageWidth - (margin * 2);
+            const safeHeight = pageHeight - (margin * 2);
             const scanW = scannerCroppedImage ? scannerCroppedImage.width : 1000;
             const scanH = scannerCroppedImage ? scannerCroppedImage.height : 1414;
-            const scale = Math.min(pageWidth / scanW, pageHeight / scanH);
+            const scale = Math.min(safeWidth / scanW, safeHeight / scanH);
             const w = scanW * scale;
             const h = scanH * scale;
-            pdf.addImage(scannerResultImg.src, 'JPEG', (pageWidth - w) / 2, (pageHeight - h) / 2, w, h);
+            pdf.addImage(scannerResultImg.src, 'JPEG', margin + (safeWidth - w) / 2, margin + (safeHeight - h) / 2, w, h);
             const _scanPdfBlob = pdf.output('blob');
             const _scanPdfUrl = URL.createObjectURL(_scanPdfBlob);
             const _scanPdfLink = document.createElement('a');
@@ -9849,7 +9914,8 @@ Configure your API key to get started.</p>
                     });
                 });
 
-                const pdfBytes = await pdfDoc.save();
+                let pdfBytes = await pdfDoc.save();
+                pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -10355,7 +10421,8 @@ Configure your API key to get started.</p>
                         }
                     }
 
-                    const pdfBytes = await pdfDoc.save();
+                    let pdfBytes = await pdfDoc.save();
+                    pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
                     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
