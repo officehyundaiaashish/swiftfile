@@ -3397,6 +3397,234 @@
                 widows: 3;
             }
         }
+
+        /* Premium Share Target Overlay */
+        .share-receiver-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .share-receiver-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .share-receiver-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 520px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: translateY(40px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+        .share-receiver-overlay.active .share-receiver-card {
+            transform: translateY(0) scale(1);
+        }
+        .share-receiver-header {
+            padding: 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .share-receiver-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+        }
+        .share-receiver-logo svg {
+            width: 28px;
+            height: 28px;
+        }
+        .share-receiver-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 0.25rem 0;
+        }
+        .share-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        .share-file-preview-card {
+            margin: 1.25rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .share-file-icon-container {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .share-file-icon-container svg {
+            width: 24px;
+            height: 24px;
+        }
+        .share-file-image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .share-file-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            min-width: 0;
+        }
+        .share-file-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .share-file-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .share-tools-section {
+            padding: 0 1.25rem;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .share-tools-section .section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0;
+        }
+        .share-tools-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            padding-bottom: 1.25rem;
+        }
+        .share-tool-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 0.875rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .share-tool-btn:hover {
+            border-color: #6366f1;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.03), rgba(168, 85, 247, 0.03));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.05);
+        }
+        .share-tool-icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+        }
+        .share-tool-btn:hover .share-tool-icon-wrap {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+        .share-tool-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+        .share-tool-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .share-tool-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .share-receiver-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            background: var(--bg-secondary);
+        }
+        .share-receiver-footer button {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Mobile specific bottom sheet design */
+        @media (max-width: 640px) {
+            .share-receiver-overlay {
+                align-items: flex-end;
+            }
+            .share-receiver-card {
+                width: 100%;
+                max-width: 100%;
+                border-radius: 28px 28px 0 0;
+                max-height: 80vh;
+                border-bottom: none;
+                transform: translateY(100%);
+            }
+            .share-receiver-overlay.active .share-receiver-card {
+                transform: translateY(0);
+            }
+        }
     </style>
     <script>
         let lastActiveTabId = 'swift-assistant';
@@ -3550,6 +3778,9 @@
                 </div>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="simulate-share-btn" class="icon-btn" title="Simulate Shared File Input">
+                    <i data-lucide="share-2"></i>
+                </button>
                 <button id="history-btn" class="icon-btn" title="View History">
                     <i data-lucide="history"></i>
                 </button>
@@ -13918,54 +14149,11 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                         // Clear the database immediately so we don't process again on refresh
                         await clearSharedFiles();
 
-                        // Route files based on types
-                        for (const item of sharedItems) {
-                            const blob = new Blob([item.data], { type: item.type });
-                            const file = new File([blob], item.name, { type: item.type });
+                        const item = sharedItems[0];
+                        const blob = new Blob([item.data], { type: item.type });
+                        const file = new File([blob], item.name, { type: item.type });
 
-                            if (file.type === 'application/pdf') {
-                                switchTab('pdf-to-img');
-                                const dt = new DataTransfer();
-                                dt.items.add(file);
-                                document.getElementById('pdf-input').files = dt.files;
-                                handlePdfSelect();
-                                notify(`Loaded ${file.name} for PDF to Image conversion.`, 'success');
-                            } else if (file.type.startsWith('image/')) {
-                                switchTab('img-to-pdf');
-                                const dt = new DataTransfer();
-                                dt.items.add(file);
-                                document.getElementById('img-input').files = dt.files;
-                                handleImgSelect();
-                                notify(`Loaded ${file.name} for Image to PDF conversion.`, 'success');
-                            } else if (file.name.endsWith('.docx')) {
-                                switchTab('word-to-pdf');
-                                const dt = new DataTransfer();
-                                dt.items.add(file);
-                                document.getElementById('word-to-pdf-input').files = dt.files;
-                                handleWordSelect();
-                                notify(`Loaded ${file.name} for Word to PDF conversion.`, 'success');
-                            } else {
-                                // Default to assistant attachment
-                                switchTab('swift-assistant');
-                                const isText = file.type === 'text/plain' || file.name.endsWith('.txt') || file.name.endsWith('.csv') || file.name.endsWith('.json') || file.name.endsWith('.xml') || file.name.endsWith('.md');
-                                const reader = new FileReader();
-                                reader.onload = () => {
-                                    attachedFile = {
-                                        name: file.name,
-                                        type: file.type,
-                                        data: reader.result,
-                                        isText: isText
-                                    };
-                                    renderAttachedFile();
-                                    notify(`Attached ${file.name} to Swift Assistant.`, 'success');
-                                };
-                                if (isText) {
-                                    reader.readAsText(file);
-                                } else {
-                                    reader.readAsDataURL(file);
-                                }
-                            }
-                        }
+                        showShareReceiverOverlay(file);
                     }
                 } catch (e) {
                     console.error("Error reading shared data:", e);
@@ -13975,6 +14163,237 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 }
             }
         }
+
+        // --- PWA Share Overlay Helper Functions ---
+        function getMatchingToolsForFile(file) {
+            const list = [];
+            const type = file.type || '';
+            const name = (file.name || '').toLowerCase();
+
+            if (type === 'application/pdf' || name.endsWith('.pdf')) {
+                list.push(
+                    { id: 'pdf-to-img', name: 'PDF to Image', desc: 'Convert PDF pages into high-quality JPEG images', icon: 'image' },
+                    { id: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple PDF documents into one', icon: 'git-merge' },
+                    { id: 'split-pdf', name: 'Split PDF', desc: 'Separate PDF pages into individual documents', icon: 'scissors' },
+                    { id: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce PDF file size without quality loss', icon: 'minimize-2' },
+                    { id: 'unlock-pdf', name: 'Unlock PDF', desc: 'Remove password protection and restrictions', icon: 'unlock' },
+                    { id: 'protect-pdf', name: 'Protect PDF', desc: 'Encrypt your PDF with a secure password', icon: 'lock' },
+                    { id: 'redact-pdf', name: 'Redact PDF', desc: 'Black out sensitive details securely', icon: 'eye-off' },
+                    { id: 'watermark-tool', name: 'Watermark PDF', desc: 'Add text or image watermark stamps', icon: 'stamp' },
+                    { id: 'swift-assistant', name: 'Analyze with Assistant', desc: 'Chat and ask questions about this document', icon: 'message-square' }
+                );
+            } else if (type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(name)) {
+                list.push(
+                    { id: 'img-to-pdf', name: 'Image to PDF', desc: 'Convert and compile photos into a PDF', icon: 'file-text' },
+                    { id: 'compress-image', name: 'Compress Image', desc: 'Shrink image file size with custom quality', icon: 'minimize-2' },
+                    { id: 'bg-remover', name: 'Remove Background', desc: 'Cut out subjects from background using AI', icon: 'sparkles' },
+                    { id: 'collage-maker', name: 'Collage Maker', desc: 'Arrange multiple images into layouts', icon: 'grid' },
+                    { id: 'watermark-tool', name: 'Watermark Image', desc: 'Staple a logo or custom signature onto image', icon: 'stamp' },
+                    { id: 'swift-assistant', name: 'Analyze with Assistant', desc: 'Ask the assistant to describe or read this photo', icon: 'message-square' }
+                );
+            } else if (name.endsWith('.docx') || name.endsWith('.doc')) {
+                list.push(
+                    { id: 'word-to-pdf', name: 'Word to PDF', desc: 'Convert Microsoft Word docx files to PDF', icon: 'file-text' },
+                    { id: 'swift-assistant', name: 'Analyze with Assistant', desc: 'Read and extract key details with AI assistant', icon: 'message-square' }
+                );
+            } else if (type.startsWith('video/') || /\.(mp4|mkv|webm|avi|mov)$/i.test(name)) {
+                list.push(
+                    { id: 'video-compressor', name: 'Compress Video', desc: 'Optimize video size and bitrates', icon: 'video' },
+                    { id: 'swift-assistant', name: 'Attach to Assistant', desc: 'Attach video file payload to assistant chat', icon: 'message-square' }
+                );
+            } else {
+                list.push(
+                    { id: 'swift-assistant', name: 'Analyze with Assistant', desc: 'Attach text, CSV or JSON data to analyze', icon: 'message-square' }
+                );
+            }
+            return list;
+        }
+
+        function routeFileToTool(file, toolId) {
+            switchTab(toolId);
+            const dt = new DataTransfer();
+            dt.items.add(file);
+
+            if (toolId === 'pdf-to-img') {
+                document.getElementById('pdf-input').files = dt.files;
+                handlePdfSelect();
+                notify(`Loaded ${file.name} for PDF to Image conversion.`, 'success');
+            } else if (toolId === 'merge-pdf') {
+                const mergeInput = document.getElementById('merge-input');
+                mergeInput.files = dt.files;
+                handleMergePdfSelect();
+                notify(`Added ${file.name} to Merge list.`, 'success');
+            } else if (toolId === 'split-pdf') {
+                const splitInput = document.getElementById('split-input');
+                splitInput.files = dt.files;
+                handleSplitPdfSelect();
+                notify(`Loaded ${file.name} to Split tool.`, 'success');
+            } else if (toolId === 'compress-pdf') {
+                const compressInput = document.getElementById('compress-input');
+                compressInput.files = dt.files;
+                handleCompressSelect();
+                notify(`Loaded ${file.name} for compression.`, 'success');
+            } else if (toolId === 'unlock-pdf') {
+                const unlockInput = document.getElementById('unlock-input');
+                unlockInput.files = dt.files;
+                handleUnlockSelect();
+                notify(`Loaded ${file.name} to Unlock.`, 'success');
+            } else if (toolId === 'protect-pdf') {
+                const protectInput = document.getElementById('protect-input');
+                protectInput.files = dt.files;
+                handleProtectSelect();
+                notify(`Loaded ${file.name} to Protect.`, 'success');
+            } else if (toolId === 'redact-pdf') {
+                const redactInput = document.getElementById('redact-input');
+                redactInput.files = dt.files;
+                handleRedactSelect();
+                notify(`Loaded ${file.name} to Redact.`, 'success');
+            } else if (toolId === 'watermark-tool') {
+                const watermarkInput = document.getElementById('watermark-input');
+                watermarkInput.files = dt.files;
+                handleWatermarkSelect();
+                notify(`Loaded ${file.name} to Watermark.`, 'success');
+            } else if (toolId === 'img-to-pdf') {
+                const imgInput = document.getElementById('img-input');
+                imgInput.files = dt.files;
+                handleImgSelect();
+                notify(`Loaded ${file.name} for Image to PDF conversion.`, 'success');
+            } else if (toolId === 'compress-image') {
+                const compressImgInput = document.getElementById('compress-img-input');
+                compressImgInput.files = dt.files;
+                handleCompressImgSelect();
+                notify(`Loaded ${file.name} for Image compression.`, 'success');
+            } else if (toolId === 'bg-remover') {
+                const bgInput = document.getElementById('bg-input');
+                bgInput.files = dt.files;
+                handleBgSelect();
+                notify(`Loaded ${file.name} for background removal.`, 'success');
+            } else if (toolId === 'collage-maker') {
+                const collageInput = document.getElementById('collage-input');
+                collageInput.files = dt.files;
+                handleCollageSelect();
+                notify(`Loaded ${file.name} for Collage Maker.`, 'success');
+            } else if (toolId === 'word-to-pdf') {
+                const wordInput = document.getElementById('word-to-pdf-input');
+                wordInput.files = dt.files;
+                handleWordSelect();
+                notify(`Loaded ${file.name} for Word to PDF conversion.`, 'success');
+            } else if (toolId === 'video-compressor') {
+                const videoInput = document.getElementById('video-compress-input');
+                videoInput.files = dt.files;
+                loadVideoFile(file);
+                notify(`Loaded ${file.name} to Video Compressor.`, 'success');
+            } else if (toolId === 'swift-assistant') {
+                const isText = file.type === 'text/plain' || file.name.endsWith('.txt') || file.name.endsWith('.csv') || file.name.endsWith('.json') || file.name.endsWith('.xml') || file.name.endsWith('.md');
+                const reader = new FileReader();
+                reader.onload = () => {
+                    attachedFile = {
+                        name: file.name,
+                        type: file.type,
+                        data: reader.result,
+                        isText: isText
+                    };
+                    renderAttachedFile();
+                    notify(`Attached ${file.name} to Swift Assistant.`, 'success');
+                };
+                if (isText) {
+                    reader.readAsText(file);
+                } else {
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        function showShareReceiverOverlay(file) {
+            const overlay = document.getElementById('share-receiver-screen');
+            const fileNameEl = document.getElementById('share-file-name');
+            const fileMetaEl = document.getElementById('share-file-meta');
+            const fallbackIcon = document.getElementById('share-file-icon-fallback');
+            const imagePreview = document.getElementById('share-file-image-preview');
+            const toolsGrid = document.getElementById('share-tools-grid');
+            
+            const closeBtn = document.getElementById('close-share-receiver-btn');
+            closeBtn.onclick = () => {
+                overlay.classList.remove('active');
+            };
+
+            fileNameEl.textContent = file.name;
+            const sizeStr = formatBytes(file.size);
+            let displayType = 'Unknown';
+            const name = file.name.toLowerCase();
+
+            if (file.type === 'application/pdf' || name.endsWith('.pdf')) displayType = 'PDF';
+            else if (file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(name)) displayType = 'Image';
+            else if (name.endsWith('.docx') || name.endsWith('.doc')) displayType = 'Word Document';
+            else if (file.type.startsWith('video/') || /\.(mp4|mkv|webm|avi|mov)$/i.test(name)) displayType = 'Video';
+            else if (file.type === 'text/plain' || name.endsWith('.txt')) displayType = 'Text File';
+            
+            fileMetaEl.textContent = `${displayType} • ${sizeStr}`;
+
+            if (file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(name)) {
+                fallbackIcon.classList.add('hidden');
+                imagePreview.classList.remove('hidden');
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.classList.add('hidden');
+                fallbackIcon.classList.remove('hidden');
+                
+                if (file.type === 'application/pdf' || name.endsWith('.pdf')) {
+                    fallbackIcon.setAttribute('data-lucide', 'file-text');
+                } else if (file.type.startsWith('video/') || /\.(mp4|mkv|webm|avi|mov)$/i.test(name)) {
+                    fallbackIcon.setAttribute('data-lucide', 'video');
+                } else {
+                    fallbackIcon.setAttribute('data-lucide', 'file');
+                }
+                lucide.createIcons({ root: document.getElementById('share-file-icon-container') });
+            }
+
+            toolsGrid.innerHTML = '';
+            const matchingTools = getMatchingToolsForFile(file);
+
+            matchingTools.forEach(tool => {
+                const btn = document.createElement('button');
+                btn.className = 'share-tool-btn';
+                btn.innerHTML = `
+                    <div class="share-tool-icon-wrap">
+                        <i data-lucide="${tool.icon}"></i>
+                    </div>
+                    <div class="share-tool-text">
+                        <span class="share-tool-name">${tool.name}</span>
+                        <span class="share-tool-desc">${tool.desc}</span>
+                    </div>
+                `;
+                btn.onclick = () => {
+                    overlay.classList.remove('active');
+                    routeFileToTool(file, tool.id);
+                };
+                toolsGrid.appendChild(btn);
+            });
+
+            lucide.createIcons({ root: toolsGrid });
+            overlay.classList.add('active');
+        }
+
+        // Set up the share simulation button listener
+        setTimeout(() => {
+            const simulateShareBtn = document.getElementById('simulate-share-btn');
+            if (simulateShareBtn) {
+                simulateShareBtn.addEventListener('click', () => {
+                    const tempInput = document.createElement('input');
+                    tempInput.type = 'file';
+                    tempInput.onchange = (e) => {
+                        if (e.target.files.length > 0) {
+                            showShareReceiverOverlay(e.target.files[0]);
+                        }
+                    };
+                    tempInput.click();
+                });
+            }
+        }, 1000);
 
         // ==========================================
         // VIDEO COMPRESSOR TOOL LOGIC
@@ -15015,6 +15434,41 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                     <button id="cancel-delete-btn" class="history-action-btn"
                         style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dedicated Shared File Receiver Overlay -->
+    <div id="share-receiver-screen" class="share-receiver-overlay">
+        <div class="share-receiver-card">
+            <div class="share-receiver-header">
+                <div class="share-receiver-logo">
+                    <i data-lucide="share-2"></i>
+                </div>
+                <h3>Shared File Received</h3>
+                <p class="share-subtitle">Select a tool to process your shared file</p>
+            </div>
+            
+            <div class="share-file-preview-card">
+                <div class="share-file-icon-container" id="share-file-icon-container">
+                    <i data-lucide="file-text" id="share-file-icon-fallback" style="width: 24px; height: 24px;"></i>
+                    <img id="share-file-image-preview" class="hidden" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="share-file-info">
+                    <span id="share-file-name" class="share-file-name">filename.pdf</span>
+                    <span id="share-file-meta" class="share-file-meta">PDF • 1.2 MB</span>
+                </div>
+            </div>
+
+            <div class="share-tools-section">
+                <p class="section-title">Recommended Tools</p>
+                <div class="share-tools-grid" id="share-tools-grid">
+                    <!-- Dynamic tool buttons will be loaded here -->
+                </div>
+            </div>
+
+            <div class="share-receiver-footer">
+                <button id="close-share-receiver-btn" class="secondary-btn" style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color);">Cancel</button>
             </div>
         </div>
     </div>
