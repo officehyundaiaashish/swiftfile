@@ -6176,8 +6176,7 @@ Configure your API key to get started.</p>
                     mergedPdf.addPage(copiedPage);
                 }
 
-                let pdfBytes = await mergedPdf.save();
-                pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
+                const pdfBytes = await mergedPdf.save();
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const firstFileName = mergeItems[0].file.name.replace(/\.[^/.]+$/, "");
@@ -6299,8 +6298,7 @@ Configure your API key to get started.</p>
                     copiedPage.setRotation(degrees(currentRotation + (item.rotation || 0)));
                     newPdf.addPage(copiedPage);
 
-                    let pdfBytes = await newPdf.save();
-                    pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
+                    const pdfBytes = await newPdf.save();
                     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                     const url = URL.createObjectURL(blob);
                     const sourceName = splitFiles[item.fileIndex].name.replace(/\.[^/.]+$/, "");
@@ -6680,7 +6678,6 @@ Configure your API key to get started.</p>
                     pdfBytes = await pdfDoc.save();
                 }
 
-                pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const sourceName = unlockFile.name.replace(/\.[^/.]+$/, "");
@@ -6799,24 +6796,8 @@ Configure your API key to get started.</p>
             try {
                 const arrayBuffer = await protectFile.arrayBuffer();
 
-                let arrayBufferToEncrypt = arrayBuffer;
-                try {
-                    const { PDFDocument } = PDFLib;
-                    let doc;
-                    if (isFileAlreadyProtected && currentPassword) {
-                        doc = await PDFDocument.load(arrayBuffer, { password: currentPassword });
-                    } else {
-                        doc = await PDFDocument.load(arrayBuffer);
-                    }
-                    const originalBytes = await doc.save();
-                    const scaledBytes = await applyPrintMarginsToPdf(originalBytes);
-                    arrayBufferToEncrypt = scaledBytes.buffer;
-                } catch (e) {
-                    console.warn("Could not apply margins before protecting PDF:", e);
-                }
-
                 // Use the new PDFEncryption engine instead of pdf-lib's save
-                const pdfBytes = await PDFEncryption.encrypt(arrayBufferToEncrypt, newPassword, newPassword);
+                const pdfBytes = await PDFEncryption.encrypt(arrayBuffer, newPassword, newPassword);
 
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
@@ -9920,8 +9901,7 @@ Configure your API key to get started.</p>
                     });
                 });
 
-                let pdfBytes = await pdfDoc.save();
-                pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
+                const pdfBytes = await pdfDoc.save();
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -10427,8 +10407,7 @@ Configure your API key to get started.</p>
                         }
                     }
 
-                    let pdfBytes = await pdfDoc.save();
-                    pdfBytes = await applyPrintMarginsToPdf(pdfBytes);
+                    const pdfBytes = await pdfDoc.save();
                     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
