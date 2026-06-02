@@ -3532,6 +3532,9 @@
                     <button class="tab-btn active" data-tab="swift-assistant" onclick="switchTab('swift-assistant')">
                         <i data-lucide="message-square"></i> Swift Assistant
                     </button>
+                    <button class="tab-btn" data-tab="scanner" onclick="switchTab('scanner')">
+                        <i data-lucide="scan"></i> Scanner
+                    </button>
                     <button class="tab-btn" data-tab="img-to-pdf" onclick="switchTab('img-to-pdf')">
                         <i data-lucide="image"></i> Image to PDF
                     </button>
@@ -3564,9 +3567,6 @@
                     </button>
                     <button class="tab-btn" data-tab="word-to-pdf" onclick="switchTab('word-to-pdf')">
                         <i data-lucide="file-up"></i> Word to PDF
-                    </button>
-                    <button class="tab-btn" data-tab="scanner" onclick="switchTab('scanner')">
-                        <i data-lucide="scan"></i> Scanner
                     </button>
                     <button class="tab-btn" data-tab="webpage-to-pdf" onclick="switchTab('webpage-to-pdf')">
                         <i data-lucide="globe"></i> Webpage to PDF
@@ -14612,6 +14612,7 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             // Tool metadata for mobile search results
             const mobileToolMeta = [
                 { id: 'swift-assistant', label: 'Swift Assistant', icon: 'message-square' },
+                { id: 'scanner', label: 'Scanner', icon: 'scan' },
                 { id: 'img-to-pdf', label: 'Image to PDF', icon: 'image' },
                 { id: 'pdf-to-img', label: 'PDF to Image', icon: 'file-text' },
                 { id: 'merge-pdf', label: 'Merge PDF', icon: 'copy' },
@@ -14623,7 +14624,6 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 { id: 'bg-remover', label: 'Remove BG', icon: 'eraser' },
                 { id: 'collage-maker', label: 'Collage Maker', icon: 'layout' },
                 { id: 'word-to-pdf', label: 'Word to PDF', icon: 'file-up' },
-                { id: 'scanner', label: 'Scanner', icon: 'scan' },
                 { id: 'webpage-to-pdf', label: 'Webpage to PDF', icon: 'globe' },
                 { id: 'redact-pdf', label: 'Redact PDF', icon: 'eye-off' },
                 { id: 'watermark-tool', label: 'Watermark', icon: 'stamp' },
