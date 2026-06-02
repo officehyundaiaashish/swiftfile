@@ -6499,6 +6499,12 @@ Configure your API key to get started.</p>
                         const page = await pdfDoc.getPage(pageItem.originalIndex);
                         const userRotation = pageItem.rotation || 0;
 
+                        // Get original page bounds for the PDF canvas dimensions
+                        const origViewport = page.getViewport({ scale: 1, rotation: userRotation });
+                        const origW = origViewport.width;
+                        const origH = origViewport.height;
+
+                        // Render at the compressed scale for image compression
                         const viewport = page.getViewport({ scale: scale, rotation: userRotation });
                         const canvas = document.createElement('canvas');
                         const context = canvas.getContext('2d');
@@ -6507,19 +6513,19 @@ Configure your API key to get started.</p>
                         await page.render({ canvasContext: context, viewport: viewport }).promise;
 
                         const imgData = canvas.toDataURL('image/jpeg', quality);
-                        const orientation = canvas.width > canvas.height ? 'l' : 'p';
+                        const orientation = origW > origH ? 'l' : 'p';
 
                         if (i === 0) {
                             outPdf = new jsPDF({
                                 orientation: orientation,
                                 unit: 'pt',
-                                format: [canvas.width, canvas.height]
+                                format: [origW, origH]
                             });
                         } else {
-                            outPdf.addPage([canvas.width, canvas.height], orientation);
+                            outPdf.addPage([origW, origH], orientation);
                         }
 
-                        outPdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+                        outPdf.addImage(imgData, 'JPEG', 0, 0, origW, origH);
 
                         if (i % 5 === 0) await new Promise(r => setTimeout(r, 50));
                     }
