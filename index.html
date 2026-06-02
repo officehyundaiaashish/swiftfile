@@ -3322,6 +3322,81 @@
         .custom-select-option:not(.active):hover .option-icon {
             color: var(--accent-color);
         }
+
+        /* ================================================
+           Print Styles — Fixes page truncation/cutoffs
+           ================================================ */
+        @media print {
+            /* Reset body, HTML and layout wrappers */
+            html, body, .container, .converter-card, .tab-content, .bg-tool-layout, .preview-container {
+                background: white !important;
+                color: black !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+                position: static !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+                transform: none !important;
+                transition: none !important;
+            }
+
+            /* Prevent layout boxes from being hidden or page-cut */
+            .tab-content.active {
+                display: block !important;
+                opacity: 1 !important;
+            }
+
+            /* Convert flex/grid layouts to simple block layouts so page breaks work correctly */
+            .bg-tool-layout, .preview-scroll, .preview-grid, .converter-tabs, .flex-mobile-stack {
+                display: block !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            /* Hide UI elements that shouldn't be printed */
+            header, footer, .background-blobs, .converter-tabs, .action-bar, 
+            .icon-btn, .primary-btn, .secondary-btn, .add-more-btn, .clear-all-btn, 
+            .mobile-bottom-nav, .mobile-tool-selector, .sidebar-backdrop, .toast, 
+            .notification-container, .drop-zone, .bg-controls-panel, .remove-btn, 
+            .rotate-btn, .page-badge, .page-count-badge, .chat-box, #theme-toggle, 
+            #history-btn, #mobile-search-toggle-btn, .custom-context-menu {
+                display: none !important;
+            }
+
+            /* Scale preview images and canvases to fit paper width */
+            .preview-item, .large-preview-box, canvas, img {
+                max-width: 100% !important;
+                width: auto !important;
+                height: auto !important;
+                max-height: 100% !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                display: block !important;
+                margin: 10px auto !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+
+            /* Page break rules for elements */
+            .preview-item, .page-break {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                page-break-after: auto !important;
+                break-after: auto !important;
+            }
+
+            /* Ensure natural paragraph flow */
+            p, h1, h2, h3, span {
+                orphans: 3;
+                widows: 3;
+            }
+        }
     </style>
     <script>
         let lastActiveTabId = 'swift-assistant';
