@@ -527,6 +527,26 @@
             transform: translateZ(0);
         }
 
+        .scanner-handle {
+            width: 24px;
+            height: 24px;
+            margin-left: -12px;
+            margin-top: -12px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 2px solid #ffffff;
+            cursor: move;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+            z-index: 10;
+            touch-action: none;
+            transition: transform 0.1s ease;
+        }
+
+        .scanner-handle:hover, .scanner-handle:active {
+            transform: scale(1.2);
+            background: var(--accent-hover);
+        }
+
         @keyframes scan {
             0% {
                 transform: translateY(0) translateZ(0);
@@ -4304,14 +4324,15 @@
 
                     <!-- Scanner Section -->
                     <div id="scanner" class="tab-content">
-                        <!-- Start Screen: Grant permission / select camera -->
-                        <div id="scanner-start-screen" class="drop-zone">
-                            <div class="drop-zone-content">
+                        <!-- Start Screen: Grant permission / select camera / file upload -->
+                        <div id="scanner-start-screen" class="drop-zone" style="position: relative;">
+                            <input type="file" id="scanner-file-input" accept="image/*,application/pdf" class="hidden">
+                            <div class="drop-zone-content" style="pointer-events: auto;">
                                 <div class="icon-wrapper">
                                     <i data-lucide="scan"></i>
                                 </div>
                                 <h3>Document Scanner</h3>
-                                <p>Use your camera to scan, autocrop, and enhance documents in real-time</p>
+                                <p>Scan, crop, and enhance documents using your camera or file uploads</p>
                                 <div
                                     style="display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 1.5rem auto 0 auto; align-items: center;">
                                     <select id="scanner-camera-select" class="password-input"
@@ -4320,6 +4341,11 @@
                                         style="width: 100%; justify-content: center;">
                                         <i data-lucide="camera"></i> Start Camera
                                     </button>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin: 4px 0;">— OR —</div>
+                                    <button id="scanner-upload-btn" class="secondary-btn"
+                                        style="width: 100%; justify-content: center;">
+                                        <i data-lucide="upload"></i> Upload Image / PDF
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -4327,7 +4353,7 @@
                         <!-- Real-time Streaming State -->
                         <div id="scanner-active-screen" class="hidden">
                             <div class="preview-header">
-                                <span id="scanner-status-text">Detecting edges...</span>
+                                <span id="scanner-status-text">Align your document and click capture</span>
                                 <button id="scanner-stop-btn" class="text-btn danger">Close Camera</button>
                             </div>
                             <div class="large-preview-box" id="scanner-video-container"
@@ -4347,12 +4373,48 @@
                             </div>
                         </div>
 
+                        <!-- 4-Point Border Adjustment State -->
+                        <div id="scanner-adjust-screen" class="hidden">
+                            <div class="preview-header">
+                                <span>Adjust Document Borders</span>
+                                <button id="scanner-adjust-back-btn" class="text-btn danger">Cancel</button>
+                            </div>
+                            <div class="bg-tool-layout"
+                                style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
+                                <div class="bg-main-preview">
+                                    <div class="large-preview-box" style="position: relative; padding: 0; background: #0b1120; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 500px;">
+                                        <!-- Draggable Corner Editor Container -->
+                                        <div id="scanner-crop-container" style="position: relative; max-width: 90%; max-height: 550px; display: inline-block;">
+                                            <img id="scanner-crop-img" style="display: block; max-width: 100%; max-height: 550px; user-select: none; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); border-radius: 4px;">
+                                            <svg id="scanner-crop-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 8;">
+                                                <polygon id="scanner-crop-polygon" points="" fill="rgba(37, 99, 235, 0.25)" stroke="var(--accent-color)" stroke-width="3" />
+                                            </svg>
+                                            <div id="scanner-handle-0" class="scanner-handle" data-index="0" style="position: absolute;"></div>
+                                            <div id="scanner-handle-1" class="scanner-handle" data-index="1" style="position: absolute;"></div>
+                                            <div id="scanner-handle-2" class="scanner-handle" data-index="2" style="position: absolute;"></div>
+                                            <div id="scanner-handle-3" class="scanner-handle" data-index="3" style="position: absolute;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-controls-panel" style="justify-content: center; align-items: center; gap: 1.5rem;">
+                                    <div style="text-align: center;">
+                                        <h4 style="margin-bottom: 8px;">Adjust Borders</h4>
+                                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Drag the 4 corner handles to align with the edges of your document.</p>
+                                    </div>
+                                    <button id="scanner-apply-crop-btn" class="primary-btn btn-pro-ai" style="width: 100%; justify-content: center;">
+                                        <i data-lucide="check"></i> Apply Crop & Warp
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Capture Edit / Preview State -->
                         <div id="scanner-preview-screen" class="hidden">
                             <div class="preview-header">
                                 <span>Scan Result</span>
                                 <button id="scanner-retake-btn" class="text-btn"><i data-lucide="rotate-ccw"></i>
-                                    Retake</button>
+                                    Retake / Restart</button>
                             </div>
 
                             <div class="bg-tool-layout"
@@ -8286,19 +8348,19 @@ Configure your API key to get started.</p>
         let scannerActive = false;
         let scannerCapturedImage = null; // Original full-res canvas
         let scannerCroppedImage = null; // Warped canvas
-        let scannerCropper = null;
-        let detectedCorners = null; // [{x, y}] on video frame scale
-        let smoothedCorners = null; // Smoothed corners across frames to eliminate shaking
         let scannerAnimationId = null;
-        let lastCorners = null;
-        let stabilityCount = 0;
-        let isStable = false;
-        const STABILITY_THRESHOLD_FRAMES = 20;
-        const STABILITY_PIXEL_TOLERANCE = 15;
+        let currentCropPoints = [
+            { x: 0.15, y: 0.15 },
+            { x: 0.85, y: 0.15 },
+            { x: 0.85, y: 0.85 },
+            { x: 0.15, y: 0.85 }
+        ];
 
         const scannerStartScreen = document.getElementById('scanner-start-screen');
         const scannerActiveScreen = document.getElementById('scanner-active-screen');
+        const scannerAdjustScreen = document.getElementById('scanner-adjust-screen');
         const scannerPreviewScreen = document.getElementById('scanner-preview-screen');
+        
         const scannerVideo = document.getElementById('scanner-video');
         const scannerOverlayCanvas = document.getElementById('scanner-overlay-canvas');
         const scannerCameraSelect = document.getElementById('scanner-camera-select');
@@ -8312,6 +8374,11 @@ Configure your API key to get started.</p>
         const scannerSavePdfBtn = document.getElementById('scanner-save-pdf-btn');
         const scannerSendToPdfBtn = document.getElementById('scanner-send-to-pdf-btn');
         const scannerStatusText = document.getElementById('scanner-status-text');
+
+        const scannerAdjustBackBtn = document.getElementById('scanner-adjust-back-btn');
+        const scannerApplyCropBtn = document.getElementById('scanner-apply-crop-btn');
+        const scannerUploadBtn = document.getElementById('scanner-upload-btn');
+        const scannerFileInput = document.getElementById('scanner-file-input');
 
         // Filter Buttons
         const filterOrig = document.getElementById('filter-orig');
@@ -8357,17 +8424,134 @@ Configure your API key to get started.</p>
         scannerStartBtn.addEventListener('click', startScannerCamera);
         scannerStopBtn.addEventListener('click', stopScannerCamera);
         scannerCaptureBtn.addEventListener('click', captureDocument);
-        scannerRetakeBtn.addEventListener('click', () => {
-            if (scannerCropper) {
-                scannerCropper.destroy();
-                scannerCropper = null;
-            }
-            scannerRecropBtn.innerHTML = '<i data-lucide="crop"></i> Adjust Borders (Recrop)';
-            lucide.createIcons();
-            scannerPreviewScreen.classList.add('hidden');
-            scannerActiveScreen.classList.remove('hidden');
-            startScannerCamera();
+        scannerRetakeBtn.addEventListener('click', resetScanner);
+        scannerAdjustBackBtn.addEventListener('click', resetScanner);
+
+        scannerUploadBtn.addEventListener('click', () => {
+            scannerFileInput.click();
         });
+
+        scannerFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.type.startsWith('image/')) {
+                loadScannerImage(file);
+            } else if (file.type === 'application/pdf') {
+                loadScannerPdf(file);
+            } else {
+                notify('Invalid file format. Please select an image or PDF.', 'error');
+            }
+        });
+
+        async function loadScannerImage(file) {
+            showStatus('Loading Image...');
+            try {
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
+                const img = new Image();
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = dataUrl;
+                });
+
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                scannerCapturedImage = canvas;
+                hideStatus();
+                openScannerAdjustScreen(dataUrl);
+            } catch (err) {
+                console.error('Image load failed', err);
+                notify('Failed to load image.', 'error');
+                hideStatus();
+            }
+        }
+
+        async function loadScannerPdf(file) {
+            showStatus('Loading PDF...');
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                if (pdf.numPages === 0) {
+                    notify('The PDF has no pages.', 'error');
+                    hideStatus();
+                    return;
+                }
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({ scale: 2.0 }); // High DPI
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                scannerCapturedImage = canvas;
+                hideStatus();
+                openScannerAdjustScreen(canvas.toDataURL('image/png'));
+            } catch (err) {
+                console.error('PDF load failed', err);
+                notify('Failed to load PDF.', 'error');
+                hideStatus();
+            }
+        }
+
+        function openScannerAdjustScreen(imgSrc) {
+            stopScannerCamera();
+
+            scannerStartScreen.classList.add('hidden');
+            scannerActiveScreen.classList.add('hidden');
+            scannerPreviewScreen.classList.add('hidden');
+            scannerAdjustScreen.classList.remove('hidden');
+
+            const cropImg = document.getElementById('scanner-crop-img');
+            cropImg.src = imgSrc;
+            cropImg.onload = () => {
+                // Guess initial corners using OpenCV if ready
+                let corners = null;
+                if (openCvReady && scannerCapturedImage) {
+                    try {
+                        corners = detectDocumentCornersFromCanvas(scannerCapturedImage);
+                    } catch (e) {
+                        console.error('Auto detection failed, falling back to default:', e);
+                    }
+                }
+
+                if (corners) {
+                    currentCropPoints = corners.map(pt => ({
+                        x: pt.x / scannerCapturedImage.width,
+                        y: pt.y / scannerCapturedImage.height
+                    }));
+                } else {
+                    currentCropPoints = [
+                        { x: 0.15, y: 0.15 },
+                        { x: 0.85, y: 0.15 },
+                        { x: 0.85, y: 0.85 },
+                        { x: 0.15, y: 0.85 }
+                    ];
+                }
+                updateCropUI();
+            };
+        }
+
+        function resetScanner() {
+            stopScannerCamera();
+            scannerCapturedImage = null;
+            scannerCroppedImage = null;
+            scannerStartScreen.classList.remove('hidden');
+            scannerActiveScreen.classList.add('hidden');
+            scannerAdjustScreen.classList.add('hidden');
+            scannerPreviewScreen.classList.add('hidden');
+            scannerFileInput.value = '';
+        }
 
         async function startScannerCamera() {
             if (scannerStream) stopScannerCamera();
@@ -8390,11 +8574,8 @@ Configure your API key to get started.</p>
                     scannerStartScreen.classList.add('hidden');
                     scannerActiveScreen.classList.remove('hidden');
                     scannerPreviewScreen.classList.add('hidden');
-                    if (openCvReady) {
-                        scannerStatusText.textContent = 'Real-time document border detection active.';
-                    } else {
-                        scannerStatusText.textContent = 'Loading intelligent edge tracking...';
-                    }
+                    scannerAdjustScreen.classList.add('hidden');
+                    scannerStatusText.textContent = 'Align your document inside the guides and capture';
                     scannerAnimationId = requestAnimationFrame(processVideoFrame);
                 };
             } catch (err) {
@@ -8418,137 +8599,97 @@ Configure your API key to get started.</p>
             scannerActiveScreen.classList.add('hidden');
         }
 
-        // Andrew's Monotone Chain Convex Hull algorithm
-        function convexHull(points) {
-            if (points.length <= 3) return points;
-            points.sort((a, b) => a.x !== b.x ? a.x - b.x : a.y - b.y);
-
-            const lower = [];
-            for (let i = 0; i < points.length; i++) {
-                while (lower.length >= 2 && crossProduct(lower[lower.length - 2], lower[lower.length - 1], points[i]) <= 0) {
-                    lower.pop();
-                }
-                lower.push(points[i]);
-            }
-
-            const upper = [];
-            for (let i = points.length - 1; i >= 0; i--) {
-                while (upper.length >= 2 && crossProduct(upper[upper.length - 2], upper[upper.length - 1], points[i]) <= 0) {
-                    upper.pop();
-                }
-                upper.push(points[i]);
-            }
-
-            upper.pop();
-            lower.pop();
-            return lower.concat(upper);
+        function sortCorners(pts) {
+            const sums = pts.map(p => p.x + p.y);
+            const diffs = pts.map(p => p.y - p.x);
+            const tl = pts[sums.indexOf(Math.min(...sums))];
+            const br = pts[sums.indexOf(Math.max(...sums))];
+            const tr = pts[diffs.indexOf(Math.min(...diffs))];
+            const bl = pts[diffs.indexOf(Math.max(...diffs))];
+            return [tl, tr, br, bl];
         }
 
-        function crossProduct(a, b, c) {
-            return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-        }
-        // Vanilla JS Sobel Filter & Corner Bounding Box Detector (Runs 100% offline, instantly)
-        function detectDocumentCornersVanilla(video) {
-            const vw = video.videoWidth;
-            const vh = video.videoHeight;
+        function detectDocumentCornersFromCanvas(canvas) {
+            const vw = canvas.width;
+            const vh = canvas.height;
             if (vw === 0 || vh === 0) return null;
 
-            const procCanvas = document.createElement('canvas');
-            const pw = 200; // downscale for max performance
-            const ph = 150;
-            procCanvas.width = pw;
-            procCanvas.height = ph;
-            const ctx = procCanvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, pw, ph);
+            let detected = null;
+            if (openCvReady) {
+                try {
+                    const src = cv.imread(canvas);
+                    const dst = new cv.Mat();
+                    const scale = Math.min(1.0, 600 / Math.max(vw, vh));
+                    const dsize = new cv.Size(vw * scale, vh * scale);
+                    cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
 
-            let imgData;
-            try {
-                imgData = ctx.getImageData(0, 0, pw, ph);
-            } catch (e) {
-                return null;
-            }
+                    const gray = new cv.Mat();
+                    const blurred = new cv.Mat();
+                    const edged = new cv.Mat();
+                    cv.cvtColor(dst, gray, cv.COLOR_RGBA2GRAY);
+                    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+                    cv.Canny(blurred, edged, 30, 120);
 
-            const data = imgData.data;
-            const gray = new Uint8Array(pw * ph);
-            for (let i = 0; i < data.length; i += 4) {
-                gray[i / 4] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            }
+                    let kernel = cv.Mat.ones(3, 3, cv.CV_8U);
+                    cv.dilate(edged, edged, kernel);
+                    kernel.delete();
 
-            const edges = new Uint8Array(pw * ph);
-            const threshold = 30; // Clean threshold
-            for (let y = 1; y < ph - 1; y++) {
-                for (let x = 1; x < pw - 1; x++) {
-                    const idx = y * pw + x;
-                    const gx =
-                        -gray[idx - pw - 1] + gray[idx - pw + 1] +
-                        -2 * gray[idx - 1] + 2 * gray[idx + 1] +
-                        -gray[idx + pw - 1] + gray[idx + pw + 1];
-                    const gy =
-                        -gray[idx - pw - 1] - 2 * gray[idx - pw] - gray[idx - pw + 1] +
-                        gray[idx + pw - 1] + 2 * gray[idx + pw] + gray[idx + pw + 1];
-                    const mag = Math.sqrt(gx * gx + gy * gy);
-                    edges[idx] = mag > threshold ? 255 : 0;
-                }
-            }
+                    const contours = new cv.MatVector();
+                    const hierarchy = new cv.Mat();
+                    cv.findContours(edged, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
-            // Radial scanning outwards from center to ignore desk clutter
-            const cx = pw / 2;
-            const cy = ph / 2;
-            const numRays = 40;
-            const points = [];
+                    let maxArea = 0;
+                    let bestContour = null;
 
-            for (let i = 0; i < numRays; i++) {
-                const angle = (i * 2 * Math.PI) / numRays;
-                const cos = Math.cos(angle);
-                const sin = Math.sin(angle);
-                const maxRadius = Math.hypot(pw, ph) / 2;
+                    for (let i = 0; i < contours.size(); ++i) {
+                        const contour = contours.get(i);
+                        const area = cv.contourArea(contour);
+                        if (area > (vw * vh * scale * scale * 0.02)) {
+                            const perimeter = cv.arcLength(contour, true);
+                            const tempApprox = new cv.Mat();
 
-                for (let r = 5; r < maxRadius; r += 1.5) {
-                    const x = Math.round(cx + r * cos);
-                    const y = Math.round(cy + r * sin);
+                            let foundQuad = false;
+                            for (let epsilonFactor = 0.01; epsilonFactor <= 0.05; epsilonFactor += 0.01) {
+                                cv.approxPolyDP(contour, tempApprox, epsilonFactor * perimeter, true);
+                                if (tempApprox.rows === 4) {
+                                    foundQuad = true;
+                                    break;
+                                }
+                            }
 
-                    if (x < 3 || x >= pw - 3 || y < 3 || y >= ph - 3) {
-                        break;
+                            if (foundQuad && area > maxArea) {
+                                maxArea = area;
+                                if (bestContour) bestContour.delete();
+                                bestContour = tempApprox.clone();
+                            }
+                            tempApprox.delete();
+                        }
                     }
 
-                    if (edges[y * pw + x] === 255) {
-                        points.push({ x, y });
-                        break; // Stop at first edge hit
+                    if (bestContour) {
+                        const pts = [];
+                        for (let i = 0; i < 4; i++) {
+                            pts.push({
+                                x: bestContour.data32S[i * 2] / scale,
+                                y: bestContour.data32S[i * 2 + 1] / scale
+                            });
+                        }
+                        detected = sortCorners(pts);
+                        bestContour.delete();
                     }
+
+                    src.delete();
+                    dst.delete();
+                    gray.delete();
+                    blurred.delete();
+                    edged.delete();
+                    contours.delete();
+                    hierarchy.delete();
+                } catch (e) {
+                    console.error('Error in OpenCV corner detection:', e);
                 }
             }
-
-            if (points.length < 15) return null;
-
-            // Compute the convex hull
-            const hull = convexHull(points);
-            if (hull.length < 4) return null;
-
-            // Find the 4 extreme diagonal points from the convex hull
-            let tl = hull[0], tr = hull[0], br = hull[0], bl = hull[0];
-            let minSum = Infinity, maxSum = -Infinity;
-            let minDiff = Infinity, maxDiff = -Infinity;
-
-            for (let i = 0; i < hull.length; i++) {
-                const p = hull[i];
-                const sum = p.x + p.y;
-                const diff = p.x - p.y;
-
-                if (sum < minSum) { minSum = sum; tl = p; }
-                if (sum > maxSum) { maxSum = sum; br = p; }
-                if (diff > maxDiff) { maxDiff = diff; tr = p; }
-                if (diff < minDiff) { minDiff = diff; bl = p; }
-            }
-
-            // Scale back to full video frame scale
-            const scaleX = vw / pw;
-            const scaleY = vh / ph;
-            return [
-                { x: tl.x * scaleX, y: tl.y * scaleY },
-                { x: tr.x * scaleX, y: tr.y * scaleY },
-                { x: br.x * scaleX, y: br.y * scaleY },
-                { x: bl.x * scaleX, y: bl.y * scaleY }
-            ];
+            return detected;
         }
 
         // Vanilla JS Bilinear Quadrilateral Warp Approximation (Fallback/Instant Warp)
@@ -8556,13 +8697,13 @@ Configure your API key to get started.</p>
             scannerCroppedImage = document.createElement('canvas');
             scannerCroppedImage.width = targetWidth;
             scannerCroppedImage.height = targetHeight;
-            const dstCtx = scannerCroppedImage.getContext('2d');
 
             const srcCtx = srcCanvas.getContext('2d');
             const srcWidth = srcCanvas.width;
             const srcHeight = srcCanvas.height;
             const srcData = srcCtx.getImageData(0, 0, srcWidth, srcHeight).data;
 
+            const dstCtx = scannerCroppedImage.getContext('2d');
             const dstImgData = dstCtx.createImageData(targetWidth, targetHeight);
             const dstData = dstImgData.data;
 
@@ -8606,7 +8747,6 @@ Configure your API key to get started.</p>
                 return;
             }
 
-            // Match overlay canvas size to layout size
             const rect = scannerVideo.getBoundingClientRect();
             scannerOverlayCanvas.width = rect.width;
             scannerOverlayCanvas.height = rect.height;
@@ -8614,228 +8754,57 @@ Configure your API key to get started.</p>
             const ctx = scannerOverlayCanvas.getContext('2d');
             ctx.clearRect(0, 0, rect.width, rect.height);
 
-            detectedCorners = null;
+            // Draw a beautiful guide frame in the center
+            const marginX = rect.width * 0.1;
+            const marginY = rect.height * 0.1;
 
-            if (openCvReady) {
-                try {
-                    // Create mats
-                    const cap = new cv.VideoCapture('scanner-video');
-                    const src = new cv.Mat(vh, vw, cv.CV_8UC4);
-                    cap.read(src);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+            ctx.clearRect(marginX, marginY, rect.width - 2 * marginX, rect.height - 2 * marginY);
 
-                    // Downscale for performance
-                    const scale = 0.5;
-                    const dsize = new cv.Size(vw * scale, vh * scale);
-                    const dst = new cv.Mat();
-                    cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(marginX, marginY, rect.width - 2 * marginX, rect.height - 2 * marginY);
 
-                    // Find document contours
-                    const gray = new cv.Mat();
-                    const blurred = new cv.Mat();
-                    const edged = new cv.Mat();
-                    cv.cvtColor(dst, gray, cv.COLOR_RGBA2GRAY);
-                    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
-                    cv.Canny(blurred, edged, 30, 120);
+            const length = 20;
+            ctx.strokeStyle = 'var(--accent-color)';
+            ctx.lineWidth = 5;
 
-                    // Dilate the edges to merge near/broken contour segments
-                    let kernel = cv.Mat.ones(3, 3, cv.CV_8U);
-                    cv.dilate(edged, edged, kernel);
-                    kernel.delete();
+            // Top Left Focus Corner
+            ctx.beginPath();
+            ctx.moveTo(marginX + length, marginY);
+            ctx.lineTo(marginX, marginY);
+            ctx.lineTo(marginX, marginY + length);
+            ctx.stroke();
 
-                    const contours = new cv.MatVector();
-                    const hierarchy = new cv.Mat();
-                    cv.findContours(edged, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+            // Top Right Focus Corner
+            ctx.beginPath();
+            ctx.moveTo(rect.width - marginX - length, marginY);
+            ctx.lineTo(rect.width - marginX, marginY);
+            ctx.lineTo(rect.width - marginX, marginY + length);
+            ctx.stroke();
 
-                    let maxArea = 0;
-                    let bestContour = null;
+            // Bottom Left Focus Corner
+            ctx.beginPath();
+            ctx.moveTo(marginX + length, rect.height - marginY);
+            ctx.lineTo(marginX, rect.height - marginY);
+            ctx.lineTo(marginX, rect.height - marginY - length);
+            ctx.stroke();
 
-                    for (let i = 0; i < contours.size(); ++i) {
-                        const contour = contours.get(i);
-                        const area = cv.contourArea(contour);
-                        if (area > (vw * vh * scale * scale * 0.03)) { // min area 3% of view
-                            const perimeter = cv.arcLength(contour, true);
-                            const tempApprox = new cv.Mat();
-
-                            // Iterate epsilon to locate a 4-point polygon
-                            let foundQuad = false;
-                            for (let epsilonFactor = 0.01; epsilonFactor <= 0.05; epsilonFactor += 0.01) {
-                                cv.approxPolyDP(contour, tempApprox, epsilonFactor * perimeter, true);
-                                if (tempApprox.rows === 4) {
-                                    foundQuad = true;
-                                    break;
-                                }
-                            }
-
-                            if (foundQuad && area > maxArea) {
-                                maxArea = area;
-                                if (bestContour) bestContour.delete();
-                                bestContour = tempApprox.clone();
-                            }
-                            tempApprox.delete();
-                        }
-                    }
-
-                    if (bestContour) {
-                        // Extract corners and scale back to full video frame scale
-                        const pts = [];
-                        for (let i = 0; i < 4; i++) {
-                            pts.push({
-                                x: bestContour.data32S[i * 2] / scale,
-                                y: bestContour.data32S[i * 2 + 1] / scale
-                            });
-                        }
-                        detectedCorners = sortCorners(pts);
-                        bestContour.delete();
-                    }
-
-                    // Clean up
-                    src.delete();
-                    dst.delete();
-                    gray.delete();
-                    blurred.delete();
-                    edged.delete();
-                    contours.delete();
-                    hierarchy.delete();
-                } catch (e) {
-                    console.error('Error in CV frame loop:', e);
-                }
-            }
-
-            // Fallback to vanilla JS detection if OpenCV fails to find a contour or isn't loaded
-            if (!detectedCorners) {
-                detectedCorners = detectDocumentCornersVanilla(scannerVideo);
-            }
-
-            // Smooth the corners temporally to prevent shaking
-            if (detectedCorners) {
-                if (!smoothedCorners) {
-                    smoothedCorners = detectedCorners.map(p => ({ ...p }));
-                } else {
-                    const alpha = 0.12; // 12% new coordinate, 88% smoothed coordinates for zero shaking
-                    smoothedCorners = smoothedCorners.map((p, idx) => ({
-                        x: p.x * (1 - alpha) + detectedCorners[idx].x * alpha,
-                        y: p.y * (1 - alpha) + detectedCorners[idx].y * alpha
-                    }));
-                }
-            } else {
-                smoothedCorners = null;
-            }
-
-            // Stability tracking using smoothed corners
-            if (smoothedCorners) {
-                if (lastCorners) {
-                    let cornersMatch = true;
-                    for (let i = 0; i < 4; i++) {
-                        let dist = Math.hypot(smoothedCorners[i].x - lastCorners[i].x, smoothedCorners[i].y - lastCorners[i].y);
-                        if (dist > STABILITY_PIXEL_TOLERANCE) {
-                            cornersMatch = false;
-                            break;
-                        }
-                    }
-                    if (cornersMatch) {
-                        stabilityCount++;
-                        if (stabilityCount >= STABILITY_THRESHOLD_FRAMES) {
-                            if (!isStable) {
-                                isStable = true;
-                                notify('Camera stable. Ready to capture!', 'info');
-                                if (scannerStatusText) scannerStatusText.textContent = 'Stable. Ready to capture!';
-                            }
-                        }
-                    } else {
-                        stabilityCount = 0;
-                        if (isStable) {
-                            isStable = false;
-                            if (scannerStatusText) scannerStatusText.textContent = 'Hold steady to lock borders...';
-                        }
-                    }
-                }
-                lastCorners = smoothedCorners.map(p => ({ ...p }));
-            } else {
-                stabilityCount = 0;
-                if (isStable) {
-                    isStable = false;
-                    if (scannerStatusText) scannerStatusText.textContent = 'Detecting document edges...';
-                }
-                lastCorners = null;
-            }
-
-            // Draw overlay aligned with active video element content bounds (compensates for letterbox/pillarbox)
-            if (smoothedCorners) {
-                const videoRatio = vw / vh;
-                const elementRatio = rect.width / rect.height;
-                let displayWidth, displayHeight;
-                let offsetX = 0, offsetY = 0;
-
-                if (elementRatio > videoRatio) {
-                    displayHeight = rect.height;
-                    displayWidth = displayHeight * videoRatio;
-                    offsetX = (rect.width - displayWidth) / 2;
-                } else {
-                    displayWidth = rect.width;
-                    displayHeight = displayWidth / videoRatio;
-                    offsetY = (rect.height - displayHeight) / 2;
-                }
-
-                // Scale corners to active video content display coordinates
-                const displayCorners = smoothedCorners.map(p => ({
-                    x: offsetX + (p.x / vw) * displayWidth,
-                    y: offsetY + (p.y / vh) * displayHeight
-                }));
-
-                const strokeColor = isStable ? '#22c55e' : '#2563eb';
-                const fillColor = isStable ? 'rgba(34, 197, 94, 0.18)' : 'rgba(37, 99, 235, 0.15)';
-
-                ctx.strokeStyle = strokeColor;
-                ctx.lineWidth = 4;
-                ctx.fillStyle = fillColor;
-                ctx.beginPath();
-                ctx.moveTo(displayCorners[0].x, displayCorners[0].y);
-                ctx.lineTo(displayCorners[1].x, displayCorners[1].y);
-                ctx.lineTo(displayCorners[2].x, displayCorners[2].y);
-                ctx.lineTo(displayCorners[3].x, displayCorners[3].y);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-
-                // Draw circles at corners
-                ctx.fillStyle = '#ffffff';
-                ctx.strokeStyle = strokeColor;
-                ctx.lineWidth = 2;
-                displayCorners.forEach(c => {
-                    ctx.beginPath();
-                    ctx.arc(c.x, c.y, 8, 0, 2 * Math.PI);
-                    ctx.fill();
-                    ctx.stroke();
-                });
-            } else {
-                // Draw a guide frame in the center
-                const marginX = rect.width * 0.05;
-                const marginY = rect.height * 0.05;
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([15, 10]);
-                ctx.strokeRect(marginX, marginY, rect.width - 2 * marginX, rect.height - 2 * marginY);
-                ctx.setLineDash([]);
-            }
+            // Bottom Right Focus Corner
+            ctx.beginPath();
+            ctx.moveTo(rect.width - marginX - length, rect.height - marginY);
+            ctx.lineTo(rect.width - marginX, rect.height - marginY);
+            ctx.lineTo(rect.width - marginX, rect.height - marginY - length);
+            ctx.stroke();
 
             scannerAnimationId = requestAnimationFrame(processVideoFrame);
         }
 
-        function sortCorners(pts) {
-            const sums = pts.map(p => p.x + p.y);
-            const diffs = pts.map(p => p.y - p.x);
-            const tl = pts[sums.indexOf(Math.min(...sums))];
-            const br = pts[sums.indexOf(Math.max(...sums))];
-            const tr = pts[diffs.indexOf(Math.min(...diffs))];
-            const bl = pts[diffs.indexOf(Math.max(...diffs))];
-            return [tl, tr, br, bl];
-        }
-
         async function captureDocument() {
             if (!scannerStream) return;
-            showStatus('Scanning and correcting perspective...');
+            showStatus('Capturing image...');
 
-            // Get current full resolution frame
             const vw = scannerVideo.videoWidth;
             const vh = scannerVideo.videoHeight;
             const captureCanvas = document.createElement('canvas');
@@ -8844,38 +8813,11 @@ Configure your API key to get started.</p>
             const captureCtx = captureCanvas.getContext('2d');
             captureCtx.drawImage(scannerVideo, 0, 0, vw, vh);
 
-            // Store original capture
             scannerCapturedImage = captureCanvas;
-
-            // Stop camera since we are previewing/editing
             stopScannerCamera();
+            hideStatus();
 
-            let corners = smoothedCorners || detectedCorners;
-            if (!corners) {
-                // Default fallback: capture almost the entire frame with a 2% margin to avoid cutting the document logo
-                corners = [
-                    { x: vw * 0.02, y: vh * 0.02 },
-                    { x: vw * 0.98, y: vh * 0.02 },
-                    { x: vw * 0.98, y: vh * 0.98 },
-                    { x: vw * 0.02, y: vh * 0.98 }
-                ];
-            }
-
-            // Calculate auto width & height based on corner distances to prevent stretching
-            const tl = corners[0];
-            const tr = corners[1];
-            const br = corners[2];
-            const bl = corners[3];
-
-            const widthBottom = Math.hypot(br.x - bl.x, br.y - bl.y);
-            const widthTop = Math.hypot(tr.x - tl.x, tr.y - tl.y);
-            const heightRight = Math.hypot(br.x - tr.x, br.y - tr.y);
-            const heightLeft = Math.hypot(bl.x - tl.x, bl.y - tl.y);
-
-            const targetWidth = Math.round(Math.max(widthBottom, widthTop));
-            const targetHeight = Math.round(Math.max(heightRight, heightLeft));
-
-            performWarpCrop(captureCanvas, corners, targetWidth, targetHeight);
+            openScannerAdjustScreen(captureCanvas.toDataURL('image/png'));
         }
 
         function performWarpCrop(srcCanvas, corners, targetWidth, targetHeight) {
@@ -8906,7 +8848,6 @@ Configure your API key to get started.</p>
 
                     cv.imshow(scannerCroppedImage, dstMat);
 
-                    // Clean up
                     srcMat.delete();
                     dstMat.delete();
                     srcCoords.delete();
@@ -8920,23 +8861,105 @@ Configure your API key to get started.</p>
                 performWarpCropVanilla(srcCanvas, corners, targetWidth, targetHeight);
             }
 
-            // Apply filter and show
             applyScannerFilter();
 
-            scannerActiveScreen.classList.add('hidden');
+            scannerAdjustScreen.classList.add('hidden');
             scannerPreviewScreen.classList.remove('hidden');
             hideStatus();
         }
 
-        function fallbackCanvasCrop(srcCanvas, corners, targetWidth, targetHeight) {
-            const minX = Math.min(...corners.map(c => c.x));
-            const maxX = Math.max(...corners.map(c => c.x));
-            const minY = Math.min(...corners.map(c => c.y));
-            const maxY = Math.max(...corners.map(c => c.y));
+        function updateCropUI() {
+            const img = document.getElementById('scanner-crop-img');
+            const polygon = document.getElementById('scanner-crop-polygon');
 
-            const ctx = scannerCroppedImage.getContext('2d');
-            ctx.drawImage(srcCanvas, minX, minY, maxX - minX, maxY - minY, 0, 0, targetWidth, targetHeight);
+            const w = img.clientWidth;
+            const h = img.clientHeight;
+            if (w === 0 || h === 0) return;
+
+            let pointsStr = '';
+            currentCropPoints.forEach((pt, i) => {
+                const px = pt.x * w;
+                const py = pt.y * h;
+
+                const handle = document.getElementById(`scanner-handle-${i}`);
+                handle.style.left = `${pt.x * 100}%`;
+                handle.style.top = `${pt.y * 100}%`;
+
+                pointsStr += `${px},${py} `;
+            });
+            polygon.setAttribute('points', pointsStr.trim());
         }
+
+        window.addEventListener('resize', () => {
+            if (!scannerAdjustScreen.classList.contains('hidden')) {
+                updateCropUI();
+            }
+        });
+
+        // Initialize Pointer Drag Handlers for Crop Handles
+        let activeHandleIdx = null;
+        for (let i = 0; i < 4; i++) {
+            const handle = document.getElementById(`scanner-handle-${i}`);
+            handle.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                activeHandleIdx = i;
+                handle.setPointerCapture(e.pointerId);
+            });
+            handle.addEventListener('pointermove', (e) => {
+                if (activeHandleIdx === i) {
+                    const container = document.getElementById('scanner-crop-container');
+                    const rect = container.getBoundingClientRect();
+
+                    let x = (e.clientX - rect.left) / rect.width;
+                    let y = (e.clientY - rect.top) / rect.height;
+
+                    x = Math.max(0, Math.min(1, x));
+                    y = Math.max(0, Math.min(1, y));
+
+                    currentCropPoints[i] = { x, y };
+                    updateCropUI();
+                }
+            });
+            handle.addEventListener('pointerup', (e) => {
+                if (activeHandleIdx === i) {
+                    handle.releasePointerCapture(e.pointerId);
+                    activeHandleIdx = null;
+                }
+            });
+            handle.addEventListener('pointercancel', (e) => {
+                if (activeHandleIdx === i) {
+                    handle.releasePointerCapture(e.pointerId);
+                    activeHandleIdx = null;
+                }
+            });
+        }
+
+        scannerApplyCropBtn.addEventListener('click', () => {
+            if (!scannerCapturedImage) return;
+
+            showStatus('Processing document...');
+            setTimeout(() => {
+                const corners = currentCropPoints.map(pt => ({
+                    x: pt.x * scannerCapturedImage.width,
+                    y: pt.y * scannerCapturedImage.height
+                }));
+
+                const tl = corners[0];
+                const tr = corners[1];
+                const br = corners[2];
+                const bl = corners[3];
+
+                const widthBottom = Math.hypot(br.x - bl.x, br.y - bl.y);
+                const widthTop = Math.hypot(tr.x - tl.x, tr.y - tl.y);
+                const heightRight = Math.hypot(br.x - tr.x, br.y - tr.y);
+                const heightLeft = Math.hypot(bl.x - tl.x, bl.y - tl.y);
+
+                const targetWidth = Math.round(Math.max(widthBottom, widthTop));
+                const targetHeight = Math.round(Math.max(heightRight, heightLeft));
+
+                performWarpCrop(scannerCapturedImage, corners, targetWidth, targetHeight);
+            }, 50);
+        });
 
         function applyScannerFilter() {
             if (!scannerCroppedImage) return;
@@ -8951,45 +8974,38 @@ Configure your API key to get started.</p>
             const data = imgData.data;
 
             if (currentScannerFilter === 'magic') {
-                // High fidelity shadow removal, background whitening, and contrast booster
                 for (let i = 0; i < data.length; i += 4) {
                     let r = data[i];
                     let g = data[i + 1];
                     let b = data[i + 2];
 
-                    // Compute gray intensity
                     let gray = 0.299 * r + 0.587 * g + 0.114 * b;
 
-                    // Whitening threshold mapping (CamScanner style magic color)
                     if (gray > 115) {
                         let factor = (gray - 115) / (255 - 115);
-                        // Clean background shadows
                         r = r + (255 - r) * (0.6 + factor * 0.4);
                         g = g + (255 - g) * (0.6 + factor * 0.4);
                         b = b + (255 - b) * (0.6 + factor * 0.4);
                     } else {
-                        // High contrast details
                         let factor = gray / 115;
                         r = r * factor;
                         g = g * factor;
                         b = b * factor;
                     }
 
-                    // Saturation adjustment to preserve colorful logos, signatures, or stamps
                     let maxVal = Math.max(r, g, b);
                     let minVal = Math.min(r, g, b);
                     let l = (maxVal + minVal) / 2;
                     let d = maxVal - minVal;
                     if (d > 8) {
                         let s = l > 127 ? d / (510 - maxVal - minVal) : d / (maxVal + minVal);
-                        let targetS = Math.min(1.0, s * 1.6); // Saturation boost
+                        let targetS = Math.min(1.0, s * 1.6);
                         let ratio = targetS / (s || 1);
                         r = l + (r - l) * ratio;
                         g = l + (g - l) * ratio;
                         b = l + (b - l) * ratio;
                     }
 
-                    // Contrast stretch
                     r = ((r - 128) * 1.15) + 128;
                     g = ((g - 128) * 1.15) + 128;
                     b = ((b - 128) * 1.15) + 128;
@@ -9011,7 +9027,6 @@ Configure your API key to get started.</p>
                 ctx.putImageData(imgData, 0, 0);
             }
 
-            // Draw watermark if checked
             const watermarkToggle = document.getElementById('scanner-watermark-toggle');
             const watermarkText = document.getElementById('scanner-watermark-text');
             if (watermarkToggle && watermarkToggle.checked) {
@@ -9036,7 +9051,6 @@ Configure your API key to get started.</p>
             scannerResultImg.src = filteredCanvas.toDataURL('image/jpeg', 0.95);
         }
 
-        // Watermark Controls Listeners
         document.getElementById('scanner-watermark-toggle').addEventListener('change', function () {
             const textInput = document.getElementById('scanner-watermark-text');
             if (this.checked) {
@@ -9049,7 +9063,6 @@ Configure your API key to get started.</p>
         });
         document.getElementById('scanner-watermark-text').addEventListener('input', applyScannerFilter);
 
-        // Hook filter buttons
         [filterOrig, filterMagic, filterBw].forEach(btn => {
             btn.addEventListener('click', () => {
                 [filterOrig, filterMagic, filterBw].forEach(b => b.classList.remove('active'));
@@ -9061,28 +9074,11 @@ Configure your API key to get started.</p>
             });
         });
 
-        // Re-crop option using Cropper.js
         scannerRecropBtn.addEventListener('click', () => {
-            if (scannerCropper) {
-                const canvas = scannerCropper.getCroppedCanvas();
-                scannerCroppedImage = canvas;
-                applyScannerFilter();
-                scannerCropper.destroy();
-                scannerCropper = null;
-                scannerRecropBtn.innerHTML = '<i data-lucide="crop"></i> Adjust Borders (Recrop)';
-                lucide.createIcons();
-            } else {
-                scannerCropper = new Cropper(scannerResultImg, {
-                    aspectRatio: NaN,
-                    viewMode: 1,
-                    background: false
-                });
-                scannerRecropBtn.innerHTML = '<i data-lucide="check"></i> Save Crop';
-                lucide.createIcons();
-            }
+            if (!scannerCapturedImage) return;
+            openScannerAdjustScreen(scannerCapturedImage.toDataURL('image/png'));
         });
 
-        // Saving / Exporting Scanned Image
         scannerSaveJpgBtn.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = `SwiftScan_${Date.now()}.jpg`;
