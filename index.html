@@ -4402,9 +4402,14 @@
                                         <h4 style="margin-bottom: 8px;">Adjust Borders</h4>
                                         <p style="font-size: 0.85rem; color: var(--text-secondary);">Drag the 4 corner handles to align with the edges of your document.</p>
                                     </div>
-                                    <button id="scanner-apply-crop-btn" class="primary-btn btn-pro-ai" style="width: 100%; justify-content: center;">
-                                        <i data-lucide="check"></i> Apply Crop & Warp
-                                    </button>
+                                    <div style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                                        <button id="scanner-adjust-rotate-btn" class="secondary-btn" style="width: 100%; justify-content: center;">
+                                            <i data-lucide="rotate-cw"></i> Rotate Image
+                                        </button>
+                                        <button id="scanner-apply-crop-btn" class="primary-btn btn-pro-ai" style="width: 100%; justify-content: center;">
+                                            <i data-lucide="check"></i> Apply Crop & Warp
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -4440,14 +4445,10 @@
                                         </div>
                                     </div>
 
-                                    <div class="control-group" style="margin-top: 1rem; display: flex; gap: 10px;">
+                                    <div class="control-group" style="margin-top: 1rem;">
                                          <button id="scanner-recrop-btn" class="secondary-btn"
-                                             style="flex: 1; justify-content: center; padding: 0.75rem 0.5rem; font-size: 0.85rem;">
-                                             <i data-lucide="crop" style="width:16px;"></i> Recrop
-                                         </button>
-                                         <button id="scanner-rotate-btn" class="secondary-btn"
-                                             style="flex: 1; justify-content: center; padding: 0.75rem 0.5rem; font-size: 0.85rem;">
-                                             <i data-lucide="rotate-cw" style="width:16px;"></i> Rotate
+                                             style="width: 100%; justify-content: center;">
+                                             <i data-lucide="crop" style="width:18px;"></i> Adjust Borders (Recrop)
                                          </button>
                                      </div>
 
@@ -8351,6 +8352,7 @@ Configure your API key to get started.</p>
         let scannerCapturedImage = null; // Original full-res canvas
         let scannerCroppedImage = null; // Warped canvas
         let scannerAnimationId = null;
+        let isAdjustScreenInit = false;
         let currentCropPoints = [
             { x: 0.15, y: 0.15 },
             { x: 0.85, y: 0.15 },
@@ -8371,7 +8373,7 @@ Configure your API key to get started.</p>
         const scannerCaptureBtn = document.getElementById('scanner-capture-btn');
         const scannerRetakeBtn = document.getElementById('scanner-retake-btn');
         const scannerRecropBtn = document.getElementById('scanner-recrop-btn');
-        const scannerRotateBtn = document.getElementById('scanner-rotate-btn');
+        const scannerAdjustRotateBtn = document.getElementById('scanner-adjust-rotate-btn');
         const scannerResultImg = document.getElementById('scanner-result-img');
         const scannerSaveJpgBtn = document.getElementById('scanner-save-jpg-btn');
         const scannerSavePdfBtn = document.getElementById('scanner-save-pdf-btn');
@@ -8508,7 +8510,7 @@ Configure your API key to get started.</p>
             }
         }
 
-        function openScannerAdjustScreen(imgSrc) {
+        function openScannerAdjustScreen(imgSrc, preservePoints = false) {
             stopScannerCamera();
 
             scannerStartScreen.classList.add('hidden');
@@ -8516,31 +8518,35 @@ Configure your API key to get started.</p>
             scannerPreviewScreen.classList.add('hidden');
             scannerAdjustScreen.classList.remove('hidden');
 
+            isAdjustScreenInit = !preservePoints;
             const cropImg = document.getElementById('scanner-crop-img');
             cropImg.src = imgSrc;
             cropImg.onload = () => {
-                // Guess initial corners using OpenCV if ready
-                let corners = null;
-                if (openCvReady && scannerCapturedImage) {
-                    try {
-                        corners = detectDocumentCornersFromCanvas(scannerCapturedImage);
-                    } catch (e) {
-                        console.error('Auto detection failed, falling back to default:', e);
+                if (isAdjustScreenInit) {
+                    isAdjustScreenInit = false;
+                    // Guess initial corners using OpenCV if ready
+                    let corners = null;
+                    if (openCvReady && scannerCapturedImage) {
+                        try {
+                            corners = detectDocumentCornersFromCanvas(scannerCapturedImage);
+                        } catch (e) {
+                            console.error('Auto detection failed, falling back to default:', e);
+                        }
                     }
-                }
 
-                if (corners) {
-                    currentCropPoints = corners.map(pt => ({
-                        x: pt.x / scannerCapturedImage.width,
-                        y: pt.y / scannerCapturedImage.height
-                    }));
-                } else {
-                    currentCropPoints = [
-                        { x: 0.15, y: 0.15 },
-                        { x: 0.85, y: 0.15 },
-                        { x: 0.85, y: 0.85 },
-                        { x: 0.15, y: 0.85 }
-                    ];
+                    if (corners) {
+                        currentCropPoints = corners.map(pt => ({
+                            x: pt.x / scannerCapturedImage.width,
+                            y: pt.y / scannerCapturedImage.height
+                        }));
+                    } else {
+                        currentCropPoints = [
+                            { x: 0.15, y: 0.15 },
+                            { x: 0.85, y: 0.15 },
+                            { x: 0.85, y: 0.85 },
+                            { x: 0.15, y: 0.85 }
+                        ];
+                    }
                 }
                 updateCropUI();
             };
@@ -9103,23 +9109,30 @@ Configure your API key to get started.</p>
 
         scannerRecropBtn.addEventListener('click', () => {
             if (!scannerCapturedImage) return;
-            openScannerAdjustScreen(scannerCapturedImage.toDataURL('image/png'));
+            openScannerAdjustScreen(scannerCapturedImage.toDataURL('image/png'), true);
         });
 
-        scannerRotateBtn.addEventListener('click', () => {
-            if (!scannerCroppedImage) return;
-            showStatus('Rotating...');
+        scannerAdjustRotateBtn.addEventListener('click', () => {
+            if (!scannerCapturedImage) return;
+            showStatus('Rotating image...');
             setTimeout(() => {
                 const canvas = document.createElement('canvas');
-                canvas.width = scannerCroppedImage.height;
-                canvas.height = scannerCroppedImage.width;
+                canvas.width = scannerCapturedImage.height;
+                canvas.height = scannerCapturedImage.width;
                 const ctx = canvas.getContext('2d');
                 ctx.translate(canvas.width / 2, canvas.height / 2);
                 ctx.rotate((90 * Math.PI) / 180);
-                ctx.drawImage(scannerCroppedImage, -scannerCroppedImage.width / 2, -scannerCroppedImage.height / 2);
-                scannerCroppedImage = canvas;
+                ctx.drawImage(scannerCapturedImage, -scannerCapturedImage.width / 2, -scannerCapturedImage.height / 2);
+                scannerCapturedImage = canvas;
 
-                applyScannerFilter();
+                const p0 = { x: 1 - currentCropPoints[3].y, y: currentCropPoints[3].x };
+                const p1 = { x: 1 - currentCropPoints[0].y, y: currentCropPoints[0].x };
+                const p2 = { x: 1 - currentCropPoints[1].y, y: currentCropPoints[1].x };
+                const p3 = { x: 1 - currentCropPoints[2].y, y: currentCropPoints[2].x };
+                currentCropPoints = [p0, p1, p2, p3];
+
+                const cropImg = document.getElementById('scanner-crop-img');
+                cropImg.src = scannerCapturedImage.toDataURL('image/png');
                 hideStatus();
             }, 50);
         });
