@@ -4431,10 +4431,12 @@
                                         <label
                                             style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Enhancement
                                             Filters</label>
-                                        <div class="bg-option-tabs" style="margin-bottom: 1.5rem;">
-                                            <button class="bg-option-btn active" id="filter-orig">Original</button>
-                                            <button class="bg-option-btn" id="filter-magic">Magic Color</button>
+                                        <div class="bg-option-tabs" style="margin-bottom: 1.5rem; flex-wrap: wrap;">
+                                            <button class="bg-option-btn active" id="filter-orig">Orig</button>
+                                            <button class="bg-option-btn" id="filter-magic">Magic</button>
                                             <button class="bg-option-btn" id="filter-bw">B&W</button>
+                                            <button class="bg-option-btn" id="filter-gray">Gray</button>
+                                            <button class="bg-option-btn" id="filter-boost">Boost</button>
                                         </div>
                                     </div>
 
@@ -4466,10 +4468,6 @@
                                         <button id="scanner-save-pdf-btn" class="primary-btn btn-pro-ai"
                                             style="width: 100%; justify-content: center;">
                                             <i data-lucide="file-text"></i> Save as PDF
-                                        </button>
-                                        <button id="scanner-send-to-pdf-btn" class="secondary-btn"
-                                            style="width: 100%; justify-content: center;">
-                                            <i data-lucide="plus"></i> Add to Image-to-PDF
                                         </button>
                                     </div>
                                 </div>
@@ -8372,7 +8370,6 @@ Configure your API key to get started.</p>
         const scannerResultImg = document.getElementById('scanner-result-img');
         const scannerSaveJpgBtn = document.getElementById('scanner-save-jpg-btn');
         const scannerSavePdfBtn = document.getElementById('scanner-save-pdf-btn');
-        const scannerSendToPdfBtn = document.getElementById('scanner-send-to-pdf-btn');
         const scannerStatusText = document.getElementById('scanner-status-text');
 
         const scannerAdjustBackBtn = document.getElementById('scanner-adjust-back-btn');
@@ -8384,7 +8381,9 @@ Configure your API key to get started.</p>
         const filterOrig = document.getElementById('filter-orig');
         const filterMagic = document.getElementById('filter-magic');
         const filterBw = document.getElementById('filter-bw');
-        let currentScannerFilter = 'original'; // original, magic, bw
+        const filterGray = document.getElementById('filter-gray');
+        const filterBoost = document.getElementById('filter-boost');
+        let currentScannerFilter = 'original'; // original, magic, bw, gray, boost
 
         // Stop camera on tab switch
         tabs.forEach(tab => {
@@ -9025,6 +9024,27 @@ Configure your API key to get started.</p>
                     data[i + 2] = val;
                 }
                 ctx.putImageData(imgData, 0, 0);
+            } else if (currentScannerFilter === 'gray') {
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                    data[i] = gray;
+                    data[i + 1] = gray;
+                    data[i + 2] = gray;
+                }
+                ctx.putImageData(imgData, 0, 0);
+            } else if (currentScannerFilter === 'boost') {
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i];
+                    let g = data[i + 1];
+                    let b = data[i + 2];
+                    r = (r - 128) * 1.3 + 128 + 20;
+                    g = (g - 128) * 1.3 + 128 + 20;
+                    b = (b - 128) * 1.3 + 128 + 20;
+                    data[i] = Math.min(255, Math.max(0, r));
+                    data[i + 1] = Math.min(255, Math.max(0, g));
+                    data[i + 2] = Math.min(255, Math.max(0, b));
+                }
+                ctx.putImageData(imgData, 0, 0);
             }
 
             const watermarkToggle = document.getElementById('scanner-watermark-toggle');
@@ -9063,13 +9083,15 @@ Configure your API key to get started.</p>
         });
         document.getElementById('scanner-watermark-text').addEventListener('input', applyScannerFilter);
 
-        [filterOrig, filterMagic, filterBw].forEach(btn => {
+        [filterOrig, filterMagic, filterBw, filterGray, filterBoost].forEach(btn => {
             btn.addEventListener('click', () => {
-                [filterOrig, filterMagic, filterBw].forEach(b => b.classList.remove('active'));
+                [filterOrig, filterMagic, filterBw, filterGray, filterBoost].forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 if (btn === filterOrig) currentScannerFilter = 'original';
                 if (btn === filterMagic) currentScannerFilter = 'magic';
                 if (btn === filterBw) currentScannerFilter = 'bw';
+                if (btn === filterGray) currentScannerFilter = 'gray';
+                if (btn === filterBoost) currentScannerFilter = 'boost';
                 applyScannerFilter();
             });
         });
@@ -9108,37 +9130,7 @@ Configure your API key to get started.</p>
             notify('Document saved as PDF.', 'success');
         });
 
-        scannerSendToPdfBtn.addEventListener('click', async () => {
-            const res = await fetch(scannerResultImg.src);
-            const blob = await res.blob();
-            const file = new File([blob], `Scan_${Date.now()}.jpg`, { type: 'image/jpeg' });
 
-            const dt = new DataTransfer();
-            dt.items.add(file);
-
-            const id = Math.random().toString(36).substr(2, 9);
-            const url = URL.createObjectURL(file);
-            imageItems.push({ id, file, url, rotation: 0 });
-
-            const div = createPreviewItem(id, imageItems.length, 'image');
-            imgPreviews.appendChild(div);
-            div.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = url;
-            div.appendChild(img);
-
-            addRemoveBtn(div, id, 'image');
-            addRotateBtn(div, id, 'image');
-            addBadge(div, imageItems.length);
-
-            imgDropZone.classList.add('hidden');
-            imgPreviewContainer.classList.remove('hidden');
-            imgCountText.textContent = `${imageItems.length} images selected`;
-            updatePageNumbers('image');
-
-            notify('Document successfully sent to Image to PDF tool.', 'success');
-            switchTab('img-to-pdf');
-        });
 
         // --- Webpage to PDF Logic ---
         const webpageUrlInput = document.getElementById('webpage-url-input');
