@@ -4440,12 +4440,16 @@
                                         </div>
                                     </div>
 
-                                    <div class="control-group" style="margin-top: 1rem;">
-                                        <button id="scanner-recrop-btn" class="secondary-btn"
-                                            style="width: 100%; justify-content: center;">
-                                            <i data-lucide="crop" style="width:18px;"></i> Adjust Borders (Recrop)
-                                        </button>
-                                    </div>
+                                    <div class="control-group" style="margin-top: 1rem; display: flex; gap: 10px;">
+                                         <button id="scanner-recrop-btn" class="secondary-btn"
+                                             style="flex: 1; justify-content: center; padding: 0.75rem 0.5rem; font-size: 0.85rem;">
+                                             <i data-lucide="crop" style="width:16px;"></i> Recrop
+                                         </button>
+                                         <button id="scanner-rotate-btn" class="secondary-btn"
+                                             style="flex: 1; justify-content: center; padding: 0.75rem 0.5rem; font-size: 0.85rem;">
+                                             <i data-lucide="rotate-cw" style="width:16px;"></i> Rotate
+                                         </button>
+                                     </div>
 
                                     <div class="control-group"
                                         style="margin-top: 1rem; background: var(--input-bg); padding: 1rem; border-radius: 16px; border: 1px solid var(--border-color);">
@@ -8367,6 +8371,7 @@ Configure your API key to get started.</p>
         const scannerCaptureBtn = document.getElementById('scanner-capture-btn');
         const scannerRetakeBtn = document.getElementById('scanner-retake-btn');
         const scannerRecropBtn = document.getElementById('scanner-recrop-btn');
+        const scannerRotateBtn = document.getElementById('scanner-rotate-btn');
         const scannerResultImg = document.getElementById('scanner-result-img');
         const scannerSaveJpgBtn = document.getElementById('scanner-save-jpg-btn');
         const scannerSavePdfBtn = document.getElementById('scanner-save-pdf-btn');
@@ -9099,6 +9104,24 @@ Configure your API key to get started.</p>
         scannerRecropBtn.addEventListener('click', () => {
             if (!scannerCapturedImage) return;
             openScannerAdjustScreen(scannerCapturedImage.toDataURL('image/png'));
+        });
+
+        scannerRotateBtn.addEventListener('click', () => {
+            if (!scannerCroppedImage) return;
+            showStatus('Rotating...');
+            setTimeout(() => {
+                const canvas = document.createElement('canvas');
+                canvas.width = scannerCroppedImage.height;
+                canvas.height = scannerCroppedImage.width;
+                const ctx = canvas.getContext('2d');
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate((90 * Math.PI) / 180);
+                ctx.drawImage(scannerCroppedImage, -scannerCroppedImage.width / 2, -scannerCroppedImage.height / 2);
+                scannerCroppedImage = canvas;
+
+                applyScannerFilter();
+                hideStatus();
+            }, 50);
         });
 
         scannerSaveJpgBtn.addEventListener('click', () => {
