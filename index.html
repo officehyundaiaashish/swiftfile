@@ -4383,6 +4383,16 @@
                                 style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem; margin-top: 1rem;">
                                 <div class="bg-main-preview">
                                     <div class="large-preview-box" style="position: relative; padding: 0; background: #0b1120; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 500px;">
+                                        <!-- Magnifier Circle at the Top Center -->
+                                        <div id="scanner-magnifier" class="hidden" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--accent-color); background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 99; overflow: hidden; pointer-events: none; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s ease;">
+                                            <canvas id="scanner-magnifier-canvas" width="130" height="130" style="display: block; width: 100%; height: 100%;"></canvas>
+                                            <!-- Crosshair (Vertical and Horizontal lines) -->
+                                            <div style="position: absolute; width: 100%; height: 1px; background: rgba(255, 255, 255, 0.45);"></div>
+                                            <div style="position: absolute; height: 100%; width: 1px; background: rgba(255, 255, 255, 0.45);"></div>
+                                            <!-- Center Dot -->
+                                            <div style="position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color); border: 1.5px solid #fff; box-shadow: 0 0 6px rgba(0,0,0,0.6);"></div>
+                                        </div>
+
                                         <!-- Draggable Corner Editor Container -->
                                         <div id="scanner-crop-container" style="position: relative; max-width: 90%; max-height: 550px; display: inline-block; transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: center;">
                                             <img id="scanner-crop-img" style="display: block; max-width: 100%; max-height: 550px; user-select: none; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); border-radius: 4px;">
@@ -8906,6 +8916,38 @@ Configure your API key to get started.</p>
             }
         });
 
+        function updateMagnifier(handleIdx) {
+            const magnifier = document.getElementById('scanner-magnifier');
+            const mCanvas = document.getElementById('scanner-magnifier-canvas');
+            if (!magnifier || !mCanvas || !scannerCapturedImage) return;
+
+            magnifier.classList.remove('hidden');
+
+            const mCtx = mCanvas.getContext('2d');
+            const pt = currentCropPoints[handleIdx];
+            const imgX = pt.x * scannerCapturedImage.width;
+            const imgY = pt.y * scannerCapturedImage.height;
+
+            const zoomSize = 80; 
+
+            mCtx.clearRect(0, 0, 130, 130);
+            
+            // Prevent drawing outside image bounds from crashing/throwing error
+            const srcX = Math.max(0, Math.min(scannerCapturedImage.width - zoomSize, imgX - zoomSize / 2));
+            const srcY = Math.max(0, Math.min(scannerCapturedImage.height - zoomSize, imgY - zoomSize / 2));
+            
+            mCtx.drawImage(
+                scannerCapturedImage,
+                srcX, srcY, zoomSize, zoomSize,
+                0, 0, 130, 130
+            );
+        }
+
+        function hideMagnifier() {
+            const magnifier = document.getElementById('scanner-magnifier');
+            if (magnifier) magnifier.classList.add('hidden');
+        }
+
         // Initialize Pointer Drag Handlers for Crop Handles
         let activeHandleIdx = null;
         for (let i = 0; i < 4; i++) {
@@ -8914,6 +8956,7 @@ Configure your API key to get started.</p>
                 e.preventDefault();
                 activeHandleIdx = i;
                 handle.setPointerCapture(e.pointerId);
+                updateMagnifier(i);
             });
             handle.addEventListener('pointermove', (e) => {
                 if (activeHandleIdx === i) {
@@ -8928,18 +8971,21 @@ Configure your API key to get started.</p>
 
                     currentCropPoints[i] = { x, y };
                     updateCropUI();
+                    updateMagnifier(i);
                 }
             });
             handle.addEventListener('pointerup', (e) => {
                 if (activeHandleIdx === i) {
                     handle.releasePointerCapture(e.pointerId);
                     activeHandleIdx = null;
+                    hideMagnifier();
                 }
             });
             handle.addEventListener('pointercancel', (e) => {
                 if (activeHandleIdx === i) {
                     handle.releasePointerCapture(e.pointerId);
                     activeHandleIdx = null;
+                    hideMagnifier();
                 }
             });
         }
