@@ -3444,11 +3444,264 @@
             if (searchWrap) {
                 const isActive = searchWrap.classList.toggle('active');
                 if (isActive) {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            width: 100%;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 1010;
+            display: none;
+            flex-direction: column;
+            padding: 4px;
+            gap: 2px;
+            animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-select-container.open .custom-select-options {
+            display: flex;
+        }
+
+        .custom-select-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .custom-select-option:hover {
+            background: var(--accent-alpha);
+            color: var(--accent-color);
+        }
+
+        .custom-select-option.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .custom-select-option .option-icon {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .custom-select-option.active .option-icon {
+            color: white;
+        }
+
+        .custom-select-option:not(.active):hover .option-icon {
+            color: var(--accent-color);
+        }
+    </style>
+    <script>
+        let lastActiveTabId = 'swift-assistant';
+        function switchTab(tabId) {
+            // Close mobile menu if open
+            toggleMobileMenu(false);
+            const searchWrap = document.getElementById('mobile-search-wrap');
+            if (searchWrap) searchWrap.classList.remove('active');
+
+            if (tabId !== 'swift-assistant') {
+                lastActiveTabId = tabId;
+            }
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === tabId);
+            });
+
+            // Sync Mobile Dropdown Label if needed
+            const toolLabels = {
+                'img-to-pdf': 'Image to PDF',
+                'pdf-to-img': 'PDF to Image',
+                'merge-pdf': 'Merge PDF',
+                'split-pdf': 'Split PDF',
+                'compress-pdf': 'Compress PDF',
+                'compress-image': 'Compress Image',
+                'unlock-pdf': 'Unlock PDF',
+                'protect-pdf': 'Protect PDF',
+                'bg-remover': 'Remove BG',
+                'collage-maker': 'Collage Maker',
+                'word-to-pdf': 'Word to PDF',
+                'scanner': 'Scanner',
+                'webpage-to-pdf': 'Webpage to PDF',
+                'redact-pdf': 'Redact PDF',
+                'watermark-tool': 'Watermark',
+                'video-compressor': 'Video Compressor',
+                'swift-assistant': 'Swift Assistant'
+            };
+            const toolIcons = {
+                'img-to-pdf': 'image',
+                'pdf-to-img': 'file-image',
+                'merge-pdf': 'copy',
+                'split-pdf': 'scissors',
+                'compress-pdf': 'shrink',
+                'compress-image': 'image-plus',
+                'unlock-pdf': 'unlock',
+                'protect-pdf': 'lock',
+                'bg-remover': 'eraser',
+                'collage-maker': 'layout',
+                'word-to-pdf': 'file-up',
+                'scanner': 'scan',
+                'webpage-to-pdf': 'globe',
+                'redact-pdf': 'eye-off',
+                'watermark-tool': 'stamp',
+                'video-compressor': 'video',
+                'swift-assistant': 'message-square'
+            };
+
+            const label = document.getElementById('current-tool-label');
+            const icon = document.getElementById('current-tool-icon');
+            if (label && toolLabels[tabId]) {
+                label.textContent = toolLabels[tabId];
+                if (icon) {
+                    icon.setAttribute('data-lucide', toolIcons[tabId]);
+                }
+            }
+
+            if (tabId === 'swift-assistant') {
+                if (window.innerWidth <= 1024) {
+                    document.getElementById('swift-assistant').classList.add('mobile-fullscreen');
+                    if (window.history.state?.panel !== 'assistant') {
+                        window.history.pushState({ panel: 'assistant' }, '');
+                    }
+                }
+                setTimeout(() => {
+                    const inputField = document.getElementById('assistant-input');
+                    if (inputField) {
+                        if (window.innerWidth <= 1024) {
+                            inputField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                        inputField.focus();
+                    }
+                }, 100);
+            } else {
+                if (window.innerWidth <= 1024) {
+                    document.getElementById('swift-assistant').classList.remove('mobile-fullscreen');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+
+            // Sync bottom navigation active class
+            document.querySelectorAll('#mobile-bottom-nav .nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+            });
+        }
+
+        // Mobile Tool Dropdown Logic removed as requested
+
+        function handleMobileToolSelect(tabId, labelText, iconName) {
+            switchTab(tabId);
+        }
+
+        function toggleMobileMenu(open) {
+            const sidebar = document.getElementById('app-sidebar-panel');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar) {
+                sidebar.classList.toggle('open', open);
+            }
+            if (backdrop) {
+                backdrop.classList.toggle('visible', open);
+            }
+            if (open) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function toggleMobileSearch() {
+            const searchWrap = document.getElementById('mobile-search-wrap');
+            if (searchWrap) {
+                const isActive = searchWrap.classList.toggle('active');
+                if (isActive) {
                     const input = document.getElementById('mobile-search-input');
                     if (input) input.focus();
                 }
             }
         }
+    </script>
+
+    <!-- Inline Lucide Icon Renderer (no CDN needed) -->
+    <script>
+        window.lucide = {
+            createIcons: function(options) {
+                options = options || {};
+                var root = options.root || document;
+                var nameAttr = options.nameAttr || 'data-lucide';
+                var attrs = options.attrs || options.props || {};
+                var selector = '[' + nameAttr + ']';
+                var elements = [];
+                if (root.hasAttribute && root.hasAttribute(nameAttr)) elements.push(root);
+                if (root.querySelectorAll) elements = elements.concat(Array.from(root.querySelectorAll(selector)));
+                elements.forEach(function(el) {
+                    var iconName = el.getAttribute(nameAttr);
+                    if (!iconName) return;
+                    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('width', '24'); svg.setAttribute('height', '24');
+                    svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('fill', 'none');
+                    svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '2');
+                    svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round');
+                    for (var i = 0; i < el.attributes.length; i++) {
+                        var a = el.attributes[i];
+                        if (a.name === 'class') svg.setAttribute('class', a.value + ' lucide lucide-' + iconName);
+                        else svg.setAttribute(a.name, a.value);
+                    }
+                    var cls = svg.getAttribute('class');
+                    if (!cls) svg.setAttribute('class', 'lucide lucide-' + iconName);
+                    else if (cls.indexOf('lucide') === -1) svg.setAttribute('class', cls + ' lucide lucide-' + iconName);
+                    Object.keys(attrs).forEach(function(key) {
+                        if (key === 'class') svg.setAttribute('class', (svg.getAttribute('class') || '') + ' ' + attrs[key]);
+                        else svg.setAttribute(key, attrs[key]);
+                    });
+                    var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+                    use.setAttribute('href', '#icon-' + iconName);
+                    svg.appendChild(use);
+                    if (el.parentNode) el.parentNode.replaceChild(svg, el);
+                });
+            }
+        };
+
+        // Watch for dynamic data-lucide changes (tab switches, toasts, etc.)
+        var _lucideObserver = new MutationObserver(function(mutations) {
+            mutations.forEach(function(m) {
+                if (m.type === 'attributes' && m.attributeName === 'data-lucide' && m.target.hasAttribute('data-lucide')) {
+                    window.lucide.createIcons({ root: m.target });
+                }
+            });
+        });
+
+        // Run on DOMContentLoaded to render all initial icons
+        document.addEventListener('DOMContentLoaded', function() {
+            window.lucide.createIcons();
+            _lucideObserver.observe(document.documentElement, {
+                attributes: true, subtree: true, attributeFilter: ['data-lucide']
+            });
+        });
     </script>
 </head>
 
