@@ -15599,20 +15599,96 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 bCtx.globalAlpha = 1.0;
             }
 
-            // Skin Softening & Relight
+            // Skin Softening — Skin Detection + Selective Softening
             const softeningVal = parseInt(sliderSoftening.value);
             if (softeningVal > 0) {
-                // Blur blending overlay (skin smooth glow)
-                const smoothCanvas = document.createElement('canvas');
-                smoothCanvas.width = width;
-                smoothCanvas.height = height;
-                const sCtx = smoothCanvas.getContext('2d');
-                sCtx.filter = `blur(${softeningVal * 0.15}px)`;
-                sCtx.drawImage(bufferCanvas, 0, 0);
-                
-                bCtx.globalAlpha = softeningVal / 180;
-                bCtx.drawImage(smoothCanvas, 0, 0);
-                bCtx.globalAlpha = 1.0;
+                const blurRadius = Math.max(1, Math.round(softeningVal * 0.18));
+                const softenStrength = softeningVal / 100; // 0..1
+
+                // Step 1: Create blurred version of the buffer canvas
+                const blurredCanvas = document.createElement('canvas');
+                blurredCanvas.width = width;
+                blurredCanvas.height = height;
+                const blCtx = blurredCanvas.getContext('2d');
+                blCtx.filter = `blur(${blurRadius}px)`;
+                blCtx.drawImage(bufferCanvas, 0, 0);
+                blCtx.filter = 'none';
+
+                // Step 2: Get pixel data from both canvases
+                const origData = bCtx.getImageData(0, 0, width, height);
+                const blurData = blCtx.getImageData(0, 0, width, height);
+                const pixels = origData.data;
+                const blurPx  = blurData.data;
+
+                // Step 3: Skin Detection via RGB ranges (covers light, medium, dark skin tones)
+                // Uses heuristic: R > 60, G > 40, B > 20, R > G, R > B, (R-G) > 10, R < 255
+                function isSkinPixel(r, g, b) {
+                    if (r < 60 || g < 40 || b < 20) return false;
+                    if (r < g || r < b) return false;
+                    if ((r - g) < 10) return false;
+                    if (r > 250 && g > 210) return false; // near-white, skip
+                    // Additional hue check: skin hue roughly 5-25 deg
+                    const max = Math.max(r, g, b);
+                    const min = Math.min(r, g, b);
+                    if (max === 0) return false;
+                    const s = (max - min) / max;
+                    if (s < 0.1 || s > 0.8) return false; // too grey or too saturated
+                    let h;
+                    if (max === r) h = ((g - b) / (max - min)) % 6;
+                    else if (max === g) h = (b - r) / (max - min) + 2;
+                    else h = (r - g) / (max - min) + 4;
+                    h = h * 60;
+                    if (h < 0) h += 360;
+                    // Skin hue: 0..35 or 340..360
+                    return (h >= 0 && h <= 38) || (h >= 340 && h <= 360);
+                }
+
+                // Step 4: Build mask and dilate slightly (expand skin region 2px) for smooth edges
+                const maskData = new Uint8ClampedArray(width * height);
+                for (let idx = 0; idx < pixels.length; idx += 4) {
+                    const i = idx / 4;
+                    if (isSkinPixel(pixels[idx], pixels[idx+1], pixels[idx+2])) {
+                        maskData[i] = 255;
+                    }
+                }
+
+                // Simple box-dilation of 3px on the mask for smooth transitions
+                const dilatedMask = new Uint8ClampedArray(width * height);
+                const dR = 3;
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const idx = y * width + x;
+                        let hasSkin = false;
+                        outer: for (let dy = -dR; dy <= dR; dy++) {
+                            for (let dx = -dR; dx <= dR; dx++) {
+                                const ny = y + dy, nx = x + dx;
+                                if (ny >= 0 && ny < height && nx >= 0 && nx < width) {
+                                    if (maskData[ny * width + nx] === 255) { hasSkin = true; break outer; }
+                                }
+                            }
+                        }
+                        dilatedMask[idx] = hasSkin ? 255 : 0;
+                    }
+                }
+
+                // Step 5: Composite — blend blurred pixels over originals only on skin areas
+                const outData = bCtx.getImageData(0, 0, width, height);
+                const outPx = outData.data;
+                for (let idx = 0; idx < pixels.length; idx += 4) {
+                    const pxIdx = idx / 4;
+                    const skinWeight = (dilatedMask[pxIdx] / 255) * softenStrength;
+                    if (skinWeight > 0) {
+                        outPx[idx]   = pixels[idx]   * (1 - skinWeight) + blurPx[idx]   * skinWeight;
+                        outPx[idx+1] = pixels[idx+1] * (1 - skinWeight) + blurPx[idx+1] * skinWeight;
+                        outPx[idx+2] = pixels[idx+2] * (1 - skinWeight) + blurPx[idx+2] * skinWeight;
+                    } else {
+                        outPx[idx]   = pixels[idx];
+                        outPx[idx+1] = pixels[idx+1];
+                        outPx[idx+2] = pixels[idx+2];
+                    }
+                    outPx[idx+3] = pixels[idx+3];
+                }
+                bCtx.putImageData(outData, 0, 0);
             }
 
             // Portrait Light (Relight radial lamp)
