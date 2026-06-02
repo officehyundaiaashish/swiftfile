@@ -4336,7 +4336,7 @@
                                 <div
                                     style="display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 1.5rem auto 0 auto; align-items: center;">
                                     <select id="scanner-camera-select" class="password-input"
-                                        style="margin-bottom: 0; padding: 0.75rem; font-size: 0.9rem; text-align-last: center;"></select>
+                                        style="display: none;"></select>
                                     <button id="scanner-start-btn" class="primary-btn"
                                         style="width: 100%; justify-content: center;">
                                         <i data-lucide="camera"></i> Start Camera
@@ -4354,7 +4354,12 @@
                         <div id="scanner-active-screen" class="hidden">
                             <div class="preview-header">
                                 <span id="scanner-status-text">Align your document and click capture</span>
-                                <button id="scanner-stop-btn" class="text-btn danger">Close Camera</button>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <button id="scanner-switch-camera-btn" class="text-btn hidden" style="color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                                        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i> Switch Camera
+                                    </button>
+                                    <button id="scanner-stop-btn" class="text-btn danger">Close Camera</button>
+                                </div>
                             </div>
                             <div class="large-preview-box" id="scanner-video-container"
                                 style="background: #000; min-height: 450px; position: relative;">
@@ -8370,6 +8375,9 @@ Configure your API key to get started.</p>
             { x: 0.15, y: 0.85 }
         ];
 
+        let scannerDevices = [];
+        let currentDeviceIndex = 0;
+
         const scannerStartScreen = document.getElementById('scanner-start-screen');
         const scannerActiveScreen = document.getElementById('scanner-active-screen');
         const scannerAdjustScreen = document.getElementById('scanner-adjust-screen');
@@ -8378,6 +8386,7 @@ Configure your API key to get started.</p>
         const scannerVideo = document.getElementById('scanner-video');
         const scannerOverlayCanvas = document.getElementById('scanner-overlay-canvas');
         const scannerCameraSelect = document.getElementById('scanner-camera-select');
+        const scannerSwitchCameraBtn = document.getElementById('scanner-switch-camera-btn');
         const scannerStartBtn = document.getElementById('scanner-start-btn');
         const scannerStopBtn = document.getElementById('scanner-stop-btn');
         const scannerCaptureBtn = document.getElementById('scanner-capture-btn');
@@ -8416,19 +8425,27 @@ Configure your API key to get started.</p>
             try {
                 await navigator.mediaDevices.getUserMedia({ video: true }); // Request permission first
                 const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(d => d.kind === 'videoinput');
-                scannerCameraSelect.innerHTML = '';
-                videoDevices.forEach((device, index) => {
-                    const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.text = device.label || `Camera ${index + 1}`;
-                    scannerCameraSelect.appendChild(option);
-                });
+                scannerDevices = devices.filter(d => d.kind === 'videoinput');
+                
+                if (scannerDevices.length > 1) {
+                    scannerSwitchCameraBtn.classList.remove('hidden');
+                    
+                    const backCamIdx = scannerDevices.findIndex(d => 
+                        d.label.toLowerCase().includes('back') || 
+                        d.label.toLowerCase().includes('environment') || 
+                        d.label.toLowerCase().includes('rear')
+                    );
+                    if (backCamIdx !== -1) {
+                        currentDeviceIndex = backCamIdx;
+                    } else {
+                        currentDeviceIndex = 0;
+                    }
+                } else {
+                    scannerSwitchCameraBtn.classList.add('hidden');
+                    currentDeviceIndex = 0;
+                }
             } catch (err) {
                 console.error('Error getting cameras:', err);
-                const option = document.createElement('option');
-                option.text = 'No camera found / Permission denied';
-                scannerCameraSelect.appendChild(option);
             }
         }
 
@@ -8438,6 +8455,13 @@ Configure your API key to get started.</p>
         });
 
         scannerStartBtn.addEventListener('click', startScannerCamera);
+        if (scannerSwitchCameraBtn) {
+            scannerSwitchCameraBtn.addEventListener('click', () => {
+                if (scannerDevices.length <= 1) return;
+                currentDeviceIndex = (currentDeviceIndex + 1) % scannerDevices.length;
+                startScannerCamera();
+            });
+        }
         scannerStopBtn.addEventListener('click', stopScannerCamera);
         scannerCaptureBtn.addEventListener('click', captureDocument);
         scannerRetakeBtn.addEventListener('click', resetScanner);
@@ -8575,7 +8599,8 @@ Configure your API key to get started.</p>
 
         async function startScannerCamera() {
             if (scannerStream) stopScannerCamera();
-            const deviceId = scannerCameraSelect.value;
+            const device = scannerDevices[currentDeviceIndex];
+            const deviceId = device ? device.deviceId : null;
             const constraints = {
                 video: {
                     deviceId: deviceId ? { exact: deviceId } : undefined,
