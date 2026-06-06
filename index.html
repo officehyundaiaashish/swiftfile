@@ -1023,9 +1023,9 @@
         }
 
         .clear-all-btn {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.08);
             color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.15);
             padding: 8px 16px;
             border-radius: 12px;
             font-size: 0.85rem;
@@ -1033,7 +1033,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: var(--transition);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
 
@@ -1043,8 +1043,14 @@
         }
 
         .clear-all-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+        }
+
+        .clear-all-btn:active {
+            transform: translateY(0) scale(0.98);
         }
 
         /* Toast */
@@ -3712,7 +3718,7 @@
                                 <div style="display:flex; gap:12px; align-items:center;">
                                     <button id="add-more-img" class="add-more-btn"><i data-lucide="plus"
                                             style="width:14px;"></i> Add More</button>
-                                    <button id="clear-img" class="text-btn danger">Clear All</button>
+                                    <button id="clear-img" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                                 </div>
                             </div>
                             <div class="preview-grid" id="img-previews"></div>
@@ -3745,7 +3751,7 @@
                                 <div style="display:flex; gap:12px; align-items:center;">
                                     <button id="add-more-pdf" class="add-more-btn"><i data-lucide="plus"
                                             style="width:14px;"></i> Add More</button>
-                                    <button id="clear-pdf" class="text-btn danger">Clear All</button>
+                                    <button id="clear-pdf" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                                 </div>
                             </div>
                             <div class="preview-scroll" id="pdf-previews"></div>
@@ -3778,7 +3784,7 @@
                                 <div style="display:flex; gap:12px; align-items:center;">
                                     <button id="add-more-merge" class="add-more-btn"><i data-lucide="plus"
                                             style="width:14px;"></i> Add More</button>
-                                    <button id="clear-merge" class="text-btn danger">Clear All</button>
+                                    <button id="clear-merge" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                                 </div>
                             </div>
                             <div class="preview-grid" id="merge-previews"></div>
@@ -3811,7 +3817,7 @@
                                 <div style="display:flex; gap:12px; align-items:center;">
                                     <button id="add-more-split" class="add-more-btn"><i data-lucide="plus"
                                             style="width:14px;"></i> Add More</button>
-                                    <button id="clear-split" class="text-btn danger">Clear All</button>
+                                    <button id="clear-split" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                                 </div>
                             </div>
                             <div class="preview-scroll" id="split-previews"></div>
@@ -3844,7 +3850,7 @@
                                 <div style="display:flex; gap:12px; align-items:center;">
                                     <button id="add-more-compress" class="add-more-btn"><i data-lucide="plus"
                                             style="width:14px;"></i> Add More</button>
-                                    <button id="clear-compress" class="text-btn danger">Clear All</button>
+                                    <button id="clear-compress" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                                 </div>
                             </div>
 
@@ -3910,7 +3916,7 @@
                         <div id="bg-preview-container" class="preview-container hidden">
                             <div class="preview-header">
                                 <span id="bg-filename">Image Ready</span>
-                                <button id="clear-bg" class="text-btn danger">Clear All</button>
+                                <button id="clear-bg" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                             </div>
 
                             <div class="bg-tool-layout"
@@ -4057,7 +4063,7 @@
                                 <div style="display:flex; gap:12px; align-items:center;">
                                     <button id="add-more-compress-img" class="add-more-btn"><i data-lucide="plus"
                                             style="width:14px;"></i> Add More</button>
-                                    <button id="clear-compress-img" class="text-btn danger">Clear All</button>
+                                    <button id="clear-compress-img" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                                 </div>
                             </div>
 
@@ -4123,7 +4129,7 @@
                         <div id="unlock-preview-container" class="preview-container hidden">
                             <div class="preview-header">
                                 <span id="unlock-filename">File Ready</span>
-                                <button id="clear-unlock" class="text-btn danger">Clear All</button>
+                                <button id="clear-unlock" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                             </div>
 
                             <div style="display: flex; justify-content: center; margin: 1rem 0;">
@@ -4175,7 +4181,7 @@
                         <div id="protect-preview-container" class="preview-container hidden">
                             <div class="preview-header">
                                 <span id="protect-filename">File Ready</span>
-                                <button id="clear-protect" class="text-btn danger">Clear All</button>
+                                <button id="clear-protect" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                             </div>
 
                             <div style="display: flex; justify-content: center; margin: 1rem 0;">
@@ -4378,7 +4384,7 @@
                         <div id="word-to-pdf-preview-container" class="preview-container hidden">
                             <div class="preview-header">
                                 <span id="word-to-pdf-filename">Document Ready</span>
-                                <button id="clear-word-to-pdf" class="text-btn danger">Clear All</button>
+                                <button id="clear-word-to-pdf" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                             </div>
 
                             <div style="display: flex; justify-content: center; margin: 1rem 0; width: 100%;">
@@ -4674,7 +4680,7 @@
                             <div class="preview-header">
                                 <span id="redact-filename">File Ready</span>
                                 <div style="display:flex; gap:12px; align-items:center;">
-                                    <button id="clear-redact" class="text-btn danger">Clear All</button>
+                                    <button id="clear-redact" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                                 </div>
                             </div>
 
@@ -4754,7 +4760,7 @@
                         <div id="watermark-preview-container" class="preview-container hidden">
                             <div class="preview-header">
                                 <span id="watermark-filename">File Ready</span>
-                                <button id="clear-watermark" class="text-btn danger">Clear All</button>
+                                <button id="clear-watermark" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear All</button>
                             </div>
 
                             <div class="bg-tool-layout"
@@ -4943,7 +4949,7 @@
                         <div id="video-compress-preview-container" class="preview-container hidden" style="height: 100%; display: flex; flex-direction: column; min-height: 0; padding: 0.5rem 0;">
                             <div class="preview-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.75rem; flex-shrink: 0;">
                                 <span id="video-compress-filename" style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary);">video.mp4</span>
-                                <button id="clear-video-compress" class="text-btn danger" style="background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Clear Video</button>
+                                <button id="clear-video-compress" class="clear-all-btn"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Clear Video</button>
                             </div>
 
                             <div class="bg-tool-layout" style="display: grid; grid-template-columns: 1fr 310px; gap: 1.5rem; flex: 1; min-height: 0; height: calc(100% - 40px); align-items: stretch;">
