@@ -7702,10 +7702,39 @@ Configure your API key to get started.</p>
 
                     if (v !== 2 || r !== 3) {
                         try {
-                            const { decryptPDF } = await import('https://cdn.jsdelivr.net/npm/@pdfsmaller/pdf-decrypt/+esm');
-                            return await decryptPDF(new Uint8Array(pdfBytes), password);
+                            const loadScript = url => new Promise((resolve, reject) => {
+                                const s = document.createElement('script');
+                                s.src = url;
+                                s.onload = resolve;
+                                s.onerror = reject;
+                                document.head.appendChild(s);
+                            });
+                            if (!window.Module) {
+                                await loadScript('https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.js');
+                            }
+                            const qpdf = await window.Module({
+                                locateFile: () => 'https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.wasm',
+                                noInitialRun: true
+                            });
+                            const inputPath = '/input.pdf';
+                            const outputPath = '/output.pdf';
+                            qpdf.FS.writeFile(inputPath, new Uint8Array(pdfBytes));
+                            
+                            const args = ['--decrypt'];
+                            if (password) {
+                                args.push('--password=' + password);
+                            }
+                            args.push(inputPath);
+                            args.push(outputPath);
+                            
+                            qpdf.callMain(args);
+                            
+                            const decBytes = qpdf.FS.readFile(outputPath);
+                            try { qpdf.FS.unlink(inputPath); } catch (e) {}
+                            try { qpdf.FS.unlink(outputPath); } catch (e) {}
+                            return decBytes;
                         } catch (err) {
-                            throw new Error('This PDF uses a newer encryption standard (like AES-256). Failed to load decryption module: ' + err.message);
+                            throw new Error('Decryption failed. Please verify the password. (Details: ' + err.message + ')');
                         }
                     }
 
