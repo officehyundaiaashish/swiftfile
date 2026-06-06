@@ -7702,17 +7702,14 @@ Configure your API key to get started.</p>
 
                     if (v !== 2 || r !== 3) {
                         try {
-                            const loadScript = url => new Promise((resolve, reject) => {
+                            if (!window.QPDFModule) {
+                                let scriptText = await fetch('https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.js').then(r => r.text());
+                                scriptText = scriptText.replace('var Module =', 'window.QPDFModule =');
                                 const s = document.createElement('script');
-                                s.src = url;
-                                s.onload = resolve;
-                                s.onerror = reject;
+                                s.text = scriptText;
                                 document.head.appendChild(s);
-                            });
-                            if (!window.Module) {
-                                await loadScript('https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.js');
                             }
-                            const qpdf = await window.Module({
+                            const qpdf = await window.QPDFModule({
                                 locateFile: () => 'https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.wasm',
                                 noInitialRun: true
                             });
