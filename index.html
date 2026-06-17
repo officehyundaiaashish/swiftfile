@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -2535,6 +2536,7 @@
 
         .history-item-actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 8px;
             justify-content: flex-end;
             margin-top: 0.25rem;
@@ -2556,6 +2558,17 @@
             gap: 6px;
             font-size: 0.75rem;
             font-weight: 600;
+            flex: 1 1 auto;
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+        /* On very narrow drawer widths (small phones), force a clean 2x2 grid
+           of action buttons so they never overflow the card. */
+        @media (max-width: 380px) {
+            .history-item-actions .history-action-btn {
+                flex: 1 1 calc(50% - 4px);
+            }
         }
 
         .history-action-btn:hover {
@@ -2651,6 +2664,38 @@
             display: flex;
             gap: 12px;
             justify-content: center;
+        }
+
+        /* Rename input field inside the rename dialog */
+        .history-rename-input {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            outline: none;
+            margin-bottom: 1.25rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .history-rename-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-alpha);
+        }
+
+        .history-rename-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .history-action-btn.success:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
         }
 
         .app-sidebar-footer {
@@ -13699,6 +13744,37 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             });
         }
 
+        async function updateHistoryItem(id, updates) {
+            const db = await initHistoryDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('conversions', 'readwrite');
+                const store = tx.objectStore('conversions');
+                const getReq = store.get(id);
+                getReq.onsuccess = () => {
+                    const record = getReq.result;
+                    if (!record) {
+                        db.close();
+                        reject(new Error('Record not found'));
+                        return;
+                    }
+                    const merged = Object.assign({}, record, updates);
+                    const putReq = store.put(merged);
+                    putReq.onsuccess = () => {
+                        db.close();
+                        resolve(merged);
+                    };
+                    putReq.onerror = () => {
+                        db.close();
+                        reject(putReq.error);
+                    };
+                };
+                getReq.onerror = () => {
+                    db.close();
+                    reject(getReq.error);
+                };
+            });
+        }
+
         async function clearHistory() {
             const db = await initHistoryDB();
             return new Promise((resolve, reject) => {
@@ -13840,6 +13916,39 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
             }
         }
 
+        let itemToRenameId = null;
+
+        function openRenameItemDialog(id, currentName) {
+            itemToRenameId = id;
+            const renameDialog = document.getElementById('history-rename-dialog');
+            const input = document.getElementById('rename-input');
+            if (!renameDialog || !input) return;
+
+            // Strip the extension so the user can edit just the base name.
+            const lastDot = currentName.lastIndexOf('.');
+            const hasExt = lastDot > 0; // ignore dotfiles like ".gitignore"
+            const baseName = hasExt ? currentName.slice(0, lastDot) : currentName;
+            const ext = hasExt ? currentName.slice(lastDot) : '';
+
+            input.value = baseName;
+            input.dataset.extension = ext; // store the original extension to re-append
+            input.placeholder = 'Enter new file name';
+
+            renameDialog.classList.add('open');
+
+            // Focus and select the base name for quick editing.
+            setTimeout(() => {
+                input.focus();
+                input.select();
+            }, 50);
+        }
+
+        function closeRenameItemDialog() {
+            const renameDialog = document.getElementById('history-rename-dialog');
+            if (renameDialog) renameDialog.classList.remove('open');
+            itemToRenameId = null;
+        }
+
         function initHistoryUI() {
             historyBtn = document.getElementById('history-btn');
             const desktopHistoryBtn = document.getElementById('desktop-history-btn');
@@ -13905,6 +14014,67 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                     itemToDeleteId = null;
                 });
             }
+
+            // Rename dialog handlers
+            const confirmRenameBtn = document.getElementById('confirm-rename-btn');
+            const cancelRenameBtn = document.getElementById('cancel-rename-btn');
+            const renameInput = document.getElementById('rename-input');
+
+            async function applyRename() {
+                if (itemToRenameId === null || !renameInput) return;
+                let newName = (renameInput.value || '').trim();
+                if (!newName) {
+                    notify("Please enter a valid file name.", "error");
+                    renameInput.focus();
+                    return;
+                }
+
+                // Sanitize: strip characters that are illegal in file names on
+                // most operating systems (Windows / macOS / Linux).
+                newName = newName.replace(/[\\/:*?"<>|]/g, '').trim();
+                if (!newName) {
+                    notify("File name contains only invalid characters.", "error");
+                    renameInput.focus();
+                    return;
+                }
+
+                // Re-attach the original extension unless the user typed one
+                // themselves. If the user typed something ending with the
+                // original extension, leave it as-is. Otherwise append it.
+                const ext = renameInput.dataset.extension || '';
+                if (ext && !newName.toLowerCase().endsWith(ext.toLowerCase())) {
+                    newName = newName + ext;
+                }
+
+                try {
+                    await updateHistoryItem(itemToRenameId, { name: newName });
+                    closeRenameItemDialog();
+                    renderHistoryList();
+                    notify("File renamed successfully.", "success");
+                } catch (err) {
+                    console.error('Failed to rename file:', err);
+                    notify("Failed to rename file.", "error");
+                }
+            }
+
+            if (confirmRenameBtn) {
+                confirmRenameBtn.addEventListener('click', applyRename);
+            }
+            if (cancelRenameBtn) {
+                cancelRenameBtn.addEventListener('click', closeRenameItemDialog);
+            }
+            if (renameInput) {
+                // Pressing Enter confirms, Escape cancels.
+                renameInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        applyRename();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        closeRenameItemDialog();
+                    }
+                });
+            }
         }
 
         window.addEventListener('DOMContentLoaded', initHistoryUI);
@@ -13929,6 +14099,9 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 if (clearDialog) clearDialog.classList.remove('open');
                 const deleteDialog = document.getElementById('history-delete-dialog');
                 if (deleteDialog) deleteDialog.classList.remove('open');
+                const renameDialog = document.getElementById('history-rename-dialog');
+                if (renameDialog) renameDialog.classList.remove('open');
+                itemToRenameId = null;
                 document.body.style.overflow = ''; // Unlock background scrolling
                 if (window.history.state?.panel === 'history') {
                     window.history.back();
@@ -13945,6 +14118,9 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 if (clearDialog) clearDialog.classList.remove('open');
                 const deleteDialog = document.getElementById('history-delete-dialog');
                 if (deleteDialog) deleteDialog.classList.remove('open');
+                const renameDialog = document.getElementById('history-rename-dialog');
+                if (renameDialog) renameDialog.classList.remove('open');
+                itemToRenameId = null;
                 document.body.style.overflow = ''; // Unlock background scrolling
                 const hOverlay = document.getElementById('history-overlay');
                 if (hOverlay) hOverlay.classList.remove('open');
@@ -14043,6 +14219,9 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                         <button class="history-action-btn share-file-btn" data-id="${item.id}">
                             <i data-lucide="share-2" style="width:12px; height:12px;"></i> Share
                         </button>
+                        <button class="history-action-btn rename-file-btn" data-id="${item.id}">
+                            <i data-lucide="pencil" style="width:12px; height:12px;"></i> Rename
+                        </button>
                         <button class="history-action-btn danger delete-file-btn" data-id="${item.id}">
                             <i data-lucide="trash-2" style="width:12px; height:12px;"></i> Delete
                         </button>
@@ -14100,6 +14279,13 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                 itemDiv.querySelector('.delete-file-btn').addEventListener('click', () => {
                     openDeleteItemDialog(item.id, item.name);
                 });
+
+                const renameBtn = itemDiv.querySelector('.rename-file-btn');
+                if (renameBtn) {
+                    renameBtn.addEventListener('click', () => {
+                        openRenameItemDialog(item.id, item.name);
+                    });
+                }
 
                 historyDrawerContent.appendChild(itemDiv);
             });
@@ -15264,6 +15450,24 @@ Do not include headings, numbering, or explanation. Output only the 4 raw remark
                     <button id="confirm-delete-btn" class="history-action-btn danger"
                         style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Yes, Delete</button>
                     <button id="cancel-delete-btn" class="history-action-btn"
+                        style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Rename Item Dialog inside panel -->
+        <div class="history-clear-dialog" id="history-rename-dialog">
+            <div class="history-clear-dialog-card">
+                <div class="history-clear-dialog-icon" style="background: var(--accent-alpha); color: var(--accent-color);">
+                    <i data-lucide="pencil"></i>
+                </div>
+                <h3>Rename file</h3>
+                <p style="font-size: 0.8rem;">Enter a new name for this file. The original extension will be kept automatically.</p>
+                <input type="text" id="rename-input" class="history-rename-input" autocomplete="off" spellcheck="false" />
+                <div class="history-clear-dialog-actions">
+                    <button id="confirm-rename-btn" class="history-action-btn success"
+                        style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Save</button>
+                    <button id="cancel-rename-btn" class="history-action-btn"
                         style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Cancel</button>
                 </div>
             </div>
