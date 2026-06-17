@@ -2588,7 +2588,33 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
             background: var(--surface-color);
+        }
+
+        /* Keep the footer's Clear All button at its natural width so it
+           never grows into the "N items" count, and make it dark red. */
+        .history-drawer-footer .history-action-btn.danger {
+            flex: 0 0 auto;
+            background: #b91c1c;
+            border-color: #b91c1c;
+            color: #ffffff;
+        }
+
+        .history-drawer-footer .history-action-btn.danger:hover {
+            background: #991b1b;
+            border-color: #991b1b;
+            color: #ffffff;
+        }
+
+        /* Make sure the item count can shrink/truncate instead of being
+           pushed under the button. */
+        .history-drawer-footer #history-count {
+            min-width: 0;
+            flex: 0 1 auto;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Custom Clear Warning Dialog inside Panel */
