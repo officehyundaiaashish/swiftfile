@@ -2563,9 +2563,11 @@
             white-space: nowrap;
         }
 
-        /* On very narrow drawer widths (small phones), force a clean 2x2 grid
-           of action buttons so they never overflow the card. */
-        @media (max-width: 380px) {
+        /* On narrow drawer widths (phones and small tablets), force a clean
+           2x2 grid of action buttons so they never overflow the card.
+           480px covers all common phone widths (360-414px) and gives a
+           comfortable margin for the 4-button row (Open/Share/Rename/Delete). */
+        @media (max-width: 480px) {
             .history-item-actions .history-action-btn {
                 flex: 1 1 calc(50% - 4px);
             }
@@ -2584,12 +2586,42 @@
 
         .history-drawer-footer {
             padding: 1rem;
+            /* Add safe-area padding so the footer's bottom edge isn't
+               clipped by iPhone notches / home indicators or Android
+               gesture bars on mobile. */
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0));
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 12px;
             background: var(--surface-color);
+        }
+
+        /* Mobile-only footer tweaks: allow wrapping and compact the
+           Clear All button so the count + button always fit inside
+           the drawer on small screens. */
+        @media (max-width: 480px) {
+            .history-drawer-footer {
+                flex-wrap: wrap;
+                padding: 0.75rem 0.85rem;
+                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0));
+                gap: 8px;
+            }
+
+            .history-drawer-footer #history-count {
+                font-size: 0.75rem;
+                flex: 1 1 100%;
+                order: 1;
+            }
+
+            .history-drawer-footer .history-action-btn.danger {
+                flex: 1 1 100%;
+                order: 2;
+                justify-content: center;
+                padding: 0.5rem 0.75rem;
+                font-size: 0.78rem;
+            }
         }
 
         /* Keep the footer's Clear All button at its natural width so it
