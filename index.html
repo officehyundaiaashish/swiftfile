@@ -1801,22 +1801,53 @@
             }
         }
 
-        /* Slider Customization */
-        #compression-slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            transition: var(--transition);
+        /* Compression Profile Selector */
+        .compression-profile-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
         }
 
-        #compression-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            background: var(--accent-hover);
+        .compression-profile-btn {
+            border: 1px solid var(--border-color);
+            background: var(--surface-color);
+            color: var(--text-primary);
+            border-radius: 14px;
+            padding: 0.9rem 0.75rem;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .compression-profile-btn strong {
+            display: block;
+            font-size: 0.88rem;
+            margin-bottom: 4px;
+        }
+
+        .compression-profile-btn span {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            line-height: 1.35;
+        }
+
+        .compression-profile-btn:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        .compression-profile-btn.active {
+            background: var(--accent-alpha);
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 14px var(--accent-shadow);
+        }
+
+        @media (max-width: 600px) {
+            .compression-profile-group {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Word Document Preview Styles */
@@ -4027,14 +4058,27 @@
 
                             <div class="compression-settings"
                                 style="margin: 2rem 0; background: var(--input-bg); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border-color);">
-                                <div
-                                    style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center;">
-                                    <span style="font-weight: 600;">Compression Strength</span>
-                                    <span id="compression-value"
-                                        style="background: var(--accent-color); color:white; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">50%</span>
+                                <div style="margin-bottom: 1rem;">
+                                    <span style="font-weight: 600;">Compression Level</span>
+                                    <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px;">
+                                        Recommended keeps pages sharp while reducing file size aggressively.
+                                    </div>
                                 </div>
-                                <input type="range" id="compression-slider" min="10" max="90" value="50"
-                                    style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+
+                                <div class="compression-profile-group" id="pdf-compression-profiles">
+                                    <button type="button" class="compression-profile-btn" data-profile="low">
+                                        <strong>Low Compression</strong>
+                                        <span>Best quality · Larger file</span>
+                                    </button>
+                                    <button type="button" class="compression-profile-btn active" data-profile="recommended">
+                                        <strong>Recommended</strong>
+                                        <span>Very high quality · Best balance</span>
+                                    </button>
+                                    <button type="button" class="compression-profile-btn" data-profile="high">
+                                        <strong>High Compression</strong>
+                                        <span>Smallest file · Some quality loss</span>
+                                    </button>
+                                </div>
 
                                 <div
                                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
@@ -4242,14 +4286,27 @@
 
                             <div class="compression-settings"
                                 style="margin: 2rem 0; background: var(--input-bg); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border-color);">
-                                <div
-                                    style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center;">
-                                    <span style="font-weight: 600;">Image Quality</span>
-                                    <span id="compress-img-quality-value"
-                                        style="background: var(--accent-color); color:white; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">80%</span>
+                                <div style="margin-bottom: 1rem;">
+                                    <span style="font-weight: 600;">Compression Level</span>
+                                    <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px;">
+                                        Recommended preserves original dimensions and keeps quality visually lossless.
+                                    </div>
                                 </div>
-                                <input type="range" id="compress-img-slider" min="10" max="100" value="80"
-                                    style="width: 100%; height: 6px; background: var(--border-color); border-radius: 5px; appearance: none; cursor: pointer; outline: none;">
+
+                                <div class="compression-profile-group" id="image-compression-profiles">
+                                    <button type="button" class="compression-profile-btn" data-profile="low">
+                                        <strong>Low Compression</strong>
+                                        <span>Best quality · Larger file</span>
+                                    </button>
+                                    <button type="button" class="compression-profile-btn active" data-profile="recommended">
+                                        <strong>Recommended</strong>
+                                        <span>Visually lossless · Best balance</span>
+                                    </button>
+                                    <button type="button" class="compression-profile-btn" data-profile="high">
+                                        <strong>High Compression</strong>
+                                        <span>Smallest file · Some quality loss</span>
+                                    </button>
+                                </div>
 
                                 <div
                                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
@@ -6667,10 +6724,32 @@
         const clearCompressBtn = document.getElementById('clear-compress');
         const addMoreCompressBtn = document.getElementById('add-more-compress');
         const convertCompressBtn = document.getElementById('convert-compress-btn');
-        const compressionSlider = document.getElementById('compression-slider');
-        const compressionValueText = document.getElementById('compression-value');
+        const pdfCompressionProfiles = document.getElementById('pdf-compression-profiles');
         const originalSizeText = document.getElementById('original-size-text');
         const estimatedSizeText = document.getElementById('estimated-size-text');
+
+        let pdfCompressionProfile = 'recommended';
+
+        const PDF_COMPRESSION_PROFILES = {
+            low: { quality: 0.99, scale: 2.0, label: 'Low Compression' },
+            recommended: { quality: 0.96, scale: 1.5, label: 'Recommended' },
+            high: { quality: 0.82, scale: 1.0, label: 'High Compression' }
+        };
+
+        function getPdfCompressionSettings() {
+            return PDF_COMPRESSION_PROFILES[pdfCompressionProfile];
+        }
+
+        pdfCompressionProfiles.addEventListener('click', (event) => {
+            const button = event.target.closest('.compression-profile-btn');
+            if (!button) return;
+
+            pdfCompressionProfile = button.dataset.profile;
+            pdfCompressionProfiles.querySelectorAll('.compression-profile-btn').forEach(btn => {
+                btn.classList.toggle('active', btn === button);
+            });
+            updateEstimatedSize();
+        });
 
         compressDropZone.addEventListener('click', () => compressInput.click());
         addMoreCompressBtn.addEventListener('click', () => compressInput.click());
@@ -6741,18 +6820,6 @@
             }
         }
 
-        function getCompressScale(sliderValue) {
-            if (sliderValue < 30) return 2.0;
-            if (sliderValue <= 60) return 1.5;
-            if (sliderValue <= 80) return 1.0;
-            return 0.75;
-        }
-
-        compressionSlider.addEventListener('input', () => {
-            compressionValueText.textContent = compressionSlider.value + '%';
-            updateEstimatedSize();
-        });
-
         function updateEstimatedSize() {
             if (compressFiles.length === 0) {
                 originalSizeText.textContent = '0 KB';
@@ -6769,8 +6836,7 @@
                 isEstimatingPdf = true;
 
                 try {
-                    const quality = (100 - compressionSlider.value) / 100;
-                    const scale = getCompressScale(compressionSlider.value);
+                    const { quality, scale } = getPdfCompressionSettings();
                     let totalEstSize = 0;
 
                     for (let f = 0; f < compressFiles.length; f++) {
@@ -6803,7 +6869,8 @@
                     estimatedSizeText.textContent = formatBytes(totalEstSize);
                 } catch (err) {
                     console.error("PDF estimation failed", err);
-                    const factor = 1 - (compressionSlider.value / 100) * 0.8;
+                    const { quality } = getPdfCompressionSettings();
+                    const factor = Math.max(0.18, quality * 0.72);
                     estimatedSizeText.textContent = formatBytes(totalSize * factor);
                 } finally {
                     isEstimatingPdf = false;
@@ -6823,8 +6890,7 @@
             showStatus(`Compressing ${compressFiles.length} PDF(s)...`);
             try {
                 const { jsPDF } = window.jspdf;
-                const quality = (100 - compressionSlider.value) / 100;
-                const scale = getCompressScale(compressionSlider.value);
+                const { quality, scale } = getPdfCompressionSettings();
 
                 for (let f = 0; f < compressFiles.length; f++) {
                     const file = compressFiles[f];
@@ -7631,9 +7697,31 @@
         const compressImgPreviewContainer = document.getElementById('compress-img-preview-container');
         const compressImgPreviews = document.getElementById('compress-img-previews');
         const compressImgCount = document.getElementById('compress-img-count');
-        const compressImgSlider = document.getElementById('compress-img-slider');
-        const compressImgQualityValue = document.getElementById('compress-img-quality-value');
+        const imageCompressionProfiles = document.getElementById('image-compression-profiles');
         const compressImgOriginalSizeText = document.getElementById('compress-img-original-size');
+
+        let imageCompressionProfile = 'recommended';
+
+        const IMAGE_COMPRESSION_PROFILES = {
+            low: { quality: 0.99, label: 'Low Compression' },
+            recommended: { quality: 0.97, label: 'Recommended' },
+            high: { quality: 0.82, label: 'High Compression' }
+        };
+
+        function getImageCompressionSettings() {
+            return IMAGE_COMPRESSION_PROFILES[imageCompressionProfile];
+        }
+
+        imageCompressionProfiles.addEventListener('click', (event) => {
+            const button = event.target.closest('.compression-profile-btn');
+            if (!button) return;
+
+            imageCompressionProfile = button.dataset.profile;
+            imageCompressionProfiles.querySelectorAll('.compression-profile-btn').forEach(btn => {
+                btn.classList.toggle('active', btn === button);
+            });
+            updateCompressImgStats();
+        });
         const compressImgEstimatedSizeText = document.getElementById('compress-img-estimated-size');
         const compressImgBtn = document.getElementById('compress-img-btn');
         const addMoreCompressImgBtn = document.getElementById('add-more-compress-img');
@@ -7660,13 +7748,85 @@
             }
         });
 
-        compressImgSlider.addEventListener('input', (e) => {
-            compressImgQualityValue.textContent = e.target.value + '%';
-            updateCompressImgStats();
-        });
-
         let isEstimatingImages = false;
         let estimateImgTimeout = null;
+
+        async function loadImageElement(file) {
+            const img = new Image();
+            const dataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+
+            await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = dataUrl;
+            });
+            return img;
+        }
+
+        function imageHasTransparency(canvas) {
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            const sampleWidth = Math.min(canvas.width, 1600);
+            const sampleHeight = Math.min(canvas.height, 1600);
+
+            if (sampleWidth === 0 || sampleHeight === 0) return false;
+
+            const scaleX = canvas.width / sampleWidth;
+            const scaleY = canvas.height / sampleHeight;
+            const sampleCanvas = document.createElement('canvas');
+            sampleCanvas.width = sampleWidth;
+            sampleCanvas.height = sampleHeight;
+
+            const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+            sampleCtx.drawImage(canvas, 0, 0, sampleWidth, sampleHeight);
+
+            const data = sampleCtx.getImageData(0, 0, sampleWidth, sampleHeight).data;
+            for (let i = 3; i < data.length; i += 4) {
+                if (data[i] < 255) return true;
+            }
+            return false;
+        }
+
+        async function encodeCompressedImage(item, img, quality) {
+            const rotation = item.rotation || 0;
+            const rotationNormalized = ((rotation % 360) + 360) % 360;
+            const quarterTurn = rotationNormalized === 90 || rotationNormalized === 270;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = quarterTurn ? img.height : img.width;
+            canvas.height = quarterTurn ? img.width : img.height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate((rotationNormalized * Math.PI) / 180);
+            ctx.drawImage(img, -img.width / 2, -img.height / 2);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            const originalType = (item.file.type || '').toLowerCase();
+            const preserveTransparency = originalType === 'image/png' && imageHasTransparency(canvas);
+
+            if (preserveTransparency) {
+                const blob = await new Promise((resolve, reject) => {
+                    canvas.toBlob(result => result ? resolve(result) : reject(new Error('PNG encoding failed')), 'image/png');
+                });
+                return { blob, extension: 'png' };
+            }
+
+            const outputType = originalType === 'image/webp' ? 'image/webp' : 'image/jpeg';
+            const blob = await new Promise((resolve, reject) => {
+                canvas.toBlob(result => result ? resolve(result) : reject(new Error('Image encoding failed')), outputType, quality);
+            });
+
+            return {
+                blob,
+                extension: outputType === 'image/webp' ? 'webp' : 'jpg'
+            };
+        }
 
         function updateCompressImgStats() {
             if (compressImgFiles.length === 0) {
@@ -7674,66 +7834,32 @@
                 compressImgEstimatedSizeText.textContent = '0 KB';
                 return;
             }
+
             let totalSize = 0;
             compressImgFiles.forEach(item => {
                 totalSize += item.file.size;
             });
             compressImgOriginalSizeText.textContent = formatBytes(totalSize);
 
-            // Debounce actual estimation to prevent lag on slider drag
             clearTimeout(estimateImgTimeout);
             estimateImgTimeout = setTimeout(async () => {
                 if (isEstimatingImages) return;
                 isEstimatingImages = true;
 
                 try {
-                    const quality = parseInt(compressImgSlider.value) / 100;
-                    let totalEstSize = 0;
+                    const { quality } = getImageCompressionSettings();
 
-                    const promises = compressImgFiles.map(async (item) => {
-                        if (!item.imgElement) {
-                            const img = new Image();
-                            const dataUrl = await new Promise((resolve) => {
-                                const reader = new FileReader();
-                                reader.onload = (e) => resolve(e.target.result);
-                                reader.readAsDataURL(item.file);
-                            });
-                            await new Promise((resolve) => {
-                                img.onload = resolve;
-                                img.src = dataUrl;
-                            });
-                            item.imgElement = img;
-                        }
+                    const sizes = await Promise.all(compressImgFiles.map(async (item) => {
+                        if (!item.imgElement) item.imgElement = await loadImageElement(item.file);
+                        const encoded = await encodeCompressedImage(item, item.imgElement, quality);
+                        return encoded.blob.size;
+                    }));
 
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const rotation = item.rotation || 0;
-                        const isPortrait = rotation % 180 === 0;
-                        canvas.width = isPortrait ? item.imgElement.width : item.imgElement.height;
-                        canvas.height = isPortrait ? item.imgElement.height : item.imgElement.width;
-
-                        ctx.fillStyle = '#FFFFFF';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                        ctx.translate(canvas.width / 2, canvas.height / 2);
-                        ctx.rotate((rotation * Math.PI) / 180);
-                        ctx.drawImage(item.imgElement, -item.imgElement.width / 2, -item.imgElement.height / 2);
-                        ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-                        return new Promise((resolve) => {
-                            canvas.toBlob((blob) => {
-                                resolve(blob ? blob.size : 0);
-                            }, 'image/jpeg', quality);
-                        });
-                    });
-
-                    const sizes = await Promise.all(promises);
-                    totalEstSize = sizes.reduce((a, b) => a + b, 0);
+                    const totalEstSize = sizes.reduce((a, b) => a + b, 0);
                     compressImgEstimatedSizeText.textContent = formatBytes(totalEstSize);
                 } catch (err) {
                     console.error("Image estimation failed", err);
-                    const quality = parseInt(compressImgSlider.value) / 100;
-                    compressImgEstimatedSizeText.textContent = formatBytes(totalSize * (quality * 0.9));
+                    compressImgEstimatedSizeText.textContent = 'Calculating...';
                 } finally {
                     isEstimatingImages = false;
                 }
@@ -7790,53 +7916,31 @@
             if (compressImgFiles.length === 0) return;
 
             showStatus('Compressing Images...');
-            const quality = parseInt(compressImgSlider.value) / 100;
+            const { quality, label } = getImageCompressionSettings();
 
             try {
                 for (let i = 0; i < compressImgFiles.length; i++) {
                     const item = compressImgFiles[i];
-                    const img = new Image();
-                    const dataUrl = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => resolve(e.target.result);
-                        reader.readAsDataURL(item.file);
-                    });
+                    if (!item.imgElement) item.imgElement = await loadImageElement(item.file);
 
-                    await new Promise((resolve) => {
-                        img.onload = resolve;
-                        img.src = dataUrl;
-                    });
-
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-
-                    const rotation = item.rotation || 0;
-                    const isPortrait = rotation % 180 === 0;
-                    canvas.width = isPortrait ? img.width : img.height;
-                    canvas.height = isPortrait ? img.height : img.width;
-
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
-                    ctx.rotate((rotation * Math.PI) / 180);
-                    ctx.drawImage(img, -img.width / 2, -img.height / 2);
-                    ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-                    // Use JPEG or WebP for best compression.
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    const encoded = await encodeCompressedImage(item, item.imgElement, quality);
+                    const url = URL.createObjectURL(encoded.blob);
 
                     const link = document.createElement('a');
-                    link.download = item.file.name.replace(/\.[^/.]+$/, "") + '_Compressed.jpg';
-                    link.href = compressedDataUrl;
+                    link.download = item.file.name.replace(/\.[^/.]+$/, "") + `_Compressed.${encoded.extension}`;
+                    link.href = url;
+                    document.body.appendChild(link);
                     link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
 
                     if (i < compressImgFiles.length - 1) {
-                        await new Promise(r => setTimeout(r, 300)); // Gap between downloads
+                        await new Promise(r => setTimeout(r, 300));
                     }
                 }
+
                 showStatus('Success!', 2000);
-                notify('Images compressed successfully.', 'success');
+                notify(`Images compressed successfully using ${label}.`, 'success');
             } catch (error) {
                 console.error(error);
                 notify('Error compressing images.', 'error');
